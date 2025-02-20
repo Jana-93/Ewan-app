@@ -98,18 +98,20 @@ class _PsignupState extends State<Psignup> {
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(60),
               topRight: Radius.circular(60),
             ),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
-              colors: [
+              colors: const [
                 Color.fromARGB(255, 219, 101, 37),
                 Color.fromRGBO(239, 108, 0, 1),
                 Color.fromRGBO(255, 167, 38, 1),
               ],
+                                        borderRadius: BorderRadius.circular(20),
+
             ),
           ),
           child: Column(

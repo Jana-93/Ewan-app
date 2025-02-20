@@ -78,10 +78,12 @@ class _LoginScreenState extends State<LoginScreen> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               colors: [
-                const Color.fromARGB(255, 219, 101, 37),
-                const Color.fromRGBO(239, 108, 0, 1),
-                const Color.fromRGBO(255, 167, 38, 1),
+                 Color.fromARGB(255, 219, 101, 37),
+                 Color.fromRGBO(239, 108, 0, 1),
+                 Color.fromRGBO(255, 167, 38, 1),
               ],
+                                        borderRadius: BorderRadius.circular(20),
+
             ),
           ),
           child: Column(

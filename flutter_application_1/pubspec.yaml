@@ -43,6 +43,7 @@ dependencies:
   flutter_native_splash: ^2.4.5
   
   flutter_svg: ^2.0.17
+  firebase_storage: ^12.4.3
 
 dev_dependencies:
   flutter_test:
