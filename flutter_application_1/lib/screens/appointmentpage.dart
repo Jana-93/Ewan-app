@@ -91,6 +91,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               colors: [
@@ -98,8 +99,6 @@ class _AppointmentpageState extends State<Appointmentpage> {
                 const Color.fromRGBO(239, 108, 0, 1),
                 const Color.fromRGBO(255, 167, 38, 1),
               ],
-                                        borderRadius: BorderRadius.circular(20),
-
             ),
           ),
           child: Column(

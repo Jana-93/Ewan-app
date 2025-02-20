@@ -77,6 +77,7 @@ class _AddChildState extends State<AddChild> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   colors: const [
@@ -84,8 +85,6 @@ class _AddChildState extends State<AddChild> {
                     Color.fromRGBO(239, 108, 0, 1),
                     Color.fromRGBO(255, 167, 38, 1),
                   ],
-                                            borderRadius: BorderRadius.circular(20),
-
                 ),
               ),
               child: Column(

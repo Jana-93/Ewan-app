@@ -75,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               colors: [
@@ -82,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                  Color.fromRGBO(239, 108, 0, 1),
                  Color.fromRGBO(255, 167, 38, 1),
               ],
-                                        borderRadius: BorderRadius.circular(20),
+                                        
 
             ),
           ),
