@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
+import 'package:flutter_application_1/screens/T_signup.dart';
 import 'package:flutter_application_1/screens/TherapistHomePage.dart';
 import 'package:flutter_application_1/screens/psignup.dart';
 
@@ -304,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => TherapistHomePage(),
+                                    builder: (context) => TherapistSignUpPage(),
                                   ),
                                 );
                               },
