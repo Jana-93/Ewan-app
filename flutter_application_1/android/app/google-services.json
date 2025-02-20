@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "95676398553",
+    "project_id": "ewan-app",
+    "storage_bucket": "ewan-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95676398553:android:83051e2e425b1457df77c8",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95676398553-kt8pt1ae7mv7j99pe1pc16fv6e58o1sj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_application_1",
+            "certificate_hash": "854e9ed83a8bfce266cefa9d08c509c2ff51cb3e"
+          }
+        },
+        {
+          "client_id": "95676398553-24kurp28o9b1fspbnt639pfn7vsuo1bb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALCXF7F3VQEHBDgMue8Da67QXCJAy2P2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95676398553-24kurp28o9b1fspbnt639pfn7vsuo1bb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "95676398553-reum3fsquvst4vl3e5borijge2olabgu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterApplication1"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
