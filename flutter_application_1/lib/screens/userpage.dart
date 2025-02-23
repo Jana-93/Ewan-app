@@ -7,6 +7,7 @@ import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/appointmentpage.dart';
 import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
+import 'package:flutter_application_1/screens/EditChild.dart'; // تأكد من استيراد صفحة التعديل
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -77,135 +78,148 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: FutureBuilder<List<Map<String, dynamic>>>(
-          future: _getChildrenData(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: FutureBuilder<List<Map<String, dynamic>>>(
+            future: _getChildrenData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            if (snapshot.hasError) {
-              return const Center(child: Text('حدث خطأ.'));
-            }
+              if (snapshot.hasError) {
+                return const Center(child: Text('حدث خطأ.'));
+              }
 
-            return FutureBuilder<DocumentSnapshot>(
-              future: _getUserData(),
-              builder: (context, userSnapshot) {
-                if (userSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+              return FutureBuilder<DocumentSnapshot>(
+                future: _getUserData(),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (userSnapshot.hasError) {
-                  return const Center(
-                      child: Text('حدث خطأ في تحميل البيانات.'));
-                }
+                  if (userSnapshot.hasError) {
+                    return const Center(
+                        child: Text('حدث خطأ في تحميل البيانات.'));
+                  }
 
-                if (!userSnapshot.hasData) {
-                  return const Center(child: Text('لا توجد بيانات للمستخدم.'));
-                }
+                  if (!userSnapshot.hasData) {
+                    return const Center(child: Text('لا توجد بيانات للمستخدم.'));
+                  }
 
-                var userData = userSnapshot.data!;
-                String firstName =
-                    userData['firstName'] ?? 'الاسم الأول غير متوفر';
-                String lastName =
-                    userData['lastName'] ?? 'الاسم الأخير غير متوفر';
-                String email = FirebaseAuth.instance.currentUser?.email ??
-                    'البريد الإلكتروني غير متوفر';
+                  var userData = userSnapshot.data!;
+                  String firstName =
+                      userData['firstName'] ?? 'الاسم الأول غير متوفر';
+                  String lastName =
+                      userData['lastName'] ?? 'الاسم الأخير غير متوفر';
+                  String email = FirebaseAuth.instance.currentUser?.email ??
+                      'البريد الإلكتروني غير متوفر';
 
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.only(top: 50),
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color.fromARGB(255, 219, 101, 37),
-                              Color.fromRGBO(239, 108, 0, 1),
-                              Color.fromRGBO(255, 167, 38, 1),
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.only(top: 50),
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color.fromARGB(255, 219, 101, 37),
+                                Color.fromRGBO(239, 108, 0, 1),
+                                Color.fromRGBO(255, 167, 38, 1),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.only(
+                              bottomRight: Radius.circular(15),
+                              bottomLeft: Radius.circular(15),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              const Text(
+                                "الملف الشخصي",
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: Image.asset(
+                                  "assets/images/user-icon.jpg",
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                "$firstName $lastName",
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                email,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
                             ],
                           ),
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(15),
-                            bottomLeft: Radius.circular(15),
-                          ),
                         ),
-                        child: Column(
-                          children: [
-                            const Text(
-                              "الملف الشخصي",
-                              style: TextStyle(
-                                fontSize: 25,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: Image.asset(
-                                "assets/images/user-icon.jpg",
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              "$firstName $lastName",
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              email,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ...snapshot.data!.map((childData) {
-                        return _buildProfileOption(
-                          childData['childIcon'],
-                          childData['childName'],
-                          context,
-                          () {},
-                          onDelete: () {
-                            _showDeleteDialog(context, childData['childId'],
-                                childData['childName']);
-                          },
-                        );
-                      }).toList(),
-                      _buildProfileOption(Icons.add, "إضافة طفل", context, () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => AddChild()),
-                        );
-                      }),
-                      _buildProfileOption(
-                          Icons.logout, "تسجيل الخروج", context, _logout),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ),
-        bottomNavigationBar: FadeInUp(
-          duration: const Duration(milliseconds: 1000),
-          child: navBar(),
+                        const SizedBox(height: 20),
+                        ...snapshot.data!.map((childData) {
+                          return _buildProfileOption(
+                            childData['childIcon'],
+                            childData['childName'],
+                            context,
+                            () {
+                              // يمكنك إضافة أي عمل إضافي هنا عند النقر على العنصر
+                            },
+                            onDelete: () {
+                              _showDeleteDialog(context, childData['childId'],
+                                  childData['childName']);
+                            },
+                            onEdit: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditChild(
+                                      childId: childData['childId']),
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
+                        _buildProfileOption(Icons.add, "إضافة طفل", context, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AddChild()),
+                          );
+                        }),
+                        _buildProfileOption(
+                            Icons.logout, "تسجيل الخروج", context, _logout),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          bottomNavigationBar: FadeInUp(
+            duration: const Duration(milliseconds: 1000),
+            child: navBar(),
+          ),
         ),
       ),
     );
@@ -303,7 +317,7 @@ class _UserPageState extends State<UserPage> {
 
   Widget _buildProfileOption(
       IconData icon, String title, BuildContext context, VoidCallback onTap,
-      {VoidCallback? onDelete}) {
+      {VoidCallback? onDelete, VoidCallback? onEdit}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: Container(
@@ -325,6 +339,11 @@ class _UserPageState extends State<UserPage> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (onEdit != null)
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue),
+                  onPressed: onEdit,
+                ),
               if (onDelete != null)
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
