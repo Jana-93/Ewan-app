@@ -197,14 +197,12 @@ class _PsignupState extends State<Psignup> {
                               height: 50,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromRGBO(
-                                    255,
-                                    167,
-                                    38,
-                                    1,
-                                  ),
+                                  backgroundColor: const Color(0xFFF6872F),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 15,
                                   ),
                                 ),
                                 onPressed: () async {
@@ -293,6 +291,9 @@ class _PsignupState extends State<Psignup> {
             controller: controller,
             obscureText: obscureText,
             textAlign: TextAlign.right,
+            // textDirection: TextDirection.rtl,
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
