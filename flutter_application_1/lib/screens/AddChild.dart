@@ -77,7 +77,7 @@ class _AddChildState extends State<AddChild> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                // borderRadius: BorderRadius.circular(20),
+              
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   colors: const [

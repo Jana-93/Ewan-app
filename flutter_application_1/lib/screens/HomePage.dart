@@ -56,7 +56,6 @@ class _HomepageState extends State<Homepage> {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            // borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               colors: const [
