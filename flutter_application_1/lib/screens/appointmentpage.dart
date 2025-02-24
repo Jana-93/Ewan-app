@@ -92,7 +92,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            // borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               colors: [
