@@ -3,6 +3,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class Appointmentpage extends StatefulWidget {
   const Appointmentpage({super.key});
