@@ -94,163 +94,171 @@ class _PsignupState extends State<Psignup> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(60),
-              topRight: Radius.circular(60),
-            ),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              colors: [
-                Color.fromARGB(255, 219, 101, 37),
-                Color.fromRGBO(239, 108, 0, 1),
-                Color.fromRGBO(255, 167, 38, 1),
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              const SizedBox(height: 80),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    FadeInUp(
-                      duration: const Duration(milliseconds: 1000),
-                      child: const Text(
-                        "حساب جديد",
-                        style: TextStyle(color: Colors.white, fontSize: 40),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                // topLeft: Radius.circular(60),
+                // topRight: Radius.circular(60),
               ),
-              const SizedBox(height: 20),
-              Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60),
-                    topRight: Radius.circular(60),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                colors: [
+                  Color.fromARGB(255, 219, 101, 37),
+                  Color.fromRGBO(239, 108, 0, 1),
+                  Color.fromRGBO(255, 167, 38, 1),
+                ],
+              ),
+            ),
+
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                const SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      FadeInUp(
+                        duration: const Duration(milliseconds: 1000),
+                        child: const Text(
+                          "حساب جديد",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 37,
+                            fontFamily: "NotoKufiArabic",
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(30),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: <Widget>[
-                        const SizedBox(height: 60),
-                        _buildInputField(
-                          "الاسم الأول",
-                          controller: _firstNameController,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildInputField(
-                          "الاسم الأخير",
-                          controller: _lastNameController,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildInputField(
-                          "البريد الإلكتروني",
-                          controller: _emailController,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildInputField(
-                          "كلمة المرور",
-                          controller: _passwordController,
-                          obscureText: true,
-                          validator: _validatePassword,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildInputField(
-                          "إعادة كتابة كلمة المرور",
-                          controller: _confirmPasswordController,
-                          obscureText: true,
-                          validator: _validateConfirmPassword,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildInputField(
-                          "رقم الجوال",
-                          controller: _phoneController,
-                        ),
-                        const SizedBox(height: 40),
-                        FadeInUp(
-                          duration: const Duration(milliseconds: 1600),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromRGBO(
-                                  255,
-                                  167,
-                                  38,
-                                  1,
+                // const SizedBox(height: 20),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(30),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: <Widget>[
+                          // const SizedBox(height: 60),
+                          const SizedBox(height: 10),
+                          _buildInputField(
+                            "الاسم الأول",
+                            controller: _firstNameController,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildInputField(
+                            "الاسم الأخير",
+                            controller: _lastNameController,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildInputField(
+                            "البريد الإلكتروني",
+                            controller: _emailController,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildInputField(
+                            "كلمة المرور",
+                            controller: _passwordController,
+                            obscureText: true,
+                            validator: _validatePassword,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildInputField(
+                            "إعادة كتابة كلمة المرور",
+                            controller: _confirmPasswordController,
+                            obscureText: true,
+                            validator: _validateConfirmPassword,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildInputField(
+                            "رقم الجوال",
+                            controller: _phoneController,
+                          ),
+                          const SizedBox(height: 40),
+                          FadeInUp(
+                            duration: const Duration(milliseconds: 1600),
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color.fromRGBO(
+                                    255,
+                                    167,
+                                    38,
+                                    1,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    await register(); // Call register function
+                                    if (!mounted) return;
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginScreen(),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text(
+                                  "إنشاء حساب",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  await register(); // Call register function
-                                  if (!mounted) return;
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LoginScreen(),
-                                    ),
-                                  );
-                                }
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          FadeInUp(
+                            duration: const Duration(milliseconds: 1800),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginScreen(),
+                                  ),
+                                );
                               },
                               child: const Text(
-                                "إنشاء حساب",
+                                "لديك حساب؟ سجل الآن",
                                 style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
+                                  fontSize: 16,
+                                  color: Color(0xFFFCB47A),
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Color(0xFFFCB47A),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        FadeInUp(
-                          duration: const Duration(milliseconds: 1800),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LoginScreen(),
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              "لديك حساب؟ سجل الآن",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFFFCB47A),
-                                decoration: TextDecoration.underline,
-                                decorationColor: Color(0xFFFCB47A),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_application_1/screens/appointmentpage.dart';
+import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
-
+import 'dart:ui';
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
 
@@ -54,13 +55,16 @@ class _HomepageState extends State<Homepage> {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
-              colors: [
-                const Color.fromARGB(255, 219, 101, 37),
-                const Color.fromRGBO(239, 108, 0, 1),
-                const Color.fromRGBO(255, 167, 38, 1),
+              colors: const [
+                 Color.fromARGB(255, 219, 101, 37),
+                 Color.fromRGBO(239, 108, 0, 1),
+                 Color.fromRGBO(255, 167, 38, 1),
               ],
+                          
+
             ),
           ),
           child: Column(
@@ -286,4 +290,9 @@ class _HomepageState extends State<Homepage> {
       ),
     );
   }
+}
+void main() {
+  runApp(
+    MaterialApp(debugShowCheckedModeBanner: false, home: LoginScreen()),
+  );
 }

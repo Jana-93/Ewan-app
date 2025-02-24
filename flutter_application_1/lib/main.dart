@@ -39,15 +39,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      home: LoginScreen(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light(useMaterial3: true),
       // Move between screens
-      initialRoute: "/",
-      routes: {
-        "/": (context) => const Getstarted(),
-        "/login": (context) => LoginScreen(),
-        "/authin": (context) => Authentication(),
-      },
+      // initialRoute: "/",
+      // routes: {
+      //   "/": (context) => const Getstarted(),
+      //   "/login": (context) => LoginScreen(),
+      //   "/authin": (context) => Authentication(),
+      // },
 
       // StreamBuilder(
       //     stream: FirebaseAuth.instance.authStateChanges(),

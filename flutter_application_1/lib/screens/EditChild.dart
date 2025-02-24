@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
-import 'HomePage.dart'; // Parent Home Screen
-import 'loginScreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore for storing user data
-import 'userpage.dart';
+import 'userpage.dart'; // للعودة إلى صفحة المستخدم بعد التعديل
 
-class AddChild extends StatefulWidget {
-  AddChild({super.key});
+class EditChild extends StatefulWidget {
+  final String childId; // معرّف الطفل الذي سيتم تعديله
+
+  const EditChild({Key? key, required this.childId}) : super(key: key);
 
   @override
-  _AddChildState createState() => _AddChildState();
+  _EditChildState createState() => _EditChildState();
 }
 
-class _AddChildState extends State<AddChild> {
+class _EditChildState extends State<EditChild> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for user input fields
@@ -21,33 +19,35 @@ class _AddChildState extends State<AddChild> {
   final TextEditingController _childAgeController = TextEditingController();
   final TextEditingController _childStatusController = TextEditingController();
 
-  /// Function to Register Child
-  Future<void> registerChild() async {
+  @override
+  void initState() {
+    super.initState();
+    _loadChildData(); // تحميل بيانات الطفل عند بدء الصفحة
+  }
+
+  // تحميل بيانات الطفل من Firestore
+  Future<void> _loadChildData() async {
     try {
-      // Get the current user (parent)
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception("المستخدم غير مسجل دخول");
+      DocumentSnapshot childDoc = await FirebaseFirestore.instance
+          .collection("children")
+          .doc(widget.childId)
+          .get();
+
+      if (childDoc.exists) {
+        setState(() {
+          _childNameController.text = childDoc['childName'];
+          _childAgeController.text = childDoc['childAge'];
+          _childStatusController.text = childDoc['childStatus'];
+        });
+      } else {
+        throw Exception("الطفل غير موجود");
       }
-
-      //  Always store in "children" collection, and add the parentId (user's uid)
-      await FirebaseFirestore.instance.collection("children").add({
-        "childName": _childNameController.text.trim(),
-        "childAge": _childAgeController.text.trim(),
-        "childStatus": _childStatusController.text.trim(),
-        "parentId": user.uid, // Adding parentId to associate with the child
-      });
-
-      // Redirect to HomePage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Homepage()),
-      );
-
+    } catch (e) {
+      print("Error loading child data: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "تمت إضافة الطفل بنجاح ",
+            "حدث خطأ أثناء تحميل بيانات الطفل",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -55,7 +55,7 @@ class _AddChildState extends State<AddChild> {
             ),
             textAlign: TextAlign.center,
           ),
-          backgroundColor: const Color.fromARGB(255, 255, 183, 0),
+          backgroundColor: Colors.red,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -63,8 +63,71 @@ class _AddChildState extends State<AddChild> {
           duration: Duration(seconds: 2),
         ),
       );
+    }
+  }
+
+  // تحديث بيانات الطفل في Firestore
+  Future<void> _updateChildData() async {
+    try {
+      if (_formKey.currentState!.validate()) {
+        await FirebaseFirestore.instance
+            .collection("children")
+            .doc(widget.childId)
+            .update({
+          "childName": _childNameController.text.trim(),
+          "childAge": _childAgeController.text.trim(),
+          "childStatus": _childStatusController.text.trim(),
+        });
+
+        // إظهار رسالة نجاح
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "تم تحديث بيانات الطفل بنجاح",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            backgroundColor: Colors.orange,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // العودة إلى صفحة المستخدم
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => UserPage()),
+        );
+      }
     } catch (e) {
-      print("Error: $e");
+      print("Error updating child data: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "حدث خطأ أثناء تحديث بيانات الطفل",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -77,7 +140,7 @@ class _AddChildState extends State<AddChild> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                // borderRadius: BorderRadius.circular(20),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   colors: const [
@@ -97,13 +160,10 @@ class _AddChildState extends State<AddChild> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         const SizedBox(height: 10),
-                        FadeInUp(
-                          duration: const Duration(milliseconds: 1000),
-                          child: const Text(
-                            "تسجيل بيانات الطفل",
-                            style: TextStyle(color: Colors.white, fontSize: 30),
-                            textAlign: TextAlign.center,
-                          ),
+                        const Text(
+                          "تعديل بيانات الطفل",
+                          style: TextStyle(color: Colors.white, fontSize: 30),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -112,8 +172,8 @@ class _AddChildState extends State<AddChild> {
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
-                        topRight: Radius.circular(60),
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(40),
                       ),
                     ),
                     child: Padding(
@@ -143,42 +203,28 @@ class _AddChildState extends State<AddChild> {
                               controller: _childStatusController,
                             ),
                             const SizedBox(height: 40),
-                            FadeInUp(
-                              duration: const Duration(milliseconds: 1600),
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(
-                                      255,
-                                      255,
-                                      145,
-                                      1,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color.fromARGB(
+                                    255,
+                                    255,
+                                    145,
+                                    1,
                                   ),
-                                  onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      await registerChild(); // Call register function
-                                      if (!mounted) return;
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => UserPage(),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: const Text(
-                                    "إضافة طفل",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: _updateChildData,
+                                child: const Text(
+                                  "حفظ التعديلات",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),

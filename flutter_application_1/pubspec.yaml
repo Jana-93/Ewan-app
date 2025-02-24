@@ -43,6 +43,7 @@ dependencies:
   flutter_native_splash: ^2.4.5
   
   flutter_svg: ^2.0.17
+  firebase_storage: ^12.4.3
 
 dev_dependencies:
   flutter_test:
@@ -78,10 +79,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: NotoKufiArabic
+      fonts:
+        - asset: assets/fonts/NotoKufiArabic-Medium.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
