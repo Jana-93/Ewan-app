@@ -81,20 +81,18 @@ class _LoginScreenState extends State<LoginScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 colors: [
-                   Color.fromARGB(255, 219, 101, 37),
-                   Color.fromRGBO(239, 108, 0, 1),
-                   Color.fromRGBO(255, 167, 38, 1),
+                  Color.fromARGB(255, 219, 101, 37),
+                  Color.fromRGBO(239, 108, 0, 1),
+                  Color.fromRGBO(255, 167, 38, 1),
                 ],
-                                          
-      
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(30),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
@@ -102,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         duration: const Duration(milliseconds: 1000),
                         child: const Text(
                           "تسجيل الدخول",
-                          style: TextStyle(color: Colors.white, fontSize: 37,fontFamily:"NotoKufiArabic"),
+                          style: TextStyle(color: Colors.white, fontSize: 40),
                           textAlign: TextAlign.right,
                         ),
                       ),
@@ -114,8 +112,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      topRight: Radius.circular(40),
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
                     ),
                   ),
                   child: Padding(
@@ -135,14 +133,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   fontSize: 16,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 15),
                               Container(
                                 decoration: BoxDecoration(
-                                  
                                   color: Colors.white,
-                                  
+
                                   borderRadius: BorderRadius.circular(10),
-                                  
+
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Color.fromRGBO(225, 95, 27, .3),
@@ -155,8 +152,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: emailController,
                                   textAlign: TextAlign.right,
                                   decoration: InputDecoration(
-                                    hintText: "أدخل البريد الإلكتروني",
-                                    hintStyle: TextStyle(color: Colors.grey,),
+                                    hintText: "أدخل البريد الإلكتروني ",
+                                    hintStyle: TextStyle(color: Colors.grey),
                                     border: InputBorder.none,
                                     prefixIcon: Icon(
                                       Icons.email,
@@ -176,7 +173,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               const SizedBox(height: 10),
                               Container(
                                 decoration: BoxDecoration(
-                                  
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(10),
                                   boxShadow: const [
@@ -226,7 +222,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                padding: const EdgeInsets.symmetric(vertical: 15),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 15,
+                                ),
                               ),
                               child: const Text(
                                 "تسجيل الدخول",
@@ -284,7 +282,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           255,
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
+                                          borderRadius: BorderRadius.circular(
+                                            50,
+                                          ),
                                           side: BorderSide(
                                             color: const Color(0xFFFCB47A),
                                           ),
@@ -304,13 +304,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 5),
+                              SizedBox(height: 10),
                               GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => TherapistSignUpPage(),
+                                      builder:
+                                          (context) => TherapistSignUpPage(),
                                     ),
                                   );
                                 },

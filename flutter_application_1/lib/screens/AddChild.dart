@@ -80,11 +80,7 @@ class _AddChildState extends State<AddChild> {
                 borderRadius: BorderRadius.circular(20),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
-                  colors: const [
-                    Color.fromARGB(255, 219, 101, 37),
-                    Color.fromRGBO(239, 108, 0, 1),
-                    Color.fromRGBO(255, 167, 38, 1),
-                  ],
+                  colors: const [Color.fromARGB(255, 0, 0, 0)],
                 ),
               ),
               child: Column(

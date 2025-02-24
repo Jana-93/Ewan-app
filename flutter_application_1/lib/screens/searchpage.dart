@@ -3,6 +3,7 @@ import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/appointmentpage.dart';
+import 'package:animate_do/animate_do.dart';
 
 class Searchpage extends StatefulWidget {
   @override
@@ -85,31 +86,32 @@ class _SearchpageState extends State<Searchpage> {
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
-          
             begin: Alignment.topCenter,
             colors: [
               const Color.fromARGB(255, 219, 101, 37),
               const Color.fromRGBO(239, 108, 0, 1),
               const Color.fromRGBO(255, 167, 38, 1),
             ],
-           
-
           ),
         ),
         child: Column(
-          children: [
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
             const SizedBox(height: 60),
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: const [
-                  Text(
-                    "البحث عن طبيب",
-                    style: TextStyle(color: Colors.white, fontSize: 40),
-                    textAlign: TextAlign.right,
+                children: <Widget>[
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 1000),
+                    child: const Text(
+                      "الأطباء",
+                      style: TextStyle(color: Colors.white, fontSize: 40),
+                      textAlign: TextAlign.right,
+                    ),
                   ),
                 ],
               ),
@@ -120,8 +122,8 @@ class _SearchpageState extends State<Searchpage> {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60),
-                    topRight: Radius.circular(60),
+                    topLeft: Radius.circular(50),
+                    topRight: Radius.circular(50),
                   ),
                 ),
                 child: Padding(
