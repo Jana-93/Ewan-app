@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screens/Stripe_payment/payment_manger.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
@@ -14,6 +16,10 @@ class _SearchpageState extends State<Searchpage> {
   int selectedIndex = 1;
   int selectedDoctorIndex = -1;
   String searchQuery = "";
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  bool showPaymentButton = false; // متغير لعرض زر الدفع
 
   List<Map<String, dynamic>> doctors = [
     {
@@ -42,7 +48,7 @@ class _SearchpageState extends State<Searchpage> {
       "specialty": "أخصائي نفسي",
       "deg": "حاصل على درجة ماجستير في علم النفس من جامعة الملك خالد",
       "price": "85 ريال",
-      "image": "assets/images/doc4.jpg",
+      "image": "assets/images/d1.jpg",
     },
   ];
 
@@ -86,7 +92,6 @@ class _SearchpageState extends State<Searchpage> {
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-        
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             colors: [
@@ -149,19 +154,34 @@ class _SearchpageState extends State<Searchpage> {
                         child: ListView.builder(
                           itemCount: doctors.length,
                           itemBuilder: (context, index) {
+                            bool isSelected = selectedDoctorIndex == index;
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8),
+                              color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
                               child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundImage: AssetImage(
                                     doctors[index]["image"],
                                   ),
                                 ),
-                                title: Text(doctors[index]["name"]),
-                                subtitle: Text(doctors[index]["deg"]),
+                                title: Text(
+                                  doctors[index]["name"],
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.orange : Colors.black,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  doctors[index]["deg"],
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.orange : Colors.grey,
+                                  ),
+                                ),
                                 trailing: Text(
                                   doctors[index]["price"],
-                                  style: TextStyle(color: Colors.green),
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.orange : Colors.green,
+                                  ),
                                 ),
                                 onTap: () {
                                   setState(() {
@@ -173,6 +193,109 @@ class _SearchpageState extends State<Searchpage> {
                           },
                         ),
                       ),
+                      if (selectedDoctorIndex != -1) ...[
+                        const SizedBox(height: 20),
+                        TableCalendar(
+                          firstDay: DateTime.utc(2010, 10, 16),
+                          lastDay: DateTime.utc(2030, 3, 14),
+                          focusedDay: _focusedDay,
+                          calendarFormat: _calendarFormat,
+                          selectedDayPredicate: (day) {
+                            return isSameDay(_selectedDay, day);
+                          },
+                          onDaySelected: (selectedDay, focusedDay) {
+                            setState(() {
+                              _selectedDay = selectedDay;
+                              _focusedDay = focusedDay;
+                            });
+                          },
+                          onFormatChanged: (format) {
+                            setState(() {
+                              _calendarFormat = format;
+                            });
+                          },
+                          onPageChanged: (focusedDay) {
+                            _focusedDay = focusedDay;
+                          },
+                          calendarStyle: CalendarStyle(
+                            todayDecoration: BoxDecoration(
+                              color: Colors.orange,
+                              shape: BoxShape.circle,
+                            ),
+                            selectedDecoration: BoxDecoration(
+                              color: Colors.deepOrange,
+                              shape: BoxShape.circle,
+                            ),
+                            weekendTextStyle: TextStyle(
+                              color: Colors.red,
+                            ),
+                            defaultTextStyle: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                          headerStyle: HeaderStyle(
+                            formatButtonVisible: false,
+                            titleTextStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            leftChevronIcon: Icon(
+                              Icons.chevron_left,
+                              color: Colors.deepOrange,
+                            ),
+                            rightChevronIcon: Icon(
+                              Icons.chevron_right,
+                              color: Colors.deepOrange,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  showPaymentButton = true; // عرض زر الدفع
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepOrange,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                "التالي",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                      if (showPaymentButton) ...[
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            // استدعاء وظيفة الدفع
+                            PaymentManager.makePayment(
+                              int.parse(doctors[selectedDoctorIndex]["price"].replaceAll("ريال", "").trim()),
+                              "SAR",
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepOrange,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            "ادفع الآن",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -185,7 +308,6 @@ class _SearchpageState extends State<Searchpage> {
     );
   }
 
-  //nav bar
   Widget navBar() {
     return Container(
       height: 60,

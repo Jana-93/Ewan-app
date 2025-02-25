@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/AddChild.dart';
 import 'package:flutter_application_1/screens/ChatScreen.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
+import 'package:flutter_application_1/screens/Stripe_payment/strip_keys.dart';
 import 'package:flutter_application_1/screens/appointmentpage.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 import 'screens/Authentication.dart';
 import 'package:flutter_application_1/screens/getStarted.dart'; // Import the getStarted screen
@@ -29,7 +31,7 @@ Future<void> main() async {
   } catch (e) {
     print(" Firebase initialization failed: $e");
   }
-
+Stripe.publishableKey=ApiKeys.publishableKey;
   runApp(const MyApp());
 }
 

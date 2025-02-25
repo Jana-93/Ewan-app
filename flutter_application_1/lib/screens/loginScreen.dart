@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('يرجى إدخال البريد الإلكتروني وكلمة المرور')),
+        SnackBar(content: Text('يرجى إدخال البريد الإلكتروني وكلمة المرور')),
       );
       return;
     }
@@ -38,22 +38,22 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('تم تسجيل الدخول بنجاح')));
 
-      if (!mounted) return; // تجنب الأخطاء عند استخدام `context`
+      if (!mounted) return; // تجنب الأخطاء عند استخدام context
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Homepage()),
       );
     } on FirebaseAuthException catch (e) {
-      String errorMessage = "حدث خطأ ";
+      String errorMessage = "حدث خطأ ";
 
       if (e.code == 'user-not-found') {
-        errorMessage = 'البريد الإلكتروني غير مسجل';
+        errorMessage = 'البريد الإلكتروني غير مسجل';
       } else if (e.code == 'wrong-password') {
         errorMessage = 'كلمة المرور غير صحيحة';
       } else if (e.code == 'invalid-email') {
-        errorMessage = 'البريد الإلكتروني غير صحيح';
+        errorMessage = 'البريد الإلكتروني غير صحيح';
       } else if (e.code == 'network-request-failed') {
-        errorMessage = 'تحقق من اتصال الإنترنت';
+        errorMessage = 'تحقق من اتصال الإنترنت';
       }
 
       ScaffoldMessenger.of(
@@ -127,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: <Widget>[
                               const Text(
-                                "البريد الإلكتروني",
+                                "البريد الإلكتروني",
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 16,
@@ -152,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: emailController,
                                   textAlign: TextAlign.right,
                                   decoration: InputDecoration(
-                                    hintText: "أدخل البريد الإلكتروني ",
+                                    hintText: "أدخل البريد الإلكتروني ",
                                     hintStyle: TextStyle(color: Colors.grey),
                                     border: InputBorder.none,
                                     prefixIcon: Icon(
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: passwordController,
                                   textAlign: TextAlign.right,
                                   decoration: InputDecoration(
-                                    hintText: "أدخل كلمة المرور",
+                                    hintText: "أدخل كلمة المرور",
                                     hintStyle: TextStyle(color: Colors.grey),
                                     border: InputBorder.none,
                                     prefixIcon: IconButton(
@@ -266,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     width: double.infinity,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        // تحويل المستخدم إلى صفحة التسجيل
+                                        // تحويل المستخدم إلى صفحة التسجيل
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
