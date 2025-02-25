@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:animate_do/animate_do.dart';
-import 'package:flutter/services.dart'; // لإضافة inputFormatters
 
 class TherapistSignUpPage extends StatefulWidget {
   @override
@@ -19,6 +18,9 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   String? selectedSpecialty;
   String? selectedExperience;
   File? profileImage;
@@ -34,6 +36,34 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     '4 سنوات',
     '5+ سنوات',
   ];
+
+  // دالة التحقق من كلمة المرور
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (value.length < 8) {
+      return "يجب أن تحتوي كلمة المرور على 8 خانات على الأقل";
+    }
+    if (!RegExp(r'[A-Za-z]').hasMatch(value)) {
+      return "يجب أن تحتوي كلمة المرور على حرف واحد على الأقل";
+    }
+    if (!RegExp(r'[0-9]').hasMatch(value)) {
+      return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
+    }
+    return null;
+  }
+
+  // دالة التحقق من تطابق كلمة المرور
+  String? _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (value != passwordController.text) {
+      return "كلمة المرور غير متطابقة";
+    }
+    return null;
+  }
 
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -63,41 +93,11 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
 
   Future<void> signUpTherapist() async {
     if (_formKey.currentState!.validate()) {
-      if (profileImage != null &&
-          qualificationFile != null &&
-          licenseFile != null) {
-        String profileUrl = await uploadFile(
-          profileImage!,
-          'therapists/profile.jpg',
-        );
-        String qualificationUrl = await uploadFile(
-          qualificationFile!,
-          'therapists/qualification.pdf',
-        );
-        String licenseUrl = await uploadFile(
-          licenseFile!,
-          'therapists/license.pdf',
-        );
-
-        String userId = FirebaseAuth.instance.currentUser!.uid;
-
-        await FirebaseFirestore.instance.collection('therapists').add({
-          'uid': userId,
-          'firstName': firstNameController.text,
-          'lastName': lastNameController.text,
-          'email': emailController.text,
-          'phone': phoneController.text,
-          'specialty': selectedSpecialty,
-          'experience': selectedExperience,
-          'profileImage': profileUrl,
-          'qualificationFile': qualificationUrl,
-          'licenseFile': licenseUrl,
-        });
-
+      if (passwordController.text != confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "تم إنشاء الحساب بنجاح",
+              "كلمة المرور غير متطابقة",
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
               ),
               textAlign: TextAlign.center,
             ),
-            backgroundColor: Color(0xFFFCB47A),
+            backgroundColor: Colors.red,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -113,6 +113,101 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
             duration: Duration(seconds: 2),
           ),
         );
+        return;
+      }
+
+      if (profileImage != null &&
+          qualificationFile != null &&
+          licenseFile != null) {
+        try {
+          // إنشاء حساب باستخدام البريد الإلكتروني وكلمة المرور
+          UserCredential userCredential = await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(
+                email: emailController.text.trim(),
+                password: passwordController.text.trim(),
+              );
+
+          String userId = userCredential.user!.uid;
+
+          // رفع الملفات إلى Firebase Storage
+          String profileUrl = await uploadFile(
+            profileImage!,
+            'therapists/profile.jpg',
+          );
+          String qualificationUrl = await uploadFile(
+            qualificationFile!,
+            'therapists/qualification.pdf',
+          );
+          String licenseUrl = await uploadFile(
+            licenseFile!,
+            'therapists/license.pdf',
+          );
+
+          // حفظ بيانات المعالج في Firestore
+          await FirebaseFirestore.instance
+              .collection('therapists')
+              .doc(userId)
+              .set({
+                'uid': userId,
+                'firstName': firstNameController.text,
+                'lastName': lastNameController.text,
+                'email': emailController.text,
+                'phone': phoneController.text,
+                'specialty': selectedSpecialty,
+                'experience': selectedExperience,
+                'profileImage': profileUrl,
+                'qualificationFile': qualificationUrl,
+                'licenseFile': licenseUrl,
+              });
+
+          // إظهار رسالة نجاح
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "تم إنشاء الحساب بنجاح",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              backgroundColor: Color(0xFFFCB47A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 2),
+            ),
+          );
+
+          // الانتقال إلى شاشة تسجيل الدخول
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          );
+        } on FirebaseAuthException catch (e) {
+          // التعامل مع الأخطاء
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                e.message ?? "حدث خطأ ما",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       }
     }
   }
@@ -179,14 +274,12 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                             child: CircleAvatar(
                               radius: 40,
                               backgroundColor: Colors.grey,
-                              backgroundImage:
-                                  profileImage != null
-                                      ? FileImage(profileImage!)
-                                      : null,
-                              child:
-                                  profileImage == null
-                                      ? Icon(Icons.person, size: 40)
-                                      : null,
+                              backgroundImage: profileImage != null
+                                  ? FileImage(profileImage!)
+                                  : null,
+                              child: profileImage == null
+                                  ? Icon(Icons.person, size: 40)
+                                  : null,
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -203,6 +296,18 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                           _buildInputField(
                             "البريد الإلكتروني",
                             controller: emailController,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildPasswordField(
+                            "كلمة المرور",
+                            controller: passwordController,
+                            validator: _validatePassword,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildPasswordField(
+                            "إعادة كتابة كلمة المرور",
+                            controller: confirmPasswordController,
+                            validator: _validateConfirmPassword,
                           ),
                           const SizedBox(height: 20),
                           _buildInputField(
@@ -250,14 +355,20 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFF6872F),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFF6872F),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 15,
+                                  ),
                                 ),
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                              ),
-                                onPressed: signUpTherapist,
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    await signUpTherapist();
+                                  }
+                                },
                                 child: const Text(
                                   "إنشاء حساب",
                                   style: TextStyle(
@@ -274,8 +385,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                             child: Center(
                               child: TextButton(
                                 onPressed: () {
-                                
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => LoginScreen(),
@@ -341,6 +451,46 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
               return null;
             },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordField(
+    String label, {
+    required TextEditingController controller,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16)),
+        const SizedBox(height: 10),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(225, 95, 27, .3),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            obscureText: true,
+            textAlign: TextAlign.right,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
+            ),
+            validator: validator,
           ),
         ),
       ],
@@ -419,22 +569,13 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           children: [
             Icon(icon, color: Color(0xFFF6872F)),
             const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
-            ),
+            Text(label, style: TextStyle(fontSize: 16, color: Colors.black)),
           ],
         ),
       ),
     );
   }
 }
-
-
-
 
 void main() {
   runApp(
