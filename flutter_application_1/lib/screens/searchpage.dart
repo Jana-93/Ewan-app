@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screens/PaymentPage.dart' show PaymentPage;
 import 'package:flutter_application_1/screens/Stripe_payment/payment_manger.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
@@ -19,7 +20,6 @@ class _SearchpageState extends State<Searchpage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  bool showPaymentButton = false; // متغير لعرض زر الدفع
 
   List<Map<String, dynamic>> doctors = [
     {
@@ -88,7 +88,7 @@ class _SearchpageState extends State<Searchpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 242, 117, 117),
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -256,9 +256,15 @@ class _SearchpageState extends State<Searchpage> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                setState(() {
-                                  showPaymentButton = true; // عرض زر الدفع
-                                });
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentPage(
+                                      amount: int.parse(doctors[selectedDoctorIndex]["price"].replaceAll("ريال", "").trim()),
+                                      currency: "SAR",
+                                    ),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.deepOrange,
@@ -272,28 +278,6 @@ class _SearchpageState extends State<Searchpage> {
                               ),
                             ),
                           ],
-                        ),
-                      ],
-                      if (showPaymentButton) ...[
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            // استدعاء وظيفة الدفع
-                            PaymentManager.makePayment(
-                              int.parse(doctors[selectedDoctorIndex]["price"].replaceAll("ريال", "").trim()),
-                              "SAR",
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepOrange,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            "ادفع الآن",
-                            style: TextStyle(color: Colors.white),
-                          ),
                         ),
                       ],
                     ],

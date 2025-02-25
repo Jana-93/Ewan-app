@@ -31,7 +31,8 @@ Future<void> main() async {
   } catch (e) {
     print(" Firebase initialization failed: $e");
   }
-Stripe.publishableKey=ApiKeys.publishableKey;
+  Stripe.publishableKey=ApiKeys.publishableKey;
+
   runApp(const MyApp());
 }
 
