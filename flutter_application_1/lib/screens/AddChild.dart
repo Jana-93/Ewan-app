@@ -18,7 +18,7 @@ class _AddChildState extends State<AddChild> {
 
   // Controllers for user input fields
   final TextEditingController _childNameController = TextEditingController();
-  final TextEditingController _childAgeController = TextEditingController();
+  String? selectedChildAge; // Variable to hold the selected age
   final TextEditingController _childStatusController = TextEditingController();
 
   /// Function to Register Child
@@ -30,10 +30,10 @@ class _AddChildState extends State<AddChild> {
         throw Exception("المستخدم غير مسجل دخول");
       }
 
-      //  Always store in "children" collection, and add the parentId (user's uid)
+      // Always store in "children" collection, and add the parentId (user's uid)
       await FirebaseFirestore.instance.collection("children").add({
         "childName": _childNameController.text.trim(),
-        "childAge": _childAgeController.text.trim(),
+        "childAge": selectedChildAge, // Use selected child age
         "childStatus": _childStatusController.text.trim(),
         "parentId": user.uid, // Adding parentId to associate with the child
       });
@@ -77,7 +77,6 @@ class _AddChildState extends State<AddChild> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-              
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   colors: const [
@@ -133,10 +132,7 @@ class _AddChildState extends State<AddChild> {
                               controller: _childNameController,
                             ),
                             const SizedBox(height: 20),
-                            _buildInputField(
-                              "عمر الطفل",
-                              controller: _childAgeController,
-                            ),
+                            _buildAgeDropdown(), // Use dropdown for age
                             const SizedBox(height: 20),
                             _buildInputField(
                               "حالة الطفل",
@@ -199,6 +195,7 @@ class _AddChildState extends State<AddChild> {
             child: IconButton(
               icon: Icon(
                 Icons.arrow_circle_right_outlined,
+
                 color: Colors.white,
                 size: 30,
               ),
@@ -240,7 +237,7 @@ class _AddChildState extends State<AddChild> {
           ),
           child: TextFormField(
             controller: controller,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.right, // Align text to the right
             decoration: const InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
@@ -249,6 +246,85 @@ class _AddChildState extends State<AddChild> {
               ),
             ),
             validator: validator,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Dropdown for child's age
+  Widget _buildAgeDropdown() {
+    List<String> ages = List.generate(
+      7,
+      (index) => (5 + index).toString(),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const Text(
+          "عمر الطفل",
+          style: TextStyle(color: Colors.black, fontSize: 16),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(225, 95, 27, .3),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: DropdownButtonHideUnderline(
+            
+            child: DropdownButtonFormField<String>(
+              value: selectedChildAge,
+              isExpanded: true,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 15,
+                ),
+              ),
+              hint: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "اختر عمر الطفل",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: Colors.grey,
+              ),
+              iconEnabledColor: Colors.grey,
+              items:
+                  ages.map((age) {
+                    return DropdownMenuItem<String>(
+                      value: age,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(age),
+                      ),
+                    );
+                  }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedChildAge = value;
+                });
+              },
+              validator: (value) {
+                if (value == null) {
+                  return "يرجى اختيار عمر الطفل";
+                }
+                return null;
+              },
+            ),
           ),
         ),
       ],
