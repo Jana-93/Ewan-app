@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore for storing user data
-import 'userpage.dart'; // للعودة إلى صفحة المستخدم بعد التعديل
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'userpage.dart';
 
 class EditChild extends StatefulWidget {
-  final String childId; // معرّف الطفل الذي سيتم تعديله
+  final String childId;
 
   const EditChild({Key? key, required this.childId}) : super(key: key);
 
@@ -14,30 +14,34 @@ class EditChild extends StatefulWidget {
 class _EditChildState extends State<EditChild> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers for user input fields
   final TextEditingController _childNameController = TextEditingController();
-  final TextEditingController _childAgeController = TextEditingController();
   final TextEditingController _childStatusController = TextEditingController();
+
+  String? _selectedAge;
+  final List<String> _ages = List.generate(
+    7,
+    (index) => (index + 5).toString(),
+  );
 
   @override
   void initState() {
     super.initState();
-    _loadChildData(); // تحميل بيانات الطفل عند بدء الصفحة
+    _loadChildData();
   }
 
-  // تحميل بيانات الطفل من Firestore
   Future<void> _loadChildData() async {
     try {
-      DocumentSnapshot childDoc = await FirebaseFirestore.instance
-          .collection("children")
-          .doc(widget.childId)
-          .get();
+      DocumentSnapshot childDoc =
+          await FirebaseFirestore.instance
+              .collection("children")
+              .doc(widget.childId)
+              .get();
 
       if (childDoc.exists) {
         setState(() {
-          _childNameController.text = childDoc['childName'];
-          _childAgeController.text = childDoc['childAge'];
-          _childStatusController.text = childDoc['childStatus'];
+          _childNameController.text = childDoc['childName'] ?? '';
+          _selectedAge = childDoc['childAge'] ?? '';
+          _childStatusController.text = childDoc['childStatus'] ?? '';
         });
       } else {
         throw Exception("الطفل غير موجود");
@@ -48,25 +52,16 @@ class _EditChildState extends State<EditChild> {
         SnackBar(
           content: Text(
             "حدث خطأ أثناء تحميل بيانات الطفل",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: const TextStyle(color: Colors.white),
             textAlign: TextAlign.center,
           ),
           backgroundColor: Colors.red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
   }
 
-  // تحديث بيانات الطفل في Firestore
   Future<void> _updateChildData() async {
     try {
       if (_formKey.currentState!.validate()) {
@@ -74,34 +69,25 @@ class _EditChildState extends State<EditChild> {
             .collection("children")
             .doc(widget.childId)
             .update({
-          "childName": _childNameController.text.trim(),
-          "childAge": _childAgeController.text.trim(),
-          "childStatus": _childStatusController.text.trim(),
-        });
+              "childName": _childNameController.text.trim(),
+              "childAge": _selectedAge,
+              "childStatus": _childStatusController.text.trim(),
+            });
 
-        // إظهار رسالة نجاح
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               "تم تحديث بيانات الطفل بنجاح",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: const TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.orange,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
 
-        // العودة إلى صفحة المستخدم
         if (!mounted) return;
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => UserPage()),
@@ -113,19 +99,11 @@ class _EditChildState extends State<EditChild> {
         SnackBar(
           content: Text(
             "حدث خطأ أثناء تحديث بيانات الطفل",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: const TextStyle(color: Colors.white),
             textAlign: TextAlign.center,
           ),
           backgroundColor: Colors.red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -140,7 +118,6 @@ class _EditChildState extends State<EditChild> {
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                // borderRadius: BorderRadius.circular(20),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   colors: const [
@@ -193,10 +170,7 @@ class _EditChildState extends State<EditChild> {
                               controller: _childNameController,
                             ),
                             const SizedBox(height: 20),
-                            _buildInputField(
-                              "عمر الطفل",
-                              controller: _childAgeController,
-                            ),
+                            _buildAgeDropdown(), // Dropdown for child's age
                             const SizedBox(height: 20),
                             _buildInputField(
                               "حالة الطفل",
@@ -243,7 +217,7 @@ class _EditChildState extends State<EditChild> {
             top: 40,
             right: 20,
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_circle_right_outlined,
                 color: Colors.white,
                 size: 30,
@@ -261,12 +235,7 @@ class _EditChildState extends State<EditChild> {
     );
   }
 
-  /// Reusable Input Field
-  Widget _buildInputField(
-    String label, {
-    TextEditingController? controller,
-    String? Function(String?)? validator,
-  }) {
+  Widget _buildInputField(String label, {TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -294,7 +263,66 @@ class _EditChildState extends State<EditChild> {
                 vertical: 15,
               ),
             ),
-            validator: validator,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'الرجاء إدخال $label';
+              }
+              return null;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAgeDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const Text(
+          "عمر الطفل",
+          style: TextStyle(color: Colors.black, fontSize: 16),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(225, 95, 27, .3),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: DropdownButtonFormField<String>(
+            value: _selectedAge,
+            items:
+                _ages.map((String age) {
+                  return DropdownMenuItem<String>(
+                    value: age,
+                    child: Text(age, textAlign: TextAlign.right),
+                  );
+                }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedAge = newValue; // Update selected age
+              });
+            },
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'الرجاء اختيار عمر الطفل';
+              }
+              return null;
+            },
           ),
         ),
       ],

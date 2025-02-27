@@ -30,6 +30,19 @@ class _AddChildState extends State<AddChild> {
         throw Exception("المستخدم غير مسجل دخول");
       }
 
+      
+      if (_childNameController.text.trim().isEmpty) {
+        throw Exception("يرجى إدخال اسم الطفل");
+      }
+      
+      if (selectedChildAge == null) {
+        throw Exception("يرجى اختيار عمر الطفل");
+      }
+
+      if (_childStatusController.text.trim().isEmpty) {
+        throw Exception("يرجى إدخال حالة الطفل");
+      }
+
       // Always store in "children" collection, and add the parentId (user's uid)
       await FirebaseFirestore.instance.collection("children").add({
         "childName": _childNameController.text.trim(),
@@ -38,12 +51,7 @@ class _AddChildState extends State<AddChild> {
         "parentId": user.uid, // Adding parentId to associate with the child
       });
 
-      // Redirect to HomePage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Homepage()),
-      );
-
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -63,8 +71,32 @@ class _AddChildState extends State<AddChild> {
           duration: Duration(seconds: 2),
         ),
       );
+
+      // Redirect to HomePage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => UserPage()),
+      );
     } catch (e) {
       print("Error: $e");
+    
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: const Color.fromARGB(255, 99, 98, 98),
+          duration: Duration(seconds: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
     }
   }
 
@@ -159,13 +191,6 @@ class _AddChildState extends State<AddChild> {
                                   onPressed: () async {
                                     if (_formKey.currentState!.validate()) {
                                       await registerChild(); // Call register function
-                                      if (!mounted) return;
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => UserPage(),
-                                        ),
-                                      );
                                     }
                                   },
                                   child: const Text(
@@ -195,7 +220,6 @@ class _AddChildState extends State<AddChild> {
             child: IconButton(
               icon: Icon(
                 Icons.arrow_circle_right_outlined,
-
                 color: Colors.white,
                 size: 30,
               ),
@@ -280,7 +304,6 @@ class _AddChildState extends State<AddChild> {
             ],
           ),
           child: DropdownButtonHideUnderline(
-            
             child: DropdownButtonFormField<String>(
               value: selectedChildAge,
               isExpanded: true,
@@ -303,19 +326,18 @@ class _AddChildState extends State<AddChild> {
                 color: Colors.grey,
               ),
               iconEnabledColor: Colors.grey,
-              items:
-                  ages.map((age) {
-                    return DropdownMenuItem<String>(
-                      value: age,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(age),
-                      ),
-                    );
-                  }).toList(),
+              items: ages.map((age) {
+                return DropdownMenuItem<String>(
+                  value: age,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(age),
+                  ),
+                );
+              }).toList(),
               onChanged: (value) {
                 setState(() {
-                  selectedChildAge = value;
+                  selectedChildAge = value; // Update selected child age
                 });
               },
               validator: (value) {
