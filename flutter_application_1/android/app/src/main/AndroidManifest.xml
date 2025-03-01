@@ -3,7 +3,7 @@
         android:label="flutter_application_1"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:theme="@style/NormalTheme">
+        android:theme="@style/Theme.MaterialComponents.Light">
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -19,21 +19,13 @@ import 'firebase_options.dart';
 // Import the login screen
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    //  Check if Firebase is already initialized before initializing it again
-    if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-    }
-    print(" Firebase initialized successfully!");
-  } catch (e) {
-    print(" Firebase initialization failed: $e");
-  }
-  Stripe.publishableKey=ApiKeys.publishableKey;
-
-  runApp(const MyApp());
+  
+  Stripe.publishableKey = "pk_test_51QtSxo2f7zIkZUDJgmIQZKjWfAlipphU1N0sulqz0lqgpPIdkIEpAeFKBCu31jJZMpnq9M9KOsQmTDz3lSvxSbbT00aQMVj7jT"; // أدخل مفتاح النشر الصحيح هنا
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+ runApp(const MyApp()); 
 }
 
 class MyApp extends StatelessWidget {
@@ -69,3 +61,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

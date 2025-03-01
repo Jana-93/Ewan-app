@@ -256,12 +256,29 @@ class _SearchpageState extends State<Searchpage> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
+                                if (_selectedDay == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("يرجى تحديد تاريخ الحجز")),
+                                  );
+                                  return;
+                                }
+
+                                
+                                final appointmentData = {
+                                  "doctorName": doctors[selectedDoctorIndex]["name"],
+                                  "date": "${_selectedDay!.toLocal()}".split(' ')[0],
+                                  "time": "10:00 صباحًا", 
+                                  "price": doctors[selectedDoctorIndex]["price"],
+                                };
+
+                                
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => PaymentPage(
                                       amount: int.parse(doctors[selectedDoctorIndex]["price"].replaceAll("ريال", "").trim()),
                                       currency: "SAR",
+                                      appointmentData: appointmentData, 
                                     ),
                                   ),
                                 );
