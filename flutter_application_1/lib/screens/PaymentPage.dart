@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/Stripe_payment/payment_manger.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // استيراد Firestore
-import 'package:flutter_application_1/screens/appointmentpage.dart'; // استيراد Appointmentpage
+import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:flutter_application_1/screens/appointmentpage.dart'; 
 
 class PaymentPage extends StatelessWidget {
   final int amount;
   final String currency;
-  final Map<String, dynamic> appointmentData; // بيانات الحجز
+  final Map<String, dynamic> appointmentData;  
 
   PaymentPage({
     required this.amount,
     required this.currency,
-    required this.appointmentData, // بيانات الحجز
+    required this.appointmentData, 
   });
 
   @override
   Widget build(BuildContext context) {
-    // متغيرات لإدارة حالة الحقول
     final cardNumberController = TextEditingController();
     final expiryDateController = TextEditingController();
     final cvcController = TextEditingController();
 
-    // خدمة Firestore
     final firestoreService = FirestoreService();
 
     return Scaffold(
@@ -40,7 +38,6 @@ class PaymentPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
 
-            // حقل رقم البطاقة
             TextFormField(
               controller: cardNumberController,
               decoration: InputDecoration(
@@ -100,7 +97,6 @@ class PaymentPage extends StatelessWidget {
                 ),
                 SizedBox(width: 10),
 
-                // حقل رمز الأمان (CVC)
                 Expanded(
                   child: TextFormField(
                     controller: cvcController,
@@ -149,9 +145,9 @@ class PaymentPage extends StatelessWidget {
                 }
 
                 try {
-                  await PaymentManager.makePayment(amount, currency);
+                  //await PaymentManager.makePayment(amount, currency);
 
-                  await firestoreService.addAppointment(appointmentData);
+                 // await firestoreService.addAppointment(appointmentData);
 
                   Navigator.pushReplacement(
                     context,
