@@ -21,8 +21,6 @@ class PaymentPage extends StatelessWidget {
     final expiryDateController = TextEditingController();
     final cvcController = TextEditingController();
 
-    final firestoreService = FirestoreService();
-
     return Scaffold(
       appBar: AppBar(
         title: Text("الدفع"),
@@ -38,6 +36,7 @@ class PaymentPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
 
+            // حقل إدخال رقم البطاقة
             TextFormField(
               controller: cardNumberController,
               decoration: InputDecoration(
@@ -59,6 +58,7 @@ class PaymentPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
 
+            // حقل إدخال تاريخ الانتهاء ورمز الأمان
             Row(
               children: [
                 Expanded(
@@ -123,8 +123,10 @@ class PaymentPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
 
+            // زر الدفع
             ElevatedButton(
               onPressed: () async {
+                // التحقق من صحة البيانات
                 if (cardNumberController.text.length != 16) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("رقم البطاقة يجب أن يتكون من 16 رقمًا")),
@@ -147,19 +149,23 @@ class PaymentPage extends StatelessWidget {
                 try {
                   //await PaymentManager.makePayment(amount, currency);
 
-                 // await firestoreService.addAppointment(appointmentData);
+                  // إضافة الموعد إلى Firestore
+                  await FirebaseFirestore.instance.collection('appointments').add(appointmentData);
 
+                  // إظهار رسالة نجاح
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("تم الدفع بنجاح!")),
+                  );
+
+                  // الانتقال إلى صفحة المواعيد
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => Appointmentpage(),
                     ),
                   );
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("تم الدفع بنجاح!")),
-                  );
                 } catch (e) {
+                  // إظهار رسالة خطأ
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("فشل الدفع: ${e.toString()}")),
                   );
@@ -178,31 +184,5 @@ class PaymentPage extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-
-class FirestoreService {
-  final CollectionReference appointments =
-      FirebaseFirestore.instance.collection('appointments');
-
-  Future<void> addAppointment(Map<String, dynamic> data) {
-    return appointments.add(data);
-  }
-
-  Future<void> updateAppointment(String id, Map<String, dynamic> data) {
-    return appointments.doc(id).update(data);
-  }
-
-  Future<void> deleteAppointment(String id) {
-    return appointments.doc(id).delete();
-  }
-
-  Stream<List<Map<String, dynamic>>> getAppointments() {
-    return appointments.snapshots().map(
-          (snapshot) => snapshot.docs
-              .map((doc) => doc.data() as Map<String, dynamic>)
-              .toList(),
-        );
   }
 }
