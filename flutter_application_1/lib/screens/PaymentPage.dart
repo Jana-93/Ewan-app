@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/Stripe_payment/payment_manger.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; 
-import 'package:flutter_application_1/screens/appointmentpage.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/screens/appointmentpage.dart';
 
 class PaymentPage extends StatelessWidget {
   final int amount;
   final String currency;
-  final Map<String, dynamic> appointmentData;  
+  final Map<String, dynamic> appointmentData;
+  final VoidCallback onPaymentSuccess;
 
   PaymentPage({
     required this.amount,
     required this.currency,
-    required this.appointmentData, 
+    required this.appointmentData,
+    required this.onPaymentSuccess,
   });
 
   @override
@@ -22,9 +24,7 @@ class PaymentPage extends StatelessWidget {
     final cvcController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("الدفع"),
-      ),
+      appBar: AppBar(title: Text("الدفع")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -45,7 +45,7 @@ class PaymentPage extends StatelessWidget {
                 prefixIcon: Icon(Icons.credit_card),
               ),
               keyboardType: TextInputType.number,
-              maxLength: 16, 
+              maxLength: 16,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return "يرجى إدخال رقم البطاقة";
@@ -106,8 +106,8 @@ class PaymentPage extends StatelessWidget {
                       prefixIcon: Icon(Icons.lock),
                     ),
                     keyboardType: TextInputType.number,
-                    maxLength: 3, 
-                    obscureText: true, 
+                    maxLength: 3,
+                    obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "يرجى إدخال رمز الأمان";
@@ -129,11 +129,15 @@ class PaymentPage extends StatelessWidget {
                 // التحقق من صحة البيانات
                 if (cardNumberController.text.length != 16) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("رقم البطاقة يجب أن يتكون من 16 رقمًا")),
+                    SnackBar(
+                      content: Text("رقم البطاقة يجب أن يتكون من 16 رقمًا"),
+                    ),
                   );
                   return;
                 }
-                if (!RegExp(r'^\d{2}/\d{2}$').hasMatch(expiryDateController.text)) {
+                if (!RegExp(
+                  r'^\d{2}/\d{2}$',
+                ).hasMatch(expiryDateController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("تاريخ الانتهاء غير صحيح")),
                   );
@@ -141,7 +145,9 @@ class PaymentPage extends StatelessWidget {
                 }
                 if (cvcController.text.length != 3) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("رمز الأمان يجب أن يتكون من 3 أرقام")),
+                    SnackBar(
+                      content: Text("رمز الأمان يجب أن يتكون من 3 أرقام"),
+                    ),
                   );
                   return;
                 }
@@ -150,19 +156,19 @@ class PaymentPage extends StatelessWidget {
                   //await PaymentManager.makePayment(amount, currency);
 
                   // إضافة الموعد إلى Firestore
-                  await FirebaseFirestore.instance.collection('appointments').add(appointmentData);
+                  await FirebaseFirestore.instance
+                      .collection('appointments')
+                      .add(appointmentData);
 
                   // إظهار رسالة نجاح
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("تم الدفع بنجاح!")),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text("تم الدفع بنجاح!")));
 
                   // الانتقال إلى صفحة المواعيد
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => Appointmentpage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => Appointmentpage()),
                   );
                 } catch (e) {
                   // إظهار رسالة خطأ

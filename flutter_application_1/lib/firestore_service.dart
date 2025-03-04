@@ -4,16 +4,24 @@ class FirestoreService {
   final CollectionReference appointments = FirebaseFirestore.instance
       .collection('appointments');
 
-  Future<void> addAppointment(Map<String, dynamic> data) {
-    return appointments.add(data);
+  Future<String> addAppointment(Map<String, dynamic> data) async {
+    DocumentReference docRef = await appointments.add(data);
+    return docRef.id;
   }
 
-  Future<void> updateAppointment(String id, Map<String, dynamic> data) {
-    return appointments.doc(id).update(data);
+  Future<void> updateAppointment(
+    String appointmentId,
+    Map<String, dynamic> data,
+  ) async {
+    await appointments.doc(appointmentId).update(data);
   }
 
-  Future<void> deleteAppointment(String id) {
-    return appointments.doc(id).delete();
+  Future<DocumentSnapshot> getAppointment(String appointmentId) async {
+    return await appointments.doc(appointmentId).get();
+  }
+
+  Future<void> deleteAppointment(String appointmentId) async {
+    await appointments.doc(appointmentId).delete();
   }
 
   Stream<List<Map<String, dynamic>>> getAppointments() {

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/PaymentPage.dart' show PaymentPage;
-import 'package:flutter_application_1/screens/Stripe_payment/payment_manger.dart';
+import 'package:flutter_application_1/screens/PaymentPage.dart'
+    show PaymentPage;
+
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/appointmentpage.dart';
+import 'package:flutter_application_1/firestore_service.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart'; // Import the uuid package
 
 class Searchpage extends StatefulWidget {
   @override
@@ -14,6 +18,7 @@ class Searchpage extends StatefulWidget {
 }
 
 class _SearchpageState extends State<Searchpage> {
+  final FirestoreService _firestoreService = FirestoreService();
   int selectedIndex = 1;
   int selectedDoctorIndex = -1;
   String searchQuery = "";
@@ -88,7 +93,6 @@ class _SearchpageState extends State<Searchpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 242, 117, 117),
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -157,30 +161,45 @@ class _SearchpageState extends State<Searchpage> {
                             bool isSelected = selectedDoctorIndex == index;
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8),
-                              color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
+                              color:
+                                  isSelected
+                                      ? Colors.orange.withOpacity(0.2)
+                                      : Colors.white,
                               child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundImage: AssetImage(
-                                    doctors[index]["image"],
+                                    doctors[index]["image"] ?? "",
                                   ),
                                 ),
                                 title: Text(
-                                  doctors[index]["name"],
+                                  doctors[index]["name"] ?? "unknown doctor",
                                   style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.black,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    color:
+                                        isSelected
+                                            ? Colors.orange
+                                            : Colors.black,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  doctors[index]["deg"],
+                                  doctors[index]["deg"] ?? "",
                                   style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.grey,
+                                    color:
+                                        isSelected
+                                            ? Colors.orange
+                                            : Colors.grey,
                                   ),
                                 ),
                                 trailing: Text(
-                                  doctors[index]["price"],
+                                  doctors[index]["price"] ?? "",
                                   style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.green,
+                                    color:
+                                        isSelected
+                                            ? Colors.orange
+                                            : Colors.green,
                                   ),
                                 ),
                                 onTap: () {
@@ -226,12 +245,8 @@ class _SearchpageState extends State<Searchpage> {
                               color: Colors.deepOrange,
                               shape: BoxShape.circle,
                             ),
-                            weekendTextStyle: TextStyle(
-                              color: Colors.red,
-                            ),
-                            defaultTextStyle: TextStyle(
-                              color: Colors.black,
-                            ),
+                            weekendTextStyle: TextStyle(color: Colors.red),
+                            defaultTextStyle: TextStyle(color: Colors.black),
                           ),
                           headerStyle: HeaderStyle(
                             formatButtonVisible: false,
@@ -255,33 +270,74 @@ class _SearchpageState extends State<Searchpage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 if (_selectedDay == null) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("يرجى تحديد تاريخ الحجز")),
+                                    SnackBar(
+                                      content: Text("يرجى تحديد تاريخ الحجز"),
+                                    ),
                                   );
                                   return;
                                 }
 
-                                
-                                final appointmentData = {
-                                  "doctorName": doctors[selectedDoctorIndex]["name"],
-                                  "date": "${_selectedDay!.toLocal()}".split(' ')[0],
-                                  "time": "10:00 صباحًا", 
-                                  "price": doctors[selectedDoctorIndex]["price"],
-                                };
+                                var uuid = Uuid();
+                                String appointmentId =
+                                    uuid.v4(); // Generate a unique ID for the appointment
+                                String uid =
+                                    FirebaseAuth
+                                        .instance
+                                        .currentUser!
+                                        .uid; // Get the user's UID
 
-                                
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PaymentPage(
-                                      amount: int.parse(doctors[selectedDoctorIndex]["price"].replaceAll("ريال", "").trim()),
-                                      currency: "SAR",
-                                      appointmentData: appointmentData, 
+                                final appointmentData = {
+                                  "Id":
+                                      appointmentId, // Use the generated unique ID
+                                  "userId":
+                                      uid, // Associate the appointment with the user's UID
+                                  "doctorName":
+                                      doctors[selectedDoctorIndex]["name"] ??
+                                      "unknown",
+                                  "date":
+                                      "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
+                                  "time": "10:00 صباحًا",
+                                  "price":
+                                      doctors[selectedDoctorIndex]["price"] ??
+                                      "0",
+                                  "status": "upcoming",
+                                };
+                                try {
+                                  await _firestoreService.addAppointment(
+                                    appointmentData,
+                                  );
+                                  print("Appointment ID: $appointmentId");
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => PaymentPage(
+                                            amount: int.parse(
+                                              doctors[selectedDoctorIndex]["price"]
+                                                  .replaceAll("ريال", "")
+                                                  .trim(),
+                                            ),
+                                            currency: "SAR",
+                                            appointmentData: appointmentData,
+                                            onPaymentSuccess: () {
+                                              _firestoreService.addAppointment(
+                                                appointmentData,
+                                              );
+                                            },
+                                          ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("حدث خطأ أثناء حجز الموعد"),
+                                    ),
+                                  );
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.deepOrange,
@@ -378,7 +434,7 @@ class _SearchpageState extends State<Searchpage> {
             alignment: Alignment.center,
             margin: const EdgeInsets.only(right: 15),
             child: ImageIcon(
-              AssetImage("assets/images/ewan.png"),
+              AssetImage(imagePath),
               size: 60,
               color: isSelected ? Colors.deepOrange : Colors.grey,
             ),

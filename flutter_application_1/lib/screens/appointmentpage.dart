@@ -3,7 +3,8 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/firestore_service.dart';
+import 'package:intl/intl.dart'; // Import the intl package for date formatting
 
 class Appointmentpage extends StatefulWidget {
   const Appointmentpage({super.key});
@@ -12,12 +13,9 @@ class Appointmentpage extends StatefulWidget {
   State<Appointmentpage> createState() => _AppointmentpageState();
 }
 
-enum FilterStatus { upcoming, complete, canceled }
-
 class _AppointmentpageState extends State<Appointmentpage> {
-  FilterStatus status = FilterStatus.upcoming; // Initial state
   int selectedIndex = 2;
-  Alignment _alignment = Alignment.centerLeft;
+  final FirestoreService _firestoreService = FirestoreService();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -52,47 +50,14 @@ class _AppointmentpageState extends State<Appointmentpage> {
     }
   }
 
-  List<dynamic> schedules = [
-    {
-      "doctorName": "سارة عبدالله",
-      "ProfilePicture": "assets/images/doctor.jpg",
-      "status": FilterStatus.upcoming,
-      "date": "2024-02-18",
-      "day": "Sunday",
-      "time": "10:00 AM",
-    },
-    {
-      "doctorName": "نورة محمد",
-      "ProfilePicture": "assets/images/doctor.jpg",
-      "status": FilterStatus.complete,
-      "date": "2024-02-18",
-      "day": "Sunday",
-      "time": "10:00 AM",
-    },
-    {
-      "doctorName": "منى صالح",
-      "ProfilePicture": "assets/images/doctor.jpg",
-      "status": FilterStatus.canceled,
-      "date": "2024-02-18",
-      "day": "Sunday",
-      "time": "10:00 AM",
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
-    List<dynamic> filteredSchedules =
-        schedules.where((var schedule) {
-          return schedule['status'] == status;
-        }).toList();
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               colors: [
@@ -141,258 +106,203 @@ class _AppointmentpageState extends State<Appointmentpage> {
                   child: Column(
                     children: <Widget>[
                       const SizedBox(height: 20),
-                      Stack(
-                        children: [
-                          // Background container for buttons
-                          Container(
-                            width: double.infinity,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  spreadRadius: 2,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                for (FilterStatus filterStatus
-                                    in FilterStatus.values)
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          status = filterStatus;
-                                          _alignment =
-                                              filterStatus ==
-                                                      FilterStatus.upcoming
-                                                  ? Alignment.centerLeft
-                                                  : filterStatus ==
-                                                      FilterStatus.complete
-                                                  ? Alignment.center
-                                                  : Alignment.centerRight;
-                                        });
-                                      },
-                                      child: Center(
-                                        child: Text(
-                                          filterStatus == FilterStatus.upcoming
-                                              ? "قادمة"
-                                              : filterStatus ==
-                                                  FilterStatus.complete
-                                              ? "مكتملة"
-                                              : "ملغاة",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color:
-                                                status == filterStatus
-                                                    ? Colors.orange
-                                                    : Colors.black,
+                      // Use StreamBuilder to fetch appointments from Firestore
+                      StreamBuilder<List<Map<String, dynamic>>>(
+                        stream: _firestoreService.getAppointments(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          }
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Text('No upcoming appointments available.');
+                          }
+
+                          List<dynamic> upcomingSchedules =
+                              snapshot.data!
+                                  .where(
+                                    (schedule) =>
+                                        schedule['status'] == 'upcoming',
+                                  )
+                                  .toList();
+
+                          return FadeInUp(
+                            duration: const Duration(milliseconds: 1400),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
+                                const SizedBox(height: 10),
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: upcomingSchedules.length,
+                                    itemBuilder: (context, index) {
+                                      var schedule = upcomingSchedules[index];
+                                      bool isLastElement =
+                                          index == upcomingSchedules.length - 1;
+
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                            255,
+                                            255,
+                                            255,
+                                            255,
                                           ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-
-                          // Animated moving highlight
-                          AnimatedAlign(
-                            alignment: _alignment,
-                            duration: const Duration(milliseconds: 200),
-                            child: Container(
-                              width:
-                                  MediaQuery.of(context).size.width /
-                                  3.5, // Each tab width
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFCB47A),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  status == FilterStatus.upcoming
-                                      ? "قادمة"
-                                      : status == FilterStatus.complete
-                                      ? "مكتملة"
-                                      : "ملغاة",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      FadeInUp(
-                        duration: const Duration(milliseconds: 1400),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            const SizedBox(height: 10),
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: filteredSchedules.length,
-                                itemBuilder: (context, index) {
-                                  var schedule = filteredSchedules[index];
-
-                                  bool isLastElement =
-                                      filteredSchedules.length + 1 == index;
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                        255,
-                                        255,
-                                        255,
-                                        255,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
-                                          blurRadius: 10,
-                                          spreadRadius: 5,
-                                          offset: Offset(0, 5),
-                                        ),
-                                      ],
-                                    ),
-                                    margin:
-                                        !isLastElement
-                                            ? const EdgeInsets.only(bottom: 20)
-                                            : EdgeInsets.zero,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(15),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              CircleAvatar(
-                                                backgroundImage: AssetImage(
-                                                  schedule['ProfilePicture'],
-                                                ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
                                               ),
-                                              const SizedBox(width: 10),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                              blurRadius: 10,
+                                              spreadRadius: 5,
+                                              offset: Offset(0, 5),
+                                            ),
+                                          ],
+                                        ),
+                                        margin:
+                                            !isLastElement
+                                                ? const EdgeInsets.only(
+                                                  bottom: 20,
+                                                )
+                                                : EdgeInsets.zero,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(15),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              Row(
                                                 children: [
-                                                  Text(
-                                                    schedule['doctorName'],
-                                                    style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w700,
+                                                  CircleAvatar(
+                                                    backgroundImage: AssetImage(
+                                                      schedule['ProfilePicture'] ??
+                                                          "assets/images/icon.jpg",
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 5),
-                                                  Text(
-                                                    schedule['category'] ?? '',
-                                                    style: const TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w600,
+                                                  const SizedBox(width: 10),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        schedule['doctorName'] ??
+                                                            "Unknown",
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 5),
+                                                      Text(
+                                                        schedule['category'] ??
+                                                            '',
+                                                        style: const TextStyle(
+                                                          color: Colors.grey,
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 15),
+                                              ScheduleCard(
+                                                date: schedule['date'] ?? '',
+                                                time: schedule['time'] ?? '',
+                                              ),
+                                              const SizedBox(height: 15),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: OutlinedButton(
+                                                      style: OutlinedButton.styleFrom(
+                                                        backgroundColor:
+                                                            Colors.orange,
+                                                        side: const BorderSide(
+                                                          color: Color.fromARGB(
+                                                            255,
+                                                            222,
+                                                            221,
+                                                            221,
+                                                          ),
+                                                          width: 2,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        // Implement start session logic
+                                                      },
+                                                      child: const Text(
+                                                        'بدء الجلسة',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 20),
+                                                  Expanded(
+                                                    child: OutlinedButton(
+                                                      style: OutlinedButton.styleFrom(
+                                                        side: const BorderSide(
+                                                          color: Color.fromARGB(
+                                                            255,
+                                                            223,
+                                                            222,
+                                                            222,
+                                                          ),
+                                                          width: 2,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    Searchpage(),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: const Text(
+                                                        'تغيير الموعد',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: Colors.orange,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 15),
-                                          ScheduleCard(
-                                            date: schedule['date'] ?? '',
-                                            day: schedule['day'] ?? '',
-                                            time: schedule['time'] ?? '',
-                                          ),
-                                          const SizedBox(height: 15),
-
-                                          // Show buttons only if the status is "Upcoming"
-                                          if (schedule['status'] ==
-                                              FilterStatus.upcoming)
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                  child: OutlinedButton(
-                                                    style:
-                                                        OutlinedButton.styleFrom(
-                                                          side: const BorderSide(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                  255,
-                                                                  223,
-                                                                  222,
-                                                                  222,
-                                                                ),
-                                                            width: 2,
-                                                          ), // Border color
-                                                        ),
-                                                    onPressed: () {},
-                                                    child: const Text(
-                                                      'إلغاء',
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.orange,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 20),
-                                                Expanded(
-                                                  child: OutlinedButton(
-                                                    style:
-                                                        OutlinedButton.styleFrom(
-                                                          backgroundColor:
-                                                              Colors.orange,
-                                                          side: const BorderSide(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                  255,
-                                                                  222,
-                                                                  221,
-                                                                  221,
-                                                                ),
-                                                            width: 2,
-                                                          ), // Border color
-                                                        ),
-                                                    onPressed: () {},
-                                                    child: const Text(
-                                                      'تغيير الموعد',
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -487,59 +397,71 @@ class _AppointmentpageState extends State<Appointmentpage> {
 }
 
 class ScheduleCard extends StatelessWidget {
-  const ScheduleCard({
-    Key? key,
-    required this.date,
-    required this.day,
-    required this.time,
-  }) : super(key: key);
-  final String date;
-  final String day;
+  final String date; // The date string retrieved from Firebase
   final String time;
+
+  const ScheduleCard({Key? key, required this.date, required this.time})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 238, 235, 235),
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            spreadRadius: 5,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Row(
-            children: [
-              const Icon(Icons.calendar_today, color: Colors.orange, size: 16),
-              const SizedBox(width: 5),
-              Text(
-                day.isNotEmpty ? day : '18/2/2025',
-                style: const TextStyle(color: Colors.orange, fontSize: 14),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Icon(Icons.access_time, color: Colors.orange, size: 16),
-              const SizedBox(width: 5),
-              Text(
-                time.isNotEmpty ? time : '11:00 AM',
-                style: const TextStyle(color: Colors.orange, fontSize: 14),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+    // Check if the date string is not null or empty
+    if (date.isNotEmpty) {
+      // Parse the date string into a DateTime object
+      DateTime parsedDate = DateTime.parse(date);
+
+      // Format the date into the desired display format
+      String formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
+
+      return Container(
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 238, 235, 235),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 15,
+              spreadRadius: 5,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(
+              children: [
+                const Icon(
+                  Icons.calendar_today,
+                  color: Colors.orange,
+                  size: 16,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  formattedDate, // Use the formatted date here
+                  style: const TextStyle(color: Colors.orange, fontSize: 14),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.access_time, color: Colors.orange, size: 16),
+                const SizedBox(width: 5),
+                Text(
+                  time.isNotEmpty ? time : '10:00 صباحًا',
+                  style: const TextStyle(color: Colors.orange, fontSize: 14),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Return an empty container if the date is null or empty
+      return Container();
+    }
   }
 }
