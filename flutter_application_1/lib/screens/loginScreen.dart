@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/T_signup.dart';
 import 'package:flutter_application_1/screens/TherapistHomePage.dart';
@@ -24,36 +25,59 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('يرجى إدخال البريد الإلكتروني وكلمة المرور')),
+        SnackBar(content: Text('يرجى إدخال البريد الإلكتروني وكلمة المرور')),
       );
       return;
     }
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('تم تسجيل الدخول بنجاح')));
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
-      if (!mounted) return; // تجنب الأخطاء عند استخدام context
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Homepage()),
+      String uid = userCredential.user!.uid;
+
+      // Check if the user is a therapist
+      DocumentSnapshot therapistSnapshot =
+          await FirebaseFirestore.instance
+              .collection('therapists')
+              .doc(uid)
+              .get();
+      if (therapistSnapshot.exists) {
+        // Navigate to the therapist home page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TherapistHomePage()),
+        );
+        return;
+      }
+
+      // Check if the user is a parent
+      DocumentSnapshot patientSnapshot =
+          await FirebaseFirestore.instance.collection('parents').doc(uid).get();
+      if (patientSnapshot.exists) {
+        // Navigate to the patient home page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Homepage()),
+        );
+        return;
+      }
+
+      // If the user is not found in either collection, handle the error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User role not found. Please contact support.")),
       );
     } on FirebaseAuthException catch (e) {
-      String errorMessage = "حدث خطأ ";
+      String errorMessage = "حدث خطأ ";
 
       if (e.code == 'user-not-found') {
-        errorMessage = 'البريد الإلكتروني غير مسجل';
+        errorMessage = 'البريد الإلكتروني غير مسجل';
       } else if (e.code == 'wrong-password') {
         errorMessage = 'كلمة المرور غير صحيحة';
       } else if (e.code == 'invalid-email') {
-        errorMessage = 'البريد الإلكتروني غير صحيح';
+        errorMessage = 'البريد الإلكتروني غير صحيح';
       } else if (e.code == 'network-request-failed') {
-        errorMessage = 'تحقق من اتصال الإنترنت';
+        errorMessage = 'تحقق من اتصال الإنترنت';
       }
 
       ScaffoldMessenger.of(
@@ -77,7 +101,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              // borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 colors: [
@@ -127,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: <Widget>[
                               const Text(
-                                "البريد الإلكتروني",
+                                "البريد الإلكتروني",
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 16,
@@ -137,9 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-
                                   borderRadius: BorderRadius.circular(10),
-
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Color.fromRGBO(225, 95, 27, .3),
@@ -152,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: emailController,
                                   textAlign: TextAlign.right,
                                   decoration: InputDecoration(
-                                    hintText: "أدخل البريد الإلكتروني ",
+                                    hintText: "أدخل البريد الإلكتروني ",
                                     hintStyle: TextStyle(color: Colors.grey),
                                     border: InputBorder.none,
                                     prefixIcon: Icon(
@@ -188,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: passwordController,
                                   textAlign: TextAlign.right,
                                   decoration: InputDecoration(
-                                    hintText: "أدخل كلمة المرور",
+                                    hintText: "أدخل كلمة المرور",
                                     hintStyle: TextStyle(color: Colors.grey),
                                     border: InputBorder.none,
                                     prefixIcon: IconButton(
@@ -266,12 +287,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     width: double.infinity,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        // تحويل المستخدم إلى صفحة التسجيل
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => Psignup(),
-                                          ), // استبدل SignupPage بالصفحة الفعلية الخاصة بك
+                                          ),
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
