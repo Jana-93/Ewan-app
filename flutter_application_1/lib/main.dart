@@ -15,17 +15,18 @@ import 'screens/loginScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Import the login screen
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  Stripe.publishableKey = "pk_test_51QtSxo2f7zIkZUDJgmIQZKjWfAlipphU1N0sulqz0lqgpPIdkIEpAeFKBCu31jJZMpnq9M9KOsQmTDz3lSvxSbbT00aQMVj7jT"; // أدخل مفتاح النشر الصحيح هنا
-  
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
- runApp(const MyApp()); 
+  await dotenv.load(fileName: ".env");
+
+  Stripe.publishableKey =
+      "pk_test_51QtSxo2f7zIkZUDJgmIQZKjWfAlipphU1N0sulqz0lqgpPIdkIEpAeFKBCu31jJZMpnq9M9KOsQmTDz3lSvxSbbT00aQMVj7jT"; // أدخل مفتاح النشر الصحيح هنا
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -61,4 +62,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

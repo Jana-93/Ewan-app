@@ -397,7 +397,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
 }
 
 class ScheduleCard extends StatelessWidget {
-  final String date; // The date string retrieved from Firebase
+  final String date;
   final String time;
 
   const ScheduleCard({Key? key, required this.date, required this.time})
@@ -441,7 +441,7 @@ class ScheduleCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  formattedDate, // Use the formatted date here
+                  formattedDate,
                   style: const TextStyle(color: Colors.orange, fontSize: 14),
                 ),
               ],
@@ -460,7 +460,6 @@ class ScheduleCard extends StatelessWidget {
         ),
       );
     } else {
-      // Return an empty container if the date is null or empty
       return Container();
     }
   }

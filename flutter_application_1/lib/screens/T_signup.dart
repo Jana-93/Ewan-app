@@ -1,11 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:animate_do/animate_do.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TherapistSignUpPage extends StatefulWidget {
   @override
@@ -37,7 +39,14 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     '5+ سنوات',
   ];
 
-  // دالة التحقق من كلمة المرور
+  // Validator functions
+  String? _validateField(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    return null;
+  }
+
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return "هذا الحقل مطلوب";
@@ -54,7 +63,6 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     return null;
   }
 
-  // دالة التحقق من تطابق كلمة المرور
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
       return "هذا الحقل مطلوب";
@@ -75,24 +83,78 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   }
 
   Future<void> pickFile(String type) async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await FilePicker.platform.pickFiles();
     if (pickedFile != null) {
       setState(() {
-        if (type == 'qualification') qualificationFile = File(pickedFile.path);
-        if (type == 'license') licenseFile = File(pickedFile.path);
+        if (type == 'qualification')
+          qualificationFile = File(pickedFile.files.single.path!);
+        if (type == 'license')
+          licenseFile = File(pickedFile.files.single.path!);
       });
     }
   }
 
-  Future<String> uploadFile(File file, String path) async {
-    Reference storageRef = FirebaseStorage.instance.ref().child(path);
-    UploadTask uploadTask = storageRef.putFile(file);
-    TaskSnapshot snapshot = await uploadTask;
-    return await snapshot.ref.getDownloadURL();
+  Future<bool> uploadToCloudinary(FilePickerResult? filePickerResult) async {
+    if (filePickerResult == null || filePickerResult.files.isEmpty) {
+      print("لا يوجد ملف");
+      return false;
+    }
+    File file = File(filePickerResult.files.single.path!);
+
+    String cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? "";
+
+    var uri = Uri.parse(
+      "https://api.cloudinary.com/v1_1/$cloudName/raw/upload",
+    );
+    var request = http.MultipartRequest("POST", uri);
+    var fileBytes = await file.readAsBytes();
+    var multipartFile = http.MultipartFile.fromBytes(
+      'file',
+      fileBytes,
+      filename: file.path.split("/").last,
+    );
+    request.files.add(multipartFile);
+    request.fields['upload_preset'] = 'therapist files';
+    request.fields['resource_type'] = 'raw';
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      print("تم الرفع بنجاح");
+      return true;
+    } else {
+      print("فشل الرفع");
+      return false;
+    }
   }
 
   Future<void> signUpTherapist() async {
     if (_formKey.currentState!.validate()) {
+      if (profileImage == null ||
+          qualificationFile == null ||
+          licenseFile == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "يرجى تحميل جميع الملفات المطلوبة",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
       if (passwordController.text != confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -116,98 +178,100 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         return;
       }
 
-      if (profileImage != null &&
-          qualificationFile != null &&
-          licenseFile != null) {
-        try {
-          // إنشاء حساب باستخدام البريد الإلكتروني وكلمة المرور
-          UserCredential userCredential = await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(
-                email: emailController.text.trim(),
-                password: passwordController.text.trim(),
-              );
+      try {
+        // Create user with email and password
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+              email: emailController.text.trim(),
+              password: passwordController.text.trim(),
+            );
 
-          String userId = userCredential.user!.uid;
+        String userId = userCredential.user!.uid;
 
-          // رفع الملفات إلى Firebase Storage
-          String profileUrl = await uploadFile(
-            profileImage!,
-            'therapists/profile.jpg',
-          );
-          String qualificationUrl = await uploadFile(
-            qualificationFile!,
-            'therapists/qualification.pdf',
-          );
-          String licenseUrl = await uploadFile(
-            licenseFile!,
-            'therapists/license.pdf',
-          );
+        // Upload files to Cloudinary
+        bool profileUploadSuccess = await uploadToCloudinary(
+          FilePickerResult([PlatformFile(name: profileImage!.path, size: 0)]),
+        );
+        bool qualificationUploadSuccess = await uploadToCloudinary(
+          FilePickerResult([
+            PlatformFile(name: qualificationFile!.path, size: 0),
+          ]),
+        );
+        bool licenseUploadSuccess = await uploadToCloudinary(
+          FilePickerResult([PlatformFile(name: licenseFile!.path, size: 0)]),
+        );
 
-          // حفظ بيانات المعالج في Firestore
-          await FirebaseFirestore.instance
-              .collection('therapists')
-              .doc(userId)
-              .set({
-                'uid': userId,
-                'firstName': firstNameController.text,
-                'lastName': lastNameController.text,
-                'email': emailController.text,
-                'phone': phoneController.text,
-                'specialty': selectedSpecialty,
-                'experience': selectedExperience,
-                'profileImage': profileUrl,
-                'qualificationFile': qualificationUrl,
-                'licenseFile': licenseUrl,
-              });
-
-          // إظهار رسالة نجاح
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "تم إنشاء الحساب بنجاح",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              backgroundColor: Color(0xFFFCB47A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 2),
-            ),
-          );
-
-          // الانتقال إلى شاشة تسجيل الدخول
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
-          );
-        } on FirebaseAuthException catch (e) {
-          // التعامل مع الأخطاء
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                e.message ?? "حدث خطأ ما",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 2),
-            ),
-          );
+        if (!profileUploadSuccess ||
+            !qualificationUploadSuccess ||
+            !licenseUploadSuccess) {
+          throw Exception("Failed to upload one or more files");
         }
+
+        // Save therapist data to Firestore
+        await FirebaseFirestore.instance
+            .collection('therapists')
+            .doc(userId)
+            .set({
+              'uid': userId,
+              'firstName': firstNameController.text,
+              'lastName': lastNameController.text,
+              'email': emailController.text,
+              'phone': phoneController.text,
+              'specialty': selectedSpecialty,
+              'experience': selectedExperience,
+              'profileImage': 'URL_TO_PROFILE_IMAGE', // Replace with actual URL
+              'qualificationFile':
+                  'URL_TO_QUALIFICATION_FILE', // Replace with actual URL
+              'licenseFile': 'URL_TO_LICENSE_FILE', // Replace with actual URL
+            });
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "تم إنشاء الحساب بنجاح",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            backgroundColor: Color(0xFFFCB47A),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Navigate to login screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      } on FirebaseAuthException catch (e) {
+        // Handle errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.message ?? "حدث خطأ ما",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
       }
     }
   }
@@ -274,28 +338,33 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                             child: CircleAvatar(
                               radius: 40,
                               backgroundColor: Colors.grey,
-                              backgroundImage: profileImage != null
-                                  ? FileImage(profileImage!)
-                                  : null,
-                              child: profileImage == null
-                                  ? Icon(Icons.person, size: 40)
-                                  : null,
+                              backgroundImage:
+                                  profileImage != null
+                                      ? FileImage(profileImage!)
+                                      : null,
+                              child:
+                                  profileImage == null
+                                      ? Icon(Icons.person, size: 40)
+                                      : null,
                             ),
                           ),
                           const SizedBox(height: 20),
                           _buildInputField(
                             "الاسم الأول",
                             controller: firstNameController,
+                            validator: _validateField,
                           ),
                           const SizedBox(height: 20),
                           _buildInputField(
                             "الاسم الأخير",
                             controller: lastNameController,
+                            validator: _validateField,
                           ),
                           const SizedBox(height: 20),
                           _buildInputField(
                             "البريد الإلكتروني",
                             controller: emailController,
+                            validator: _validateField,
                           ),
                           const SizedBox(height: 20),
                           _buildPasswordField(
@@ -313,6 +382,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                           _buildInputField(
                             "رقم الجوال",
                             controller: phoneController,
+                            validator: _validateField,
                           ),
                           const SizedBox(height: 20),
                           _buildDropdown(
@@ -324,6 +394,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                                 selectedSpecialty = value as String;
                               });
                             },
+                            validator: _validateField,
                           ),
                           const SizedBox(height: 20),
                           _buildDropdown(
@@ -335,6 +406,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                                 selectedExperience = value as String;
                               });
                             },
+                            validator: _validateField,
                           ),
                           const SizedBox(height: 20),
                           _buildFilePickerButton(
@@ -417,7 +489,11 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     );
   }
 
-  Widget _buildInputField(String label, {TextEditingController? controller}) {
+  Widget _buildInputField(
+    String label, {
+    TextEditingController? controller,
+    String? Function(String?)? validator,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -447,10 +523,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                 vertical: 15,
               ),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
-              return null;
-            },
+            validator: validator,
           ),
         ),
       ],
@@ -502,6 +575,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     required String? value,
     required List<String> items,
     required Function(dynamic) onChanged,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -534,10 +608,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                 vertical: 15,
               ),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
-              return null;
-            },
+            validator: validator,
           ),
         ),
       ],
@@ -575,10 +646,4 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(
-    MaterialApp(debugShowCheckedModeBanner: false, home: TherapistSignUpPage()),
-  );
 }
