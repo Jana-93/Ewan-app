@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
       DocumentSnapshot patientSnapshot =
           await FirebaseFirestore.instance.collection('parents').doc(uid).get();
       if (patientSnapshot.exists) {
-        // Navigate to the patient home page
+        // Navigate to the parent home page
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Homepage()),

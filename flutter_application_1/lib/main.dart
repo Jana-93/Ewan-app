@@ -1,19 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/AddChild.dart';
-import 'package:flutter_application_1/screens/ChatScreen.dart';
-import 'package:flutter_application_1/screens/HomePage.dart';
-import 'package:flutter_application_1/screens/Stripe_payment/strip_keys.dart';
-import 'package:flutter_application_1/screens/appointmentpage.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-
-import 'screens/Authentication.dart';
-import 'package:flutter_application_1/screens/getStarted.dart'; // Import the getStarted screen
-import 'package:flutter_application_1/screens/psignup.dart';
-import 'package:flutter_application_1/screens/userpage.dart';
-import 'screens/TherapistHomePage.dart';
 import 'screens/loginScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 

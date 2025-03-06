@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter_application_1/screens/AddChild.dart';
 import 'package:flutter_application_1/screens/appointmentpage.dart';
 import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
 import 'dart:ui';
+import 'package:flutter_application_1/feedbackScreen.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -15,6 +17,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int selectedIndex = 3;
+
   void _onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
@@ -136,14 +139,43 @@ class _HomepageState extends State<Homepage> {
   Widget _buildHealthConsultation() {
     return Column(
       children: [
-        _buildHealthConsultationSection(),
+        _buildHealthConsultationSection(
+          title: "تحدث إلى مختص صحي الآن",
+          description: "احصل على استشارة طبية عن بعد لطفلك",
+          imagePath: 'assets/images/doco.jpg',
+          actionText: "تصفح مزودي خدمتنا الصحية عن بعد",
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Searchpage()),
+            );
+          },
+        ),
         SizedBox(height: 16),
-        _buildHealthConsultationSection(),
+        _buildHealthConsultationSection(
+          title: "اطّلع على تقدم طفلك",
+          description:
+              "تابع التقدم الذي يحرزه طفلك من خلال ملاحظات المختصين بعد كل جلسة ",
+          imagePath: 'assets/images/feedback.jpg',
+          actionText: "عرض سجل المراجعات",
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => FeedbackScreen()),
+            );
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildHealthConsultationSection() {
+  Widget _buildHealthConsultationSection({
+    required String title,
+    required String description,
+    required String imagePath,
+    required String actionText,
+    required VoidCallback onTap,
+  }) {
     return Container(
       width: 360,
       height: 130,
@@ -169,7 +201,7 @@ class _HomepageState extends State<Homepage> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  "تحدث إلى مختص صحي الآن",
+                  title,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -179,20 +211,15 @@ class _HomepageState extends State<Homepage> {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  "احصل على استشارة طبية عن بعد لطفلك  ",
+                  description,
                   style: TextStyle(fontSize: 12, color: Colors.black87),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Searchpage()),
-                    );
-                  },
+                  onTap: onTap,
                   child: Text(
-                    "تصفح مزودي خدمتنا الصحية عن بعد",
+                    actionText,
                     style: TextStyle(fontSize: 12, color: Color(0xFFFCB47A)),
                     textAlign: TextAlign.right,
                   ),
@@ -200,10 +227,7 @@ class _HomepageState extends State<Homepage> {
               ],
             ),
           ),
-          Expanded(
-            flex: 1,
-            child: Image.asset('assets/images/doco.jpg', fit: BoxFit.contain),
-          ),
+          Expanded(flex: 1, child: Image.asset(imagePath, fit: BoxFit.contain)),
         ],
       ),
     );
@@ -279,7 +303,7 @@ class _HomepageState extends State<Homepage> {
             alignment: Alignment.center,
             margin: const EdgeInsets.only(right: 15),
             child: ImageIcon(
-              AssetImage("assets/images/ewan.png"),
+              AssetImage(imagePath),
               size: 60,
               color: isSelected ? Colors.deepOrange : Colors.grey,
             ),
