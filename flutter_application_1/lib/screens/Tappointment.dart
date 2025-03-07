@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/feedbackScreen.dart';
 import 'package:flutter_application_1/firestore_service.dart';
-import 'package:intl/intl.dart'; // لتنسيق التاريخ
+import 'package:flutter_application_1/screens/TherapistHomePage.dart';
+import 'package:flutter_application_1/screens/user_info_page_t.dart';
+import 'package:intl/intl.dart';
 
 class Tappointment extends StatefulWidget {
   const Tappointment({super.key});
@@ -12,161 +16,410 @@ class Tappointment extends StatefulWidget {
 
 class _TappointmentState extends State<Tappointment> {
   final FirestoreService _firestoreService = FirestoreService();
+  int selectedIndex = 1;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TherapistProfilePage()),
+        );
+        break;
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Tappointment()),
+        );
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => FeedbackScreen()),
+        );
+        break;
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TherapistHomePage()),
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("مواعيد الطبيب"),
-        backgroundColor: Colors.deepOrange,
-      ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // عرض المواعيد
-            StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _firestoreService.getAppointments(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text('حدث خطأ: ${snapshot.error}'));
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('لا توجد مواعيد متاحة.'));
-                }
-
-                List<dynamic> appointments = snapshot.data!;
-
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: appointments.length,
-                  itemBuilder: (context, index) {
-                    var appointment = appointments[index];
-                    return AppointmentCard(
-                      patientName: appointment['patientName'] ?? "غير معروف",
-                      date: appointment['date'] ?? "",
-                      time: appointment['time'] ?? "",
-                      status: appointment['status'] ?? "غير معروف",
-                    );
-                  },
-                );
-              },
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              colors: [
+                const Color.fromARGB(255, 219, 101, 37),
+                const Color.fromRGBO(239, 108, 0, 1),
+                const Color.fromRGBO(255, 167, 38, 1),
+              ],
             ),
-          ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              const SizedBox(height: 60),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    FadeInUp(
+                      duration: const Duration(milliseconds: 1000),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            "مواعيدي",
+                            style: TextStyle(color: Colors.white, fontSize: 40),
+                            textAlign: TextAlign.right,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(50),
+                    topRight: Radius.circular(50),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: Column(
+                    children: <Widget>[
+                      const SizedBox(height: 20),
+                      StreamBuilder<List<Map<String, dynamic>>>(
+                        stream: _firestoreService.getAppointments(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          }
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Text('No upcoming appointments available.');
+                          }
+
+                          List<dynamic> appointments = snapshot.data!;
+
+                          return FadeInUp(
+                            duration: const Duration(milliseconds: 1400),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
+                                const SizedBox(height: 10),
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: appointments.length,
+                                    itemBuilder: (context, index) {
+                                      var appointment = appointments[index];
+                                      bool isLastElement =
+                                          index == appointments.length - 1;
+
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                            255,
+                                            255,
+                                            255,
+                                            255,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 10,
+                                              spreadRadius: 5,
+                                              offset: Offset(0, 5),
+                                            ),
+                                          ],
+                                        ),
+                                        margin:
+                                            !isLastElement
+                                                ? const EdgeInsets.only(
+                                                  bottom: 20,
+                                                )
+                                                : EdgeInsets.zero,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(15),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  CircleAvatar(
+                                                    backgroundImage: AssetImage(
+                                                      appointment['ProfilePicture'] ??
+                                                          "assets/images/icon.jpg",
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        appointment['patientName'] ??
+                                                            "",
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 5),
+                                                      Text(
+                                                        appointment['category'] ??
+                                                            '',
+                                                        style: const TextStyle(
+                                                          color: Colors.grey,
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 15),
+                                              ScheduleCard(
+                                                date: appointment['date'] ?? '',
+                                                time: appointment['time'] ?? '',
+                                              ),
+                                              const SizedBox(height: 15),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: OutlinedButton(
+                                                      style: OutlinedButton.styleFrom(
+                                                        backgroundColor:
+                                                            Colors.orange,
+                                                        side: const BorderSide(
+                                                          color: Color.fromARGB(
+                                                            255,
+                                                            222,
+                                                            221,
+                                                            221,
+                                                          ),
+                                                          width: 2,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        // Implement start session logic
+                                                      },
+                                                      child: const Text(
+                                                        'بدء الجلسة',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 20),
+                                                  Expanded(
+                                                    child: OutlinedButton(
+                                                      style: OutlinedButton.styleFrom(
+                                                        side: const BorderSide(
+                                                          color: Color.fromARGB(
+                                                            255,
+                                                            223,
+                                                            222,
+                                                            222,
+                                                          ),
+                                                          width: 2,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        // Implement change appointment logic
+                                                      },
+                                                      child: const Text(
+                                                        'تغيير الموعد',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: Colors.orange,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
+      bottomNavigationBar: navBar(),
+    );
+  }
+
+  Widget navBar() {
+    return Container(
+      height: 60,
+      width: double.infinity,
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            spreadRadius: 5,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildNavItem(Icons.person, 0),
+          _buildNavItem(Icons.calendar_today, 2),
+          _buildNavItem(Icons.folder, 1),
+          _buildNavItem(Icons.home, 3),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, int index) {
+    bool isSelected = selectedIndex == index;
+    return GestureDetector(
+      onTap: () {
+        _onItemTapped(index);
+      },
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.center,
+            margin: const EdgeInsets.only(
+              top: 15,
+              bottom: 0,
+              left: 30,
+              right: 30,
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.deepOrange : Colors.grey,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class AppointmentCard extends StatelessWidget {
-  final String patientName;
+class ScheduleCard extends StatelessWidget {
   final String date;
   final String time;
-  final String status;
 
-  const AppointmentCard({
-    required this.patientName,
-    required this.date,
-    required this.time,
-    required this.status,
-  });
+  const ScheduleCard({Key? key, required this.date, required this.time})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.all(8.0),
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // اسم المريض
-            Text(
-              patientName,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
+    if (date.isNotEmpty) {
+      DateTime parsedDate = DateTime.parse(date);
+      String formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
 
-            // التاريخ والوقت
+      return Container(
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 238, 235, 235),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 15,
+              spreadRadius: 5,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
             Row(
               children: [
-                Icon(Icons.calendar_today, size: 16, color: Colors.deepOrange),
-                SizedBox(width: 5),
-                Text(
-                  DateFormat('dd/MM/yyyy').format(DateTime.parse(date)),
-                  style: TextStyle(color: Colors.grey[700]),
+                const Icon(
+                  Icons.calendar_today,
+                  color: Colors.orange,
+                  size: 16,
                 ),
-                SizedBox(width: 20),
-                Icon(Icons.access_time, size: 16, color: Colors.deepOrange),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Text(
-                  time,
-                  style: TextStyle(color: Colors.grey[700]),
+                  formattedDate,
+                  style: const TextStyle(color: Colors.orange, fontSize: 14),
                 ),
               ],
             ),
-            SizedBox(height: 8),
-
-            // حالة الموعد
             Row(
               children: [
-                Icon(
-                  Icons.circle,
-                  size: 12,
-                  color: status == 'مكتملة'
-                      ? Colors.green
-                      : status == 'ملغاة'
-                          ? Colors.red
-                          : Colors.orange,
-                ),
-                SizedBox(width: 4),
+                const Icon(Icons.access_time, color: Colors.orange, size: 16),
+                const SizedBox(width: 5),
                 Text(
-                  status,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // تعديل الموعد
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  child: Text(
-                    "تعديل الموعد",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  time.isNotEmpty ? time : '10:00 صباحًا',
+                  style: const TextStyle(color: Colors.orange, fontSize: 14),
                 ),
               ],
             ),
           ],
         ),
-      ),
-    );
+      );
+    } else {
+      return Container();
+    }
   }
 }

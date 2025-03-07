@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/feedbackScreen.dart';
+import 'package:flutter_application_1/screens/Tappointment.dart';
+import 'package:flutter_application_1/screens/user_info_page_t.dart';
 
 class TherapistHomePage extends StatefulWidget {
   @override
@@ -16,6 +19,32 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
     setState(() {
       _selectedIndex = index;
     });
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TherapistProfilePage()),
+        );
+        break;
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Tappointment()),
+        );
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => FeedbackScreen()),
+        );
+        break;
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TherapistHomePage()),
+        );
+        break;
+    }
   }
 
   Future<Map<String, dynamic>> _fetchUserData() async {
