@@ -16,7 +16,7 @@ class Tappointment extends StatefulWidget {
 
 class _TappointmentState extends State<Tappointment> {
   final FirestoreService _firestoreService = FirestoreService();
-  int selectedIndex = 1;
+  int selectedIndex = 2;
 
   void _onItemTapped(int index) {
     setState(() {
