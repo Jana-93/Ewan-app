@@ -9,7 +9,8 @@ class TherapistProfilePage extends StatelessWidget {
         FirebaseAuth.instance.currentUser!.uid; // جلب UID الخاص بالطبيب
 
     return Scaffold(
-      appBar: AppBar(title: Text('معلوماتي')),
+      appBar: AppBar(title: Text('معلوماتي'),),
+      
       body: FutureBuilder<DocumentSnapshot>(
         future:
             FirebaseFirestore.instance.collection('therapists').doc(uid).get(),
@@ -32,12 +33,12 @@ class TherapistProfilePage extends StatelessWidget {
                   backgroundColor: Colors.grey[300],
                 ),
                 SizedBox(height: 16),
-                buildInfoTile('الاسم: ', data['firstName']),
-                buildInfoTile('الاسم الأخير: ', data['lastName']),
-                buildInfoTile('التخصص الدقيق: ', data['specialty']),
-                buildInfoTile('سنوات الخبرة: ', data['experience']),
-                buildInfoTile('البريد الإلكتروني: ', data['email']),
-                buildInfoTile('رقم الجوال: ', data['phone']),
+                buildInfoTile(': الاسم الأول ', data['firstName']),
+                buildInfoTile(': الاسم الأخير  ', data['lastName']),
+                buildInfoTile(': التخصص الدقيق ', data['specialty']),
+                buildInfoTile(': سنوات الخبرة  ', data['experience']),
+                buildInfoTile(': البريد الإلكتروني  ', data['email']),
+                buildInfoTile(': رقم الجوال  ', data['phone']),
               ],
             ),
           );
@@ -51,6 +52,7 @@ class TherapistProfilePage extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
+        
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
@@ -58,6 +60,7 @@ class TherapistProfilePage extends StatelessWidget {
         ],
       ),
       child: Row(
+        textDirection: TextDirection.rtl,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
