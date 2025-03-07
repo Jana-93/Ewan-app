@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TherapistHomePage extends StatefulWidget {
   @override
@@ -7,11 +9,25 @@ class TherapistHomePage extends StatefulWidget {
 
 class _TherapistHomePageState extends State<TherapistHomePage> {
   int _selectedIndex = 3;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  Future<Map<String, dynamic>> _fetchUserData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot doc =
+          await _firestore.collection('therapists').doc(user.uid).get();
+      if (doc.exists) {
+        return doc.data() as Map<String, dynamic>;
+      }
+    }
+    return {};
   }
 
   @override
@@ -22,45 +38,71 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         backgroundColor: Colors.white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(150.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.orange,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: _fetchUserData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('حدث خطأ أثناء جلب البيانات'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text('لا توجد بيانات'));
+              } else {
+                Map<String, dynamic> userData = snapshot.data!;
+                String firstName = userData['firstName'] ?? 'غير معروف';
+                String lastName = userData['lastName'] ?? 'غير معروف';
+                String profileImageUrl = userData['profileImage'] ?? '';
+
+                return Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              colors: const [
+                Color.fromARGB(255, 219, 101, 37),
+                Color.fromRGBO(239, 108, 0, 1),
+                Color.fromRGBO(255, 167, 38, 1),
+              ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'مرحبًا،',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'مرحبًا،',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'د. $firstName $lastName',
+                              style: TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                          ],
                         ),
-                      ),
-                      Text(
-                        'د. سارة محمد',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ],
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundImage: profileImageUrl.isNotEmpty
+                              ? NetworkImage(profileImageUrl)
+                              : AssetImage('assets/images/doctor.jpg')
+                                  as ImageProvider,
+                        ),
+                      ],
+                    ),
                   ),
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: AssetImage(
-                      'assets/images/doctor.jpg',
-                    ), // ✅ Fixed syntax error
-                  ),
-                ],
-              ),
-            ),
+                );
+              }
+            },
           ),
         ),
         body: Padding(
@@ -73,25 +115,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.orange,
-          unselectedItemColor: Colors.grey,
-          currentIndex: _selectedIndex, // ✅ Maintains the selected index
-          onTap: _onItemTapped, // ✅ Handles navigation
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'الملف الشخصي',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'الملفات'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
-              label: 'المواعيد',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'الرئيسية'),
-          ],
-        ),
+        bottomNavigationBar: navBar(), // استبدل _buildCustomNavBar بـ navBar
       ),
     );
   }
@@ -117,6 +141,61 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         onTap: () {
           // Handle navigation or actions
         },
+      ),
+    );
+  }
+
+  Widget navBar() {
+    return Container(
+      height: 60,
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            spreadRadius: 5,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(Icons.person, null, 0),
+          _buildNavItem(Icons.folder, null, 2),
+          _buildNavItem(Icons.calendar_month, null, 1),
+          _buildNavItem(Icons.home, null, 3),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData? icon, String? imagePath, int index) {
+    bool isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () {
+        _onItemTapped(index);
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            alignment: Alignment.center,
+            child: imagePath != null
+                ? ImageIcon(
+                    AssetImage(imagePath),
+                    size: 30,
+                    color: isSelected ? Colors.deepOrange : Colors.grey,
+                  )
+                : Icon(
+                    icon,
+                    color: isSelected ? Colors.deepOrange : Colors.grey,
+                  ),
+          ),
+        ],
       ),
     );
   }
