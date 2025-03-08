@@ -146,155 +146,12 @@ class _AppointmentpageState extends State<Appointmentpage> {
                                       var schedule = upcomingSchedules[index];
                                       bool isLastElement =
                                           index == upcomingSchedules.length - 1;
-
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromARGB(
-                                            255,
-                                            255,
-                                            255,
-                                            255,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.2,
-                                              ),
-                                              blurRadius: 10,
-                                              spreadRadius: 5,
-                                              offset: Offset(0, 5),
-                                            ),
-                                          ],
-                                        ),
-                                        margin:
-                                            !isLastElement
-                                                ? const EdgeInsets.only(
-                                                  bottom: 20,
-                                                )
-                                                : EdgeInsets.zero,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(15),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  CircleAvatar(
-                                                    backgroundImage: AssetImage(
-                                                      schedule['ProfilePicture'] ??
-                                                          "assets/images/icon.jpg",
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 10),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        schedule['doctorName'] ??
-                                                            "Unknown",
-                                                        style: const TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 5),
-                                                      Text(
-                                                        schedule['category'] ??
-                                                            '',
-                                                        style: const TextStyle(
-                                                          color: Colors.grey,
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 15),
-                                              ScheduleCard(
-                                                date: schedule['date'] ?? '',
-                                                time: schedule['time'] ?? '',
-                                              ),
-                                              const SizedBox(height: 15),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton.styleFrom(
-                                                        backgroundColor:
-                                                            Colors.orange,
-                                                        side: const BorderSide(
-                                                          color: Color.fromARGB(
-                                                            255,
-                                                            222,
-                                                            221,
-                                                            221,
-                                                          ),
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        // Implement start session logic
-                                                      },
-                                                      child: const Text(
-                                                        'بدء الجلسة',
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 20),
-                                                  Expanded(
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton.styleFrom(
-                                                        side: const BorderSide(
-                                                          color: Color.fromARGB(
-                                                            255,
-                                                            223,
-                                                            222,
-                                                            222,
-                                                          ),
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    Searchpage(),
-                                                          ),
-                                                        );
-                                                      },
-                                                      child: const Text(
-                                                        'تغيير الموعد',
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.orange,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                      return AppointmentCard(
+                                        key: ValueKey(
+                                          schedule['date'],
+                                        ), // Ensure unique key
+                                        schedule: schedule,
+                                        isLastElement: isLastElement,
                                       );
                                     },
                                   ),
@@ -392,6 +249,164 @@ class _AppointmentpageState extends State<Appointmentpage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class AppointmentCard extends StatefulWidget {
+  final Map<String, dynamic> schedule;
+  final bool isLastElement;
+
+  const AppointmentCard({
+    Key? key,
+    required this.schedule,
+    required this.isLastElement,
+  }) : super(key: key);
+
+  @override
+  _AppointmentCardState createState() => _AppointmentCardState();
+}
+
+class _AppointmentCardState extends State<AppointmentCard> {
+  final FirestoreService _firestoreService = FirestoreService();
+  late Future<Map<String, dynamic>> _therapistDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    String uid = widget.schedule['therapistUid'] ?? '';
+    _therapistDataFuture = _firestoreService.getTherapistData(uid);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _therapistDataFuture,
+      builder: (context, therapistSnapshot) {
+        if (therapistSnapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+        if (therapistSnapshot.hasError) {
+          return Text('Error: ${therapistSnapshot.error}');
+        }
+        if (!therapistSnapshot.hasData) {
+          return Text('Therapist not found.');
+        }
+
+        Map<String, dynamic> therapistData = therapistSnapshot.data!;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 255, 255, 255),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                spreadRadius: 5,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
+          margin:
+              !widget.isLastElement
+                  ? const EdgeInsets.only(bottom: 20)
+                  : EdgeInsets.zero,
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage:
+                          therapistData['profileImage'] != null
+                              ? NetworkImage(therapistData['profileImage'])
+                              : AssetImage("assets/images/icon.jpg"),
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${therapistData['firstName'] ?? 'Unknown'} ${therapistData['lastName'] ?? ''}",
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          therapistData['specialty'] ??
+                              "No Specialty Information",
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                ScheduleCard(
+                  date: widget.schedule['date'] ?? '',
+                  time: widget.schedule['time'] ?? '',
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          side: const BorderSide(
+                            color: Color.fromARGB(255, 222, 221, 221),
+                            width: 2,
+                          ),
+                        ),
+                        onPressed: () {
+                          // Implement start session logic
+                        },
+                        child: const Text(
+                          'بدء الجلسة',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(
+                            color: Color.fromARGB(255, 223, 222, 222),
+                            width: 2,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Searchpage(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'تغيير الموعد',
+                          style: TextStyle(fontSize: 16, color: Colors.orange),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

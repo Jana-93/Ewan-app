@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/PaymentPage.dart'
-    show PaymentPage;
-
+import 'package:flutter_application_1/screens/PaymentPage.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
-import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/appointmentpage.dart';
 import 'package:flutter_application_1/firestore_service.dart';
 import 'package:animate_do/animate_do.dart';
@@ -20,42 +17,27 @@ class Searchpage extends StatefulWidget {
 class _SearchpageState extends State<Searchpage> {
   final FirestoreService _firestoreService = FirestoreService();
   int selectedIndex = 1;
-  int selectedDoctorIndex = -1;
+  int selectedTherapistIndex = -1;
   String searchQuery = "";
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
-  List<Map<String, dynamic>> doctors = [
-    {
-      "name": "د. عبدالعزيز فهد",
-      "specialty": "أخصائي نفسي",
-      "deg": "حاصل على درجة دكتوارة في الارشاد النفسي",
-      "price": "100 ريال",
-      "image": "assets/images/doc3.jpg",
-    },
-    {
-      "name": "د. سارة محمد",
-      "specialty": "أخصائية نفسية",
-      "deg": "حاصله على ماجستير في علم النفس",
-      "price": "85 ريال",
-      "image": "assets/images/doctor.jpg",
-    },
-    {
-      "name": "د. نورة محمد",
-      "specialty": "أخصائي نفسي",
-      "deg": "حاصله على درجة ماجستير في علم النفس من جامعة الملك سعود",
-      "price": "85 ريال",
-      "image": "assets/images/doc1.jpg",
-    },
-    {
-      "name": "د. شرف سعد",
-      "specialty": "أخصائي نفسي",
-      "deg": "حاصل على درجة ماجستير في علم النفس من جامعة الملك خالد",
-      "price": "85 ريال",
-      "image": "assets/images/d1.jpg",
-    },
-  ];
+  List<Map<String, dynamic>> therapists = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTherapists();
+  }
+
+  Future<void> _fetchTherapists() async {
+    List<Map<String, dynamic>> fetchedTherapists =
+        await _firestoreService.getTherapists();
+    setState(() {
+      therapists = fetchedTherapists;
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -156,9 +138,9 @@ class _SearchpageState extends State<Searchpage> {
                       const SizedBox(height: 20),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: doctors.length,
+                          itemCount: therapists.length,
                           itemBuilder: (context, index) {
-                            bool isSelected = selectedDoctorIndex == index;
+                            bool isSelected = selectedTherapistIndex == index;
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8),
                               color:
@@ -167,12 +149,17 @@ class _SearchpageState extends State<Searchpage> {
                                       : Colors.white,
                               child: ListTile(
                                 leading: CircleAvatar(
-                                  backgroundImage: AssetImage(
-                                    doctors[index]["image"] ?? "",
-                                  ),
+                                  backgroundImage:
+                                      therapists[index]["profileImage"] != null
+                                          ? NetworkImage(
+                                            therapists[index]["profileImage"],
+                                          )
+                                          : AssetImage(
+                                            "path_to_default_image.jpg",
+                                          ), // Provide a default image
                                 ),
                                 title: Text(
-                                  doctors[index]["name"] ?? "unknown doctor",
+                                  "${therapists[index]["firstName"] ?? ""} ${therapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
                                     color:
                                         isSelected
@@ -185,7 +172,8 @@ class _SearchpageState extends State<Searchpage> {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  doctors[index]["deg"] ?? "",
+                                  therapists[index]["specialty"] ??
+                                      "No Specialty Information",
                                   style: TextStyle(
                                     color:
                                         isSelected
@@ -194,7 +182,8 @@ class _SearchpageState extends State<Searchpage> {
                                   ),
                                 ),
                                 trailing: Text(
-                                  doctors[index]["price"] ?? "",
+                                  therapists[index]["experience"] ??
+                                      "Experience Unavailable",
                                   style: TextStyle(
                                     color:
                                         isSelected
@@ -204,7 +193,7 @@ class _SearchpageState extends State<Searchpage> {
                                 ),
                                 onTap: () {
                                   setState(() {
-                                    selectedDoctorIndex = index;
+                                    selectedTherapistIndex = index;
                                   });
                                 },
                               ),
@@ -212,7 +201,7 @@ class _SearchpageState extends State<Searchpage> {
                           },
                         ),
                       ),
-                      if (selectedDoctorIndex != -1) ...[
+                      if (selectedTherapistIndex != -1) ...[
                         const SizedBox(height: 20),
                         TableCalendar(
                           firstDay: DateTime.utc(2010, 10, 16),
@@ -280,47 +269,50 @@ class _SearchpageState extends State<Searchpage> {
                                   return;
                                 }
 
-                                var uuid = Uuid();
-                                String appointmentId =
-                                    uuid.v4(); // Generate a unique ID for the appointment
                                 String uid =
-                                    FirebaseAuth
-                                        .instance
-                                        .currentUser!
-                                        .uid; // Get the user's UID
+                                    FirebaseAuth.instance.currentUser!.uid;
+                                String therapistUid =
+                                    therapists[selectedTherapistIndex]["uid"] ??
+                                    "unknown";
+                                String therapistName =
+                                    "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
 
                                 final appointmentData = {
-                                  "Id":
-                                      appointmentId, // Use the generated unique ID
-                                  "userId":
-                                      uid, // Associate the appointment with the user's UID
-                                  "doctorName":
-                                      doctors[selectedDoctorIndex]["name"] ??
-                                      "unknown",
+                                  "userId": uid,
+                                  "therapistUid":
+                                      therapistUid, // Ensure this matches the field name in Firebase
+                                  "therapistName": therapistName,
                                   "date":
                                       "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
                                   "time": "10:00 صباحًا",
                                   "price":
-                                      doctors[selectedDoctorIndex]["price"] ??
+                                      therapists[selectedTherapistIndex]["price"] ??
                                       "0",
                                   "status": "upcoming",
                                 };
+
                                 try {
                                   await _firestoreService.addAppointment(
                                     appointmentData,
                                   );
-                                  print("Appointment ID: $appointmentId");
+                                  print("Appointment added successfully");
 
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder:
                                           (context) => PaymentPage(
-                                            amount: int.parse(
-                                              doctors[selectedDoctorIndex]["price"]
-                                                  .replaceAll("ريال", "")
-                                                  .trim(),
-                                            ),
+                                            amount:
+                                                int.tryParse(
+                                                  therapists[selectedTherapistIndex]["price"]
+                                                          ?.replaceAll(
+                                                            "ريال",
+                                                            "",
+                                                          )
+                                                          .trim() ??
+                                                      "0",
+                                                ) ??
+                                                0,
                                             currency: "SAR",
                                             appointmentData: appointmentData,
                                             onPaymentSuccess: () {
