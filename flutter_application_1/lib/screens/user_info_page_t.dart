@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/screens/TherapistHomePage.dart';
 import 'package:flutter_application_1/screens/loginScreen.dart';
-import 'package:flutter_application_1/screens/Tappointment.dart'; // تأكد من استيراد الصفحات الأخرى
+import 'package:flutter_application_1/screens/Tappointment.dart';
 
 class TherapistProfilePage extends StatefulWidget {
   @override
@@ -10,8 +11,8 @@ class TherapistProfilePage extends StatefulWidget {
 }
 
 class _TherapistProfilePageState extends State<TherapistProfilePage> {
-  String? selectedPrice; // سعر الجلسة المحدد
-  int _selectedIndex = 0; // الفهرس المحدد لـ navBar
+  String? selectedPrice;
+  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -19,7 +20,8 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
     });
     switch (index) {
       case 0:
-        // البقاء في الصفحة الحالية (الملف الشخصي)
+      
+        
         break;
       case 1:
         Navigator.pushReplacement(
@@ -28,10 +30,13 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         );
         break;
       case 2:
-        // يمكنك إضافة صفحة أخرى هنا
+      
         break;
       case 3:
-        // يمكنك إضافة صفحة أخرى هنا
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TherapistHomePage()),
+        );
         break;
     }
   }
@@ -128,7 +133,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
             );
           },
         ),
-        bottomNavigationBar: navBar(), // إضافة navBar هنا
+        bottomNavigationBar: navBar(),
       ),
     );
   }
@@ -147,7 +152,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
               .update({'bio': newBio});
         },
       ),
-      // إضافة سعر الجلسة تحت "نبذة عني"
+      
       _buildPriceOption(context),
       _buildProfileOption(Icons.work, "التخصص الدقيق: ${data['specialty']}", context, () {}),
       _buildProfileOption(Icons.timeline, "سنوات الخبرة: ${data['experience']}", context, () {}),
@@ -253,7 +258,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
                   int price = 40 + (index * 10);
                   return DropdownMenuItem<String>(
                     value: price.toString(),
-                    child: Text("$price ﷼"), // استخدام رمز الريال هنا
+                    child: Text("$price ﷼"),
                   );
                 }),
               ),
@@ -266,7 +271,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
                         .doc(FirebaseAuth.instance.currentUser!.uid)
                         .update({'sessionPrice': selectedPrice});
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("تم حفظ سعر الجلسة: $selectedPrice ﷼")), // استخدام رمز الريال هنا
+                      SnackBar(content: Text("تم حفظ سعر الجلسة: $selectedPrice ﷼")),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -301,10 +306,10 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.person, null, 0),
-          _buildNavItem(Icons.folder, null, 2),
-          _buildNavItem(Icons.calendar_month, null, 1),
           _buildNavItem(Icons.home, null, 3),
+          _buildNavItem(Icons.folder, null, 2),
+            _buildNavItem(Icons.calendar_month, null, 1),
+          _buildNavItem(Icons.person, null, 0),
         ],
       ),
     );
