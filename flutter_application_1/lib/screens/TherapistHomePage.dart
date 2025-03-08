@@ -144,7 +144,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
             ],
           ),
         ),
-        bottomNavigationBar: navBar(), // استبدل _buildCustomNavBar بـ navBar
+        bottomNavigationBar: navBar(),
       ),
     );
   }
@@ -193,10 +193,10 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.person, null, 0),
-          _buildNavItem(Icons.folder, null, 2),
-          _buildNavItem(Icons.calendar_month, null, 1),
           _buildNavItem(Icons.home, null, 3),
+          _buildNavItem(Icons.folder, null, 2),
+            _buildNavItem(Icons.calendar_month, null, 1),
+          _buildNavItem(Icons.person, null, 0),
         ],
       ),
     );
