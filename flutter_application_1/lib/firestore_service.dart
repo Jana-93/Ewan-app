@@ -7,6 +7,8 @@ class FirestoreService {
       .collection('therapists');
   final CollectionReference childrenCollection = FirebaseFirestore.instance
       .collection('children');
+      final CollectionReference parentsCollection = FirebaseFirestore.instance
+      .collection('parents');
 
   Future<void> addAppointment(Map<String, dynamic> data) async {
     try {
@@ -99,25 +101,37 @@ class FirestoreService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getChildren(String parentId) async {
-    if (parentId.isEmpty) {
-      print('Parent ID is empty');
-      throw Exception("Parent ID is empty");
-    }
+  
+Future<List<Map<String, dynamic>>> getChildren() async {
+   List<Map<String, dynamic>> children = [];
     try {
-      QuerySnapshot snapshot = await childrenCollection
-          .where('parentId', isEqualTo: parentId)
-          .get();
-      print("Fetched Children: ${snapshot.docs.length}"); // اطبع عدد الأطفال المسترجع
-      if (snapshot.docs.isNotEmpty) {
-        return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-      } else {
-        print("No children found for parentId: $parentId"); // اطبع إذا لم يتم العثور على أطفال
-        throw Exception("No children found for this parent");
+      QuerySnapshot snapshot = await childrenCollection.get();
+      for (var doc in snapshot.docs) {
+        children.add(doc.data() as Map<String, dynamic>);
       }
     } catch (e) {
-      print("Error fetching children: $e"); // اطبع الخطأ بالتفصيل
+      print("Error fetching children: $e");
+    }
+    return children; 
+  }
+
+  // Fetch data for a specific child by their UID
+  Future<Map<String, dynamic>> getChildData(String childId) async {
+     if (childId.isEmpty) {
+      print('childId is empty');
+      throw Exception("childId is empty");
+    }
+    try {
+      DocumentSnapshot doc = await childrenCollection.doc(childId).get();
+      if (doc.exists) {
+        return doc.data() as Map<String, dynamic>;
+      } else {
+        throw Exception(" children not found");
+      }
+    } catch (e) {
+      print("Error fetching children data: $e");
       throw e;
     }
   }
 }
+
