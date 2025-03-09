@@ -32,10 +32,7 @@ class _SearchpageState extends State<Searchpage> {
   void initState() {
     super.initState();
     _fetchTherapists();
-    _fetchChildren();
   }
-  
-
 
   Future<void> _fetchTherapists() async {
     try {
@@ -54,10 +51,10 @@ class _SearchpageState extends State<Searchpage> {
     }
   }
 
-  Future<void> _fetchChildren() async {
+  Future<void> _fetchChildren(String parentId) async {
     try {
       List<Map<String, dynamic>> fetchedChildren =
-          await _firestoreService.getChildren();
+          await _firestoreService.getChildren(parentId);
       print("Fetched Children: $fetchedChildren"); // Debugging: Print fetched children
       setState(() {
         children = fetchedChildren;
@@ -207,7 +204,7 @@ class _SearchpageState extends State<Searchpage> {
                                     setState(() {
                                       selectedTherapistIndex = index;
                                     });
-                                    await _fetchChildren();
+                                    await _fetchChildren(therapists[index]["uid"]);
                                   } catch (e) {
                                     print("Error fetching children: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -243,7 +240,7 @@ class _SearchpageState extends State<Searchpage> {
                                   color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
                                   child: ListTile(
                                     title: Text(
-                                      "${children[index]["firstName"] ?? ""} ${children[index]["lastName"] ?? ""}",
+                                      "${children[index]["childName"] ?? "No Name"}",
                                       style: TextStyle(
                                         color: isSelected ? Colors.orange : Colors.black,
                                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -370,7 +367,7 @@ class _SearchpageState extends State<Searchpage> {
                                 String uid = FirebaseAuth.instance.currentUser!.uid;
                                 String therapistUid = therapists[selectedTherapistIndex]["uid"] ?? "unknown";
                                 String therapistName = "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
-                                String childName = "${children[selectedChildIndex]["firstName"] ?? ""} ${children[selectedChildIndex]["lastName"] ?? ""}";
+                                String childName = "${children[selectedChildIndex]["childName"] ?? "No Name"}";
 
                                 final appointmentData = {
                                   "userId": uid,
@@ -492,7 +489,8 @@ class _SearchpageState extends State<Searchpage> {
 
   Widget _buildImageItem(String imagePath, int index) {
     bool isSelected = selectedIndex == index;
-    return GestureDetector(
+    return
+     GestureDetector(
       onTap: () {
         _onItemTapped(index);
       },
