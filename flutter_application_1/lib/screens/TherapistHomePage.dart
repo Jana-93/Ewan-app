@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/feedbackScreen.dart';
 import 'package:flutter_application_1/screens/Tappointment.dart';
 import 'package:flutter_application_1/screens/user_info_page_t.dart';
+import 'package:animate_do/animate_do.dart';
 
 class TherapistHomePage extends StatefulWidget {
   @override
@@ -65,118 +66,182 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(150.0),
-          child: FutureBuilder<Map<String, dynamic>>(
-            future: _fetchUserData(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('حدث خطأ أثناء جلب البيانات'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('لا توجد بيانات'));
-              } else {
-                Map<String, dynamic> userData = snapshot.data!;
-                String firstName = userData['firstName'] ?? 'غير معروف';
-                String lastName = userData['lastName'] ?? 'غير معروف';
-                String profileImageUrl = userData['profileImage'] ?? '';
-
-                return Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              colors: const [
-                Color.fromARGB(255, 219, 101, 37),
-                Color.fromRGBO(239, 108, 0, 1),
-                Color.fromRGBO(255, 167, 38, 1),
-              ],
+        body: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                colors: const [
+                  Color.fromARGB(255, 219, 101, 37),
+                  Color.fromRGBO(239, 108, 0, 1),
+                  Color.fromRGBO(255, 167, 38, 1),
+                ],
+              ),
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                const SizedBox(height: 60),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: FutureBuilder<Map<String, dynamic>>(
+                    future: _fetchUserData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('حدث خطأ أثناء جلب البيانات'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(child: Text('لا توجد بيانات'));
+                      } else {
+                        Map<String, dynamic> userData = snapshot.data!;
+                        String firstName = userData['firstName'] ?? 'غير معروف';
+                        String lastName = userData['lastName'] ?? 'غير معروف';
+                        String profileImageUrl = userData['profileImage'] ?? '';
+
+                        return FadeInUp(
+                          duration: const Duration(milliseconds: 1000),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    "مرحبًا،",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    "د. $firstName $lastName",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              CircleAvatar(
+                                radius: 35,
+                                backgroundImage: profileImageUrl.isNotEmpty
+                                    ? NetworkImage(profileImageUrl)
+                                    : AssetImage('assets/images/doctor.jpg')
+                                        as ImageProvider,
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'مرحبًا،',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'د. $firstName $lastName',
-                              style: TextStyle(fontSize: 18, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundImage: profileImageUrl.isNotEmpty
-                              ? NetworkImage(profileImageUrl)
-                              : AssetImage('assets/images/doctor.jpg')
-                                  as ImageProvider,
+                    padding: const EdgeInsets.all(30),
+                    child: Column(
+                      children: <Widget>[
+                        const SizedBox(height: 30),
+                        FadeInUp(
+                          duration: const Duration(milliseconds: 1400),
+                          child: Column(
+                            children: [
+                              buildMenuItem('المواعيد السابقة', Icons.history, context),
+                              SizedBox(height: 16),
+                              buildMenuItem('المواعيد القادمة', Icons.schedule, context),
+                              SizedBox(height: 16),
+                              buildMenuItem('تقدم المراجعين', Icons.bar_chart, context),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                );
-              }
-            },
+                ),
+              ],
+            ),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              buildMenuItem('المواعيد السابقة', Icons.history, context),
-              buildMenuItem('المواعيد القادمة', Icons.schedule, context),
-              buildMenuItem('تقدم المراجعين', Icons.bar_chart, context),
-            ],
-          ),
+        bottomNavigationBar: FadeInUp(
+          duration: const Duration(milliseconds: 1000),
+          child: navBar(),
         ),
-        bottomNavigationBar: navBar(),
       ),
     );
   }
 
   Widget buildMenuItem(String title, IconData icon, BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
+  return Container(
+    width: 360,
+    height: 130,
+    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 10,
+          spreadRadius: 2,
+          offset: Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Icon(icon, size: 40, color: Colors.orange),
+        ),
+        Expanded(
+          flex: 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  // Handle navigation or actions
+                },
+                child: Text(
+                  'عرض التفاصيل',
+                  style: TextStyle(fontSize: 12, color: Color(0xFFFCB47A)),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: ListTile(
-        title: Text(title, textAlign: TextAlign.right),
-        leading: Icon(icon, color: Colors.orange),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
-        onTap: () {
-          // Handle navigation or actions
-        },
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   Widget navBar() {
     return Container(
       height: 60,
+      width: double.infinity,
       margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -191,39 +256,39 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildNavItem(Icons.home, null, 3),
-          _buildNavItem(Icons.folder, null, 2),
-          _buildNavItem(Icons.calendar_month, null, 1),
-          _buildNavItem(Icons.person, null, 0),
+          _buildNavItem(Icons.home, 3),
+          _buildNavItem(Icons.folder, 2),
+          _buildNavItem(Icons.calendar_month, 1),
+            _buildNavItem(Icons.person, 0),
           
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData? icon, String? imagePath, int index) {
+  Widget _buildNavItem(IconData icon, int index) {
     bool isSelected = _selectedIndex == index;
     return GestureDetector(
       onTap: () {
         _onItemTapped(index);
       },
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             alignment: Alignment.center,
-            child: imagePath != null
-                ? ImageIcon(
-                    AssetImage(imagePath),
-                    size: 30,
-                    color: isSelected ? Colors.deepOrange : Colors.grey,
-                  )
-                : Icon(
-                    icon,
-                    color: isSelected ? Colors.deepOrange : Colors.grey,
-                  ),
+            margin: const EdgeInsets.only(
+              top: 15,
+              bottom: 0,
+              left: 30,
+              right: 25,
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.deepOrange : Colors.grey,
+            ),
           ),
         ],
       ),
