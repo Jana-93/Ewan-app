@@ -50,6 +50,23 @@ class _TappointmentState extends State<Tappointment> {
     }
   }
 
+  Future<Map<String, dynamic>> _fetchChildData(String childId) async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('children')
+          .doc(childId)
+          .get();
+      if (doc.exists) {
+        return doc.data() as Map<String, dynamic>;
+      } else {
+        throw Exception("Child not found");
+      }
+    } catch (e) {
+      print("Error fetching child data: $e");
+      throw e;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,147 +157,138 @@ class _TappointmentState extends State<Tappointment> {
                                       bool isLastElement =
                                           index == appointments.length - 1;
 
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromARGB(
-                                            255,
-                                            255,
-                                            255,
-                                            255,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.2,
+                                      return FutureBuilder<Map<String, dynamic>>(
+                                        future: _fetchChildData(appointment['childId']),
+                                        builder: (context, childSnapshot) {
+                                          if (childSnapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return CircularProgressIndicator();
+                                          }
+                                          if (childSnapshot.hasError) {
+                                            return Text('Error: ${childSnapshot.error}');
+                                          }
+                                          if (!childSnapshot.hasData) {
+                                            return Text('No child data available.');
+                                          }
+
+                                          var childData = childSnapshot.data!;
+
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: const Color.fromARGB(
+                                                255,
+                                                255,
+                                                255,
+                                                255,
                                               ),
-                                              blurRadius: 10,
-                                              spreadRadius: 5,
-                                              offset: Offset(0, 5),
-                                            ),
-                                          ],
-                                        ),
-                                        margin:
-                                            !isLastElement
-                                                ? const EdgeInsets.only(
-                                                  bottom: 20,
-                                                )
-                                                : EdgeInsets.zero,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(15),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  CircleAvatar(
-                                                    backgroundImage: AssetImage(
-                                                      appointment['ProfilePicture'] ??
-                                                          "assets/images/icon.jpg",
-                                                    ),
+                                              borderRadius: BorderRadius.circular(
+                                                20,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(
+                                                    0.2,
                                                   ),
-                                                  const SizedBox(width: 10),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                  blurRadius: 10,
+                                                  spreadRadius: 5,
+                                                  offset: Offset(0, 5),
+                                                ),
+                                              ],
+                                            ),
+                                            margin:
+                                                !isLastElement
+                                                    ? const EdgeInsets.only(
+                                                      bottom: 20,
+                                                    )
+                                                    : EdgeInsets.zero,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(15),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.stretch,
+                                                children: [
+                                                  Row(
                                                     children: [
-                                                      Text(
-                                                        appointment['patientName'] ??
-                                                            "",
-                                                        style: const TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.w700,
+                                                      CircleAvatar(
+                                                        backgroundImage: AssetImage(
+                                                          appointment['ProfilePicture'] ??
+                                                              "assets/images/icon.jpg",
                                                         ),
                                                       ),
-                                                      const SizedBox(height: 5),
-                                                      Text(
-                                                        appointment['category'] ??
-                                                            '',
-                                                        style: const TextStyle(
-                                                          color: Colors.grey,
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w600,
+                                                      const SizedBox(width: 10),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            childData['childName'] ?? "",
+                                                            style: const TextStyle(
+                                                              color: Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight.w700,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(height: 5),
+                                                          Text(
+                                                            appointment['category'] ??
+                                                                '',
+                                                            style: const TextStyle(
+                                                              color: Colors.grey,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight.w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 15),
+                                                  ScheduleCard(
+                                                    date: appointment['date'] ?? '',
+                                                    time: appointment['time'] ?? '',
+                                                  ),
+                                                  const SizedBox(height: 15),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Expanded(
+                                                        child: OutlinedButton(
+                                                          style: OutlinedButton.styleFrom(
+                                                            backgroundColor:
+                                                                Colors.orange,
+                                                            side: const BorderSide(
+                                                              color: Color.fromARGB(
+                                                                255,
+                                                                222,
+                                                                221,
+                                                                221,
+                                                              ),
+                                                              width: 2,
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            // Implement start session logic
+                                                          },
+                                                          child: const Text(
+                                                            'بدء الجلسة',
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: Colors.white,
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(height: 15),
-                                              ScheduleCard(
-                                                date: appointment['date'] ?? '',
-                                                time: appointment['time'] ?? '',
-                                              ),
-                                              const SizedBox(height: 15),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton.styleFrom(
-                                                        backgroundColor:
-                                                            Colors.orange,
-                                                        side: const BorderSide(
-                                                          color: Color.fromARGB(
-                                                            255,
-                                                            222,
-                                                            221,
-                                                            221,
-                                                          ),
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        // Implement start session logic
-                                                      },
-                                                      child: const Text(
-                                                        'بدء الجلسة',
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 20),
-                                                  Expanded(
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton.styleFrom(
-                                                        side: const BorderSide(
-                                                          color: Color.fromARGB(
-                                                            255,
-                                                            223,
-                                                            222,
-                                                            222,
-                                                          ),
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        // Implement change appointment logic
-                                                      },
-                                                      child: const Text(
-                                                        'تغيير الموعد',
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.orange,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                            ),
+                                          );
+                                        },
                                       );
                                     },
                                   ),
