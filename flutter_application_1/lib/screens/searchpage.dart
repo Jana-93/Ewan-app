@@ -240,7 +240,7 @@ class _SearchpageState extends State<Searchpage> {
                                   color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
                                   child: ListTile(
                                     title: Text(
-                                      "${children[index]["firstName"] ?? ""} ${children[index]["lastName"] ?? ""}",
+                                      "${children[index]["childName"] ?? "No Name"}",
                                       style: TextStyle(
                                         color: isSelected ? Colors.orange : Colors.black,
                                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -367,7 +367,7 @@ class _SearchpageState extends State<Searchpage> {
                                 String uid = FirebaseAuth.instance.currentUser!.uid;
                                 String therapistUid = therapists[selectedTherapistIndex]["uid"] ?? "unknown";
                                 String therapistName = "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
-                                String childName = "${children[selectedChildIndex]["firstName"] ?? ""} ${children[selectedChildIndex]["lastName"] ?? ""}";
+                                String childName = "${children[selectedChildIndex]["childName"] ?? "No Name"}";
 
                                 final appointmentData = {
                                   "userId": uid,
@@ -489,7 +489,8 @@ class _SearchpageState extends State<Searchpage> {
 
   Widget _buildImageItem(String imagePath, int index) {
     bool isSelected = selectedIndex == index;
-    return GestureDetector(
+    return
+     GestureDetector(
       onTap: () {
         _onItemTapped(index);
       },

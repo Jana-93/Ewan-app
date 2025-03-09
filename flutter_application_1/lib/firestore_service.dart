@@ -5,6 +5,8 @@ class FirestoreService {
       .collection('appointments');
   final CollectionReference therapistsCollection = FirebaseFirestore.instance
       .collection('therapists');
+  final CollectionReference childrenCollection = FirebaseFirestore.instance
+      .collection('children');
 
   Future<void> addAppointment(Map<String, dynamic> data) async {
     try {
@@ -96,35 +98,26 @@ class FirestoreService {
       throw e;
     }
   }
-  
-Future<void> addParentIdToChildren(String parentId) async {
-  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('children').get();
-  for (var doc in snapshot.docs) {
-    await doc.reference.update({
-      'parentId': parentId,
-    });
-  }
-}
-Future<List<Map<String, dynamic>>> getChildren(String parentId) async {
-  if (parentId.isEmpty) {
-    print('Parent ID is empty');
-    throw Exception("Parent ID is empty");
-  }
-  try {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('children')
-        .where('parentId', isEqualTo: parentId)
-        .get();
-    print("Fetched Children: ${snapshot.docs.length}"); // اطبع عدد الأطفال المسترجع
-    if (snapshot.docs.isNotEmpty) {
-      return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-    } else {
-      print("No children found for parentId: $parentId"); // اطبع إذا لم يتم العثور على أطفال
-      throw Exception("No children found for this parent");
+
+  Future<List<Map<String, dynamic>>> getChildren(String parentId) async {
+    if (parentId.isEmpty) {
+      print('Parent ID is empty');
+      throw Exception("Parent ID is empty");
     }
-  } catch (e) {
-    print("Error fetching children: $e"); // اطبع الخطأ بالتفصيل
-    throw e;
+    try {
+      QuerySnapshot snapshot = await childrenCollection
+          .where('parentId', isEqualTo: parentId)
+          .get();
+      print("Fetched Children: ${snapshot.docs.length}"); // اطبع عدد الأطفال المسترجع
+      if (snapshot.docs.isNotEmpty) {
+        return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      } else {
+        print("No children found for parentId: $parentId"); // اطبع إذا لم يتم العثور على أطفال
+        throw Exception("No children found for this parent");
+      }
+    } catch (e) {
+      print("Error fetching children: $e"); // اطبع الخطأ بالتفصيل
+      throw e;
+    }
   }
-}
 }
