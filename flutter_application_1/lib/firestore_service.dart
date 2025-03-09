@@ -145,6 +145,32 @@ Future<Map<String, dynamic>> getChildrenData(String childId) async {
     throw e;
   }
 }
+  Future<Map<String, dynamic>> getChildByName(String childName) async {
+    if (childName.isEmpty) {
+      print('childName is empty');
+      throw Exception("childName is empty");
+    }
+    try {
+      QuerySnapshot snapshot = await childrenCollection
+          .where('childName', isEqualTo: childName)
+          .get();
+      if (snapshot.docs.isNotEmpty) {
+        Map<String, dynamic> data = snapshot.docs.first.data() as Map<String, dynamic>;
+        return {
+          "childId": snapshot.docs.first.id,
+          "childName": data["childName"],
+          "childAge": data["childAge"],
+          "childStatus": data["childStatus"],
+          "parentId": data["parentId"],
+        };
+      } else {
+        throw Exception("Child not found");
+      }
+    } catch (e) {
+      print("Error fetching child data: $e");
+      throw e;
+    }
+  }
 
 
 }

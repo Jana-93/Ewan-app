@@ -50,14 +50,14 @@ class _TappointmentState extends State<Tappointment> {
     }
   }
 
-  Future<Map<String, dynamic>> _fetchChildData(String childId) async {
+  Future<Map<String, dynamic>> _fetchChildDataByName(String childName) async {
     try {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('children')
-          .doc(childId)
+          .where('childName', isEqualTo: childName)
           .get();
-      if (doc.exists) {
-        return doc.data() as Map<String, dynamic>;
+      if (snapshot.docs.isNotEmpty) {
+        return snapshot.docs.first.data() as Map<String, dynamic>;
       } else {
         throw Exception("Child not found");
       }
@@ -158,7 +158,9 @@ class _TappointmentState extends State<Tappointment> {
                                           index == appointments.length - 1;
 
                                       return FutureBuilder<Map<String, dynamic>>(
-                                        future: _fetchChildData(appointment['childId']),
+                                        future: appointment['childName'] != null && appointment['childName'].isNotEmpty
+                                            ? _fetchChildDataByName(appointment['childName'])
+                                            : Future.value({}),
                                         builder: (context, childSnapshot) {
                                           if (childSnapshot.connectionState ==
                                               ConnectionState.waiting) {
@@ -167,7 +169,7 @@ class _TappointmentState extends State<Tappointment> {
                                           if (childSnapshot.hasError) {
                                             return Text('Error: ${childSnapshot.error}');
                                           }
-                                          if (!childSnapshot.hasData) {
+                                          if (!childSnapshot.hasData || childSnapshot.data!.isEmpty) {
                                             return Text('No child data available.');
                                           }
 
@@ -222,7 +224,7 @@ class _TappointmentState extends State<Tappointment> {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            childData['childName'] ?? "",
+                                                            childData['childName'] ?? "No Name",
                                                             style: const TextStyle(
                                                               color: Colors.black,
                                                               fontWeight:
