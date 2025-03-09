@@ -33,7 +33,9 @@ class _SearchpageState extends State<Searchpage> {
     super.initState();
     _fetchTherapists();
   }
-
+void initState2() {
+    super.initState();
+_fetchChildren();  }
   Future<void> _fetchTherapists() async {
     try {
       List<Map<String, dynamic>> fetchedTherapists =
@@ -51,10 +53,10 @@ class _SearchpageState extends State<Searchpage> {
     }
   }
 
-  Future<void> _fetchChildren(String parentId) async {
+  Future<void> _fetchChildren() async {
     try {
       List<Map<String, dynamic>> fetchedChildren =
-          await _firestoreService.getChildren(parentId);
+          await _firestoreService.getchildren();
       print("Fetched Children: $fetchedChildren"); // Debugging: Print fetched children
       setState(() {
         children = fetchedChildren;
@@ -202,9 +204,9 @@ class _SearchpageState extends State<Searchpage> {
                                 onTap: () async {
                                   try {
                                     setState(() {
-                                      selectedTherapistIndex = index;
+                                      var selectedchildrenIndex = index;
                                     });
-                                    await _fetchChildren(therapists[index]["uid"]);
+                                    await _fetchChildren(children[index]["childId"]);
                                   } catch (e) {
                                     print("Error fetching children: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
