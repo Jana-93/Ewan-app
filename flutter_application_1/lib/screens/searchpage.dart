@@ -18,12 +18,15 @@ class _SearchpageState extends State<Searchpage> {
   final FirestoreService _firestoreService = FirestoreService();
   int selectedIndex = 1;
   int selectedTherapistIndex = -1;
+  int selectedChildIndex = -1;
   String searchQuery = "";
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  String? selectedTime;
 
   List<Map<String, dynamic>> therapists = [];
+  List<Map<String, dynamic>> children = [];
 
   @override
   void initState() {
@@ -32,11 +35,38 @@ class _SearchpageState extends State<Searchpage> {
   }
 
   Future<void> _fetchTherapists() async {
-    List<Map<String, dynamic>> fetchedTherapists =
-        await _firestoreService.getTherapists();
-    setState(() {
-      therapists = fetchedTherapists;
-    });
+    try {
+      List<Map<String, dynamic>> fetchedTherapists =
+          await _firestoreService.getTherapists();
+      setState(() {
+        therapists = fetchedTherapists;
+      });
+    } catch (e) {
+      print("Error fetching therapists: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("حدث خطأ أثناء جلب المعالجين"),
+        ),
+      );
+    }
+  }
+
+  Future<void> _fetchChildren(String parentId) async {
+    try {
+      List<Map<String, dynamic>> fetchedChildren =
+          await _firestoreService.getChildren(parentId);
+      print("Fetched Children: $fetchedChildren"); // Debugging: Print fetched children
+      setState(() {
+        children = fetchedChildren;
+      });
+    } catch (e) {
+      print("Error fetching children: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("حدث خطأ أثناء جلب الأطفال"),
+        ),
+      );
+    }
   }
 
   void _onItemTapped(int index) {
@@ -143,58 +173,46 @@ class _SearchpageState extends State<Searchpage> {
                             bool isSelected = selectedTherapistIndex == index;
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8),
-                              color:
-                                  isSelected
-                                      ? Colors.orange.withOpacity(0.2)
-                                      : Colors.white,
+                              color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
                               child: ListTile(
                                 leading: CircleAvatar(
-                                  backgroundImage:
-                                      therapists[index]["profileImage"] != null
-                                          ? NetworkImage(
-                                            therapists[index]["profileImage"],
-                                          )
-                                          : AssetImage(
-                                            "path_to_default_image.jpg",
-                                          ), // Provide a default image
+                                  backgroundImage: therapists[index]["profileImage"] != null
+                                      ? NetworkImage(therapists[index]["profileImage"])
+                                      : AssetImage("path_to_default_image.jpg"), // Provide a default image
                                 ),
                                 title: Text(
                                   "${therapists[index]["firstName"] ?? ""} ${therapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.orange
-                                            : Colors.black,
-                                    fontWeight:
-                                        isSelected
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
+                                    color: isSelected ? Colors.orange : Colors.black,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  therapists[index]["specialty"] ??
-                                      "No Specialty Information",
+                                  therapists[index]["specialty"] ?? "No Specialty Information",
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.orange
-                                            : Colors.grey,
+                                    color: isSelected ? Colors.orange : Colors.grey,
                                   ),
                                 ),
                                 trailing: Text(
-                                  therapists[index]["experience"] ??
-                                      "Experience Unavailable",
+                                  therapists[index]["experience"] ?? "Experience Unavailable",
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.orange
-                                            : Colors.green,
+                                    color: isSelected ? Colors.orange : Colors.green,
                                   ),
                                 ),
-                                onTap: () {
-                                  setState(() {
-                                    selectedTherapistIndex = index;
-                                  });
+                                onTap: () async {
+                                  try {
+                                    setState(() {
+                                      selectedTherapistIndex = index;
+                                    });
+                                    await _fetchChildren(therapists[index]["uid"]);
+                                  } catch (e) {
+                                    print("Error fetching children: $e");
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("حدث خطأ أثناء جلب الأطفال"),
+                                      ),
+                                    );
+                                  }
                                 },
                               ),
                             );
@@ -203,124 +221,180 @@ class _SearchpageState extends State<Searchpage> {
                       ),
                       if (selectedTherapistIndex != -1) ...[
                         const SizedBox(height: 20),
-                        TableCalendar(
-                          firstDay: DateTime.utc(2010, 10, 16),
-                          lastDay: DateTime.utc(2030, 3, 14),
-                          focusedDay: _focusedDay,
-                          calendarFormat: _calendarFormat,
-                          selectedDayPredicate: (day) {
-                            return isSameDay(_selectedDay, day);
-                          },
-                          onDaySelected: (selectedDay, focusedDay) {
-                            setState(() {
-                              _selectedDay = selectedDay;
-                              _focusedDay = focusedDay;
-                            });
-                          },
-                          onFormatChanged: (format) {
-                            setState(() {
-                              _calendarFormat = format;
-                            });
-                          },
-                          onPageChanged: (focusedDay) {
-                            _focusedDay = focusedDay;
-                          },
-                          calendarStyle: CalendarStyle(
-                            todayDecoration: BoxDecoration(
-                              color: Colors.orange,
-                              shape: BoxShape.circle,
-                            ),
-                            selectedDecoration: BoxDecoration(
-                              color: Colors.deepOrange,
-                              shape: BoxShape.circle,
-                            ),
-                            weekendTextStyle: TextStyle(color: Colors.red),
-                            defaultTextStyle: TextStyle(color: Colors.black),
-                          ),
-                          headerStyle: HeaderStyle(
-                            formatButtonVisible: false,
-                            titleTextStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            leftChevronIcon: Icon(
-                              Icons.chevron_left,
-                              color: Colors.deepOrange,
-                            ),
-                            rightChevronIcon: Icon(
-                              Icons.chevron_right,
-                              color: Colors.deepOrange,
-                            ),
+                        Text(
+                          "الأطفال المتاحين",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
+                        const SizedBox(height: 10),
+                        if (children.isNotEmpty)
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: children.length,
+                              itemBuilder: (context, index) {
+                                bool isSelected = selectedChildIndex == index;
+                                return Card(
+                                  margin: EdgeInsets.symmetric(vertical: 8),
+                                  color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
+                                  child: ListTile(
+                                    title: Text(
+                                      "${children[index]["firstName"] ?? ""} ${children[index]["lastName"] ?? ""}",
+                                      style: TextStyle(
+                                        color: isSelected ? Colors.orange : Colors.black,
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        selectedChildIndex = index;
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        if (children.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              "لا يوجد أطفال متاحين",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        if (selectedChildIndex != -1) ...[
+                          const SizedBox(height: 20),
+                          TableCalendar(
+                            firstDay: DateTime.utc(2010, 10, 16),
+                            lastDay: DateTime.utc(2030, 3, 14),
+                            focusedDay: _focusedDay,
+                            calendarFormat: _calendarFormat,
+                            selectedDayPredicate: (day) {
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                              });
+                            },
+                            onFormatChanged: (format) {
+                              setState(() {
+                                _calendarFormat = format;
+                              });
+                            },
+                            onPageChanged: (focusedDay) {
+                              _focusedDay = focusedDay;
+                            },
+                            calendarStyle: CalendarStyle(
+                              todayDecoration: BoxDecoration(
+                                color: Colors.orange,
+                                shape: BoxShape.circle,
+                              ),
+                              selectedDecoration: BoxDecoration(
+                                color: Colors.deepOrange,
+                                shape: BoxShape.circle,
+                              ),
+                              weekendTextStyle: TextStyle(color: Colors.red),
+                              defaultTextStyle: TextStyle(color: Colors.black),
+                            ),
+                            headerStyle: HeaderStyle(
+                              formatButtonVisible: false,
+                              titleTextStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              leftChevronIcon: Icon(
+                                Icons.chevron_left,
+                                color: Colors.deepOrange,
+                              ),
+                              rightChevronIcon: Icon(
+                                Icons.chevron_right,
+                                color: Colors.deepOrange,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          if (_selectedDay != null) ...[
+                            Text(
+                              "اختر الوقت",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 8.0,
+                              runSpacing: 8.0,
+                              children: List.generate(10, (index) {
+                                String time = "${8 + index}:00 صباحًا";
+                                return ChoiceChip(
+                                  label: Text(time),
+                                  selected: selectedTime == time,
+                                  onSelected: (selected) {
+                                    setState(() {
+                                      selectedTime = selected ? time : null;
+                                    });
+                                  },
+                                  selectedColor: Colors.deepOrange,
+                                  labelStyle: TextStyle(
+                                    color: selectedTime == time
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                );
+                              }),
+                            ),
+                            const SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: () async {
-                                if (_selectedDay == null) {
+                                if (_selectedDay == null || selectedTime == null) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text("يرجى تحديد تاريخ الحجز"),
+                                      content: Text("يرجى تحديد التاريخ والوقت"),
                                     ),
                                   );
                                   return;
                                 }
 
-                                String uid =
-                                    FirebaseAuth.instance.currentUser!.uid;
-                                String therapistUid =
-                                    therapists[selectedTherapistIndex]["uid"] ??
-                                    "unknown";
-                                String therapistName =
-                                    "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
+                                String uid = FirebaseAuth.instance.currentUser!.uid;
+                                String therapistUid = therapists[selectedTherapistIndex]["uid"] ?? "unknown";
+                                String therapistName = "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
+                                String childName = "${children[selectedChildIndex]["firstName"] ?? ""} ${children[selectedChildIndex]["lastName"] ?? ""}";
 
                                 final appointmentData = {
                                   "userId": uid,
-                                  "therapistUid":
-                                      therapistUid, // Ensure this matches the field name in Firebase
+                                  "therapistUid": therapistUid,
                                   "therapistName": therapistName,
-                                  "date":
-                                      "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
-                                  "time": "10:00 صباحًا",
-                                  "price":
-                                      therapists[selectedTherapistIndex]["price"] ??
-                                      "0",
+                                  "childName": childName,
+                                  "date": "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
+                                  "time": selectedTime,
+                                  "price": therapists[selectedTherapistIndex]["price"] ?? "0",
                                   "status": "upcoming",
                                 };
 
                                 try {
-                                  await _firestoreService.addAppointment(
-                                    appointmentData,
-                                  );
+                                  await _firestoreService.addAppointment(appointmentData);
                                   print("Appointment added successfully");
 
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder:
-                                          (context) => PaymentPage(
-                                            amount:
-                                                int.tryParse(
-                                                  therapists[selectedTherapistIndex]["price"]
-                                                          ?.replaceAll(
-                                                            "ريال",
-                                                            "",
-                                                          )
-                                                          .trim() ??
-                                                      "0",
-                                                ) ??
-                                                0,
-                                            currency: "SAR",
-                                            appointmentData: appointmentData,
-                                            onPaymentSuccess: () {
-                                              _firestoreService.addAppointment(
-                                                appointmentData,
-                                              );
-                                            },
-                                          ),
+                                      builder: (context) => PaymentPage(
+                                        amount: int.tryParse(therapists[selectedTherapistIndex]["price"]?.replaceAll("ريال", "").trim() ?? "0") ?? 0,
+                                        currency: "SAR",
+                                        appointmentData: appointmentData,
+                                        onPaymentSuccess: () {
+                                          _firestoreService.addAppointment(appointmentData);
+                                        },
+                                      ),
                                     ),
                                   );
                                 } catch (e) {
@@ -343,7 +417,7 @@ class _SearchpageState extends State<Searchpage> {
                               ),
                             ),
                           ],
-                        ),
+                        ],
                       ],
                     ],
                   ),
