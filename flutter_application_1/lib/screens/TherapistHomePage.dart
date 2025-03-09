@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/feedbackScreen.dart';
@@ -11,7 +12,7 @@ class TherapistHomePage extends StatefulWidget {
 }
 
 class _TherapistHomePageState extends State<TherapistHomePage> {
-  int _selectedIndex = 3;
+  int _selectedIndex = 2;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -33,12 +34,6 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         );
         break;
       case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => FeedbackScreen()),
-        );
-        break;
-      case 3:
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => TherapistHomePage()),
@@ -176,62 +171,57 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
 
   Widget navBar() {
     return Container(
-      height: 60,
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            spreadRadius: 5,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+    height: 60,
+    width: double.infinity,
+    margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(30),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 15,
+          spreadRadius: 5,
+          offset: const Offset(0, 5),
+        ),
+      ],
+    ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(Icons.home, null, 3),
-          _buildNavItem(Icons.folder, null, 2),
-            _buildNavItem(Icons.calendar_month, null, 1),
-          _buildNavItem(Icons.person, null, 0),
-        ],
-      ),
-    );
-  }
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildNavItem(Icons.person, 0),
+        _buildNavItem(Icons.calendar_today, 1),
+        _buildImageItem("assets/images/ewan.png", 2),
+      ],
+    ),
+  );
+}
 
-  Widget _buildNavItem(IconData? icon, String? imagePath, int index) {
+  Widget _buildNavItem(IconData icon, int index) {
     bool isSelected = _selectedIndex == index;
     return GestureDetector(
       onTap: () {
         _onItemTapped(index);
       },
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            alignment: Alignment.center,
-            child: imagePath != null
-                ? ImageIcon(
-                    AssetImage(imagePath),
-                    size: 30,
-                    color: isSelected ? Colors.deepOrange : Colors.grey,
-                  )
-                : Icon(
-                    icon,
-                    color: isSelected ? Colors.deepOrange : Colors.grey,
-                  ),
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          alignment: Alignment.center,
+          margin: const EdgeInsets.only(right: 15),
+          child: ImageIcon(
+            AssetImage(imagePath),
+            size: 60,
+            color: isSelected ? Colors.deepOrange : Colors.grey,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }
 
 void main() {
-  runApp(
-    MaterialApp(debugShowCheckedModeBanner: false, home: TherapistHomePage()),
-  );
+  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: TherapistHomePage()));
 }
