@@ -32,10 +32,9 @@ class _SearchpageState extends State<Searchpage> {
   void initState() {
     super.initState();
     _fetchTherapists();
+    _fetchChildren(); // Fetch children data when the page initializes
   }
-void initState2() {
-    super.initState();
-_fetchChildren();  }
+
   Future<void> _fetchTherapists() async {
     try {
       List<Map<String, dynamic>> fetchedTherapists =
@@ -101,6 +100,77 @@ _fetchChildren();  }
           MaterialPageRoute(builder: (context) => Homepage()),
         );
         break;
+    }
+  }
+
+  // Widget لصفحة اختيار الوقت
+  Future<void> _selectTime(BuildContext context) async {
+    final String? selected = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TimeSelectionPage(),
+      ),
+    );
+
+    if (selected != null) {
+      setState(() {
+        selectedTime = selected;
+      });
+
+      // الانتقال إلى صفحة الدفع مباشرة بعد اختيار الوقت
+      _navigateToPaymentPage();
+    }
+  }
+
+  void _navigateToPaymentPage() async {
+    if (_selectedDay == null || selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("يرجى تحديد التاريخ والوقت"),
+        ),
+      );
+      return;
+    }
+
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    String therapistUid = therapists[selectedTherapistIndex]["uid"] ?? "unknown";
+    String therapistName = "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
+    String childName = "${children[selectedChildIndex]["childName"] ?? "No Name"}";
+
+    final appointmentData = {
+      "userId": uid,
+      "therapistUid": therapistUid,
+      "therapistName": therapistName,
+      "childName": childName,
+      "date": "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
+      "time": selectedTime,
+      "price": therapists[selectedTherapistIndex]["price"] ?? "0",
+      "status": "upcoming",
+    };
+
+    try {
+      await _firestoreService.addAppointment(appointmentData);
+      print("Appointment added successfully");
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentPage(
+            amount: int.tryParse(therapists[selectedTherapistIndex]["price"]?.replaceAll("ريال", "").trim() ?? "0") ?? 0,
+            currency: "SAR",
+            appointmentData: appointmentData,
+            onPaymentSuccess: () {
+              _firestoreService.addAppointment(appointmentData);
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("حدث خطأ أثناء حجز الموعد"),
+        ),
+      );
     }
   }
 
@@ -204,9 +274,9 @@ _fetchChildren();  }
                                 onTap: () async {
                                   try {
                                     setState(() {
-                                      var selectedchildrenIndex = index;
+                                      selectedTherapistIndex = index;
                                     });
-                                    await _fetchChildren(children[index]["childId"]);
+                                    await _fetchChildren(); // Fetch children data when a therapist is selected
                                   } catch (e) {
                                     print("Error fetching children: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -239,7 +309,7 @@ _fetchChildren();  }
                                 bool isSelected = selectedChildIndex == index;
                                 return Card(
                                   margin: EdgeInsets.symmetric(vertical: 8),
-                                  color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
+                                  color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.orange,
                                   child: ListTile(
                                     title: Text(
                                       "${children[index]["childName"] ?? "No Name"}",
@@ -279,11 +349,12 @@ _fetchChildren();  }
                             selectedDayPredicate: (day) {
                               return isSameDay(_selectedDay, day);
                             },
-                            onDaySelected: (selectedDay, focusedDay) {
+                            onDaySelected: (selectedDay, focusedDay) async {
                               setState(() {
                                 _selectedDay = selectedDay;
                                 _focusedDay = focusedDay;
                               });
+                              await _selectTime(context); // انتقل إلى صفحة اختيار الوقت مباشرة
                             },
                             onFormatChanged: (format) {
                               setState(() {
@@ -322,100 +393,13 @@ _fetchChildren();  }
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          if (_selectedDay != null) ...[
-                            Text(
-                              "اختر الوقت",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Wrap(
-                              spacing: 8.0,
-                              runSpacing: 8.0,
-                              children: List.generate(10, (index) {
-                                String time = "${8 + index}:00 صباحًا";
-                                return ChoiceChip(
-                                  label: Text(time),
-                                  selected: selectedTime == time,
-                                  onSelected: (selected) {
-                                    setState(() {
-                                      selectedTime = selected ? time : null;
-                                    });
-                                  },
-                                  selectedColor: Colors.deepOrange,
-                                  labelStyle: TextStyle(
-                                    color: selectedTime == time
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                );
-                              }),
-                            ),
+                          if (selectedTime != null) ...[
                             const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () async {
-                                if (_selectedDay == null || selectedTime == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text("يرجى تحديد التاريخ والوقت"),
-                                    ),
-                                  );
-                                  return;
-                                }
-
-                                String uid = FirebaseAuth.instance.currentUser!.uid;
-                                String therapistUid = therapists[selectedTherapistIndex]["uid"] ?? "unknown";
-                                String therapistName = "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
-                                String childName = "${children[selectedChildIndex]["childName"] ?? "No Name"}";
-
-                                final appointmentData = {
-                                  "userId": uid,
-                                  "therapistUid": therapistUid,
-                                  "therapistName": therapistName,
-                                  "childName": childName,
-                                  "date": "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
-                                  "time": selectedTime,
-                                  "price": therapists[selectedTherapistIndex]["price"] ?? "0",
-                                  "status": "upcoming",
-                                };
-
-                                try {
-                                  await _firestoreService.addAppointment(appointmentData);
-                                  print("Appointment added successfully");
-
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PaymentPage(
-                                        amount: int.tryParse(therapists[selectedTherapistIndex]["price"]?.replaceAll("ريال", "").trim() ?? "0") ?? 0,
-                                        currency: "SAR",
-                                        appointmentData: appointmentData,
-                                        onPaymentSuccess: () {
-                                          _firestoreService.addAppointment(appointmentData);
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text("حدث خطأ أثناء حجز الموعد"),
-                                    ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepOrange,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                "التالي",
-                                style: TextStyle(color: Colors.white),
+                            Text(
+                              "الوقت المحدد: $selectedTime",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
@@ -491,8 +475,7 @@ _fetchChildren();  }
 
   Widget _buildImageItem(String imagePath, int index) {
     bool isSelected = selectedIndex == index;
-    return
-     GestureDetector(
+    return GestureDetector(
       onTap: () {
         _onItemTapped(index);
       },
@@ -509,6 +492,39 @@ _fetchChildren();  }
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// صفحة اختيار الوقت
+class TimeSelectionPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("اختر الوقت"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Wrap(
+          spacing: 8.0,
+          runSpacing: 8.0,
+          children: List.generate(10, (index) {
+            String time = "${8 + index}:00 صباحًا";
+            return ChoiceChip(
+              label: Text(time),
+              selected: false,
+              onSelected: (selected) {
+                Navigator.pop(context, time); // إرجاع الوقت المحدد
+              },
+              selectedColor: Colors.deepOrange,
+              labelStyle: TextStyle(
+                color: Colors.black,
+              ),
+            );
+          }),
+        ),
       ),
     );
   }

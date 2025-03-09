@@ -102,32 +102,49 @@ class FirestoreService {
   }
 
  Future<List<Map<String, dynamic>>> getchildren() async {
-   List<Map<String, dynamic>> children = [];
-    try {
-      QuerySnapshot snapshot = await childrenCollection.get();
-      for (var doc in snapshot.docs) {
-        children.add(doc.data() as Map<String, dynamic>);
-      }
-    } catch (e) {
-      print("Error fetching therapists: $e");
+  List<Map<String, dynamic>> children = [];
+  try {
+    QuerySnapshot snapshot = await childrenCollection.get();
+    for (var doc in snapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      children.add({
+        "childId": doc.id,
+        "childName": data["childName"],
+        "childAge": data["childAge"],
+        "childStatus": data["childStatus"],
+        "parentId": data["parentId"],
+      });
     }
-    return children;
-}
- Future<Map<String, dynamic>> getChildrenData(String childId) async {
-    if (childId.isEmpty) {
-      print('childId is empty');
-      throw Exception("childId is empty");
-    }
-    try {
-      DocumentSnapshot doc = await childrenCollection.doc(childId).get();
-      if (doc.exists) {
-        return doc.data() as Map<String, dynamic>;
-      } else {
-        throw Exception("children not found");
-      }
-    } catch (e) {
-      print("Error fetching children data: $e");
-      throw e;
-    }
+  } catch (e) {
+    print("Error fetching children: $e");
   }
+  return children;
+}
+
+Future<Map<String, dynamic>> getChildrenData(String childId) async {
+  if (childId.isEmpty) {
+    print('childId is empty');
+    throw Exception("childId is empty");
+  }
+  try {
+    DocumentSnapshot doc = await childrenCollection.doc(childId).get();
+    if (doc.exists) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      return {
+        "childId": doc.id,
+        "childName": data["childName"],
+        "childAge": data["childAge"],
+        "childStatus": data["childStatus"],
+        "parentId": data["parentId"],
+      };
+    } else {
+      throw Exception("Child not found");
+    }
+  } catch (e) {
+    print("Error fetching child data: $e");
+    throw e;
+  }
+}
+
+
 }
