@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/callVideo/presentation/views/video_call_screen.dart';
 import 'package:flutter_application_1/feedbackScreen.dart';
 import 'package:flutter_application_1/firestore_service.dart';
 import 'package:flutter_application_1/screens/TherapistHomePage.dart';
@@ -52,10 +53,11 @@ class _TappointmentState extends State<Tappointment> {
 
   Future<Map<String, dynamic>> _fetchChildDataByName(String childName) async {
     try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('children')
-          .where('childName', isEqualTo: childName)
-          .get();
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance
+              .collection('children')
+              .where('childName', isEqualTo: childName)
+              .get();
       if (snapshot.docs.isNotEmpty) {
         return snapshot.docs.first.data() as Map<String, dynamic>;
       } else {
@@ -157,20 +159,32 @@ class _TappointmentState extends State<Tappointment> {
                                       bool isLastElement =
                                           index == appointments.length - 1;
 
-                                      return FutureBuilder<Map<String, dynamic>>(
-                                        future: appointment['childName'] != null && appointment['childName'].isNotEmpty
-                                            ? _fetchChildDataByName(appointment['childName'])
-                                            : Future.value({}),
+                                      return FutureBuilder<
+                                        Map<String, dynamic>
+                                      >(
+                                        future:
+                                            appointment['childName'] != null &&
+                                                    appointment['childName']
+                                                        .isNotEmpty
+                                                ? _fetchChildDataByName(
+                                                  appointment['childName'],
+                                                )
+                                                : Future.value({}),
                                         builder: (context, childSnapshot) {
                                           if (childSnapshot.connectionState ==
                                               ConnectionState.waiting) {
                                             return CircularProgressIndicator();
                                           }
                                           if (childSnapshot.hasError) {
-                                            return Text('Error: ${childSnapshot.error}');
+                                            return Text(
+                                              'Error: ${childSnapshot.error}',
+                                            );
                                           }
-                                          if (!childSnapshot.hasData || childSnapshot.data!.isEmpty) {
-                                            return Text('No child data available.');
+                                          if (!childSnapshot.hasData ||
+                                              childSnapshot.data!.isEmpty) {
+                                            return Text(
+                                              'No child data available.',
+                                            );
                                           }
 
                                           var childData = childSnapshot.data!;
@@ -183,14 +197,12 @@ class _TappointmentState extends State<Tappointment> {
                                                 255,
                                                 255,
                                               ),
-                                              borderRadius: BorderRadius.circular(
-                                                20,
-                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black.withOpacity(
-                                                    0.2,
-                                                  ),
+                                                  color: Colors.black
+                                                      .withOpacity(0.2),
                                                   blurRadius: 10,
                                                   spreadRadius: 5,
                                                   offset: Offset(0, 5),
@@ -224,23 +236,34 @@ class _TappointmentState extends State<Tappointment> {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            childData['childName'] ?? "No Name",
-                                                            style: const TextStyle(
-                                                              color: Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight.w700,
-                                                            ),
+                                                            childData['childName'] ??
+                                                                "No Name",
+                                                            style:
+                                                                const TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .black,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                ),
                                                           ),
-                                                          const SizedBox(height: 5),
+                                                          const SizedBox(
+                                                            height: 5,
+                                                          ),
                                                           Text(
                                                             appointment['category'] ??
                                                                 '',
-                                                            style: const TextStyle(
-                                                              color: Colors.grey,
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight.w600,
-                                                            ),
+                                                            style:
+                                                                const TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .grey,
+                                                                  fontSize: 12,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
                                                           ),
                                                         ],
                                                       ),
@@ -248,8 +271,12 @@ class _TappointmentState extends State<Tappointment> {
                                                   ),
                                                   const SizedBox(height: 15),
                                                   ScheduleCard(
-                                                    date: appointment['date'] ?? '',
-                                                    time: appointment['time'] ?? '',
+                                                    date:
+                                                        appointment['date'] ??
+                                                        '',
+                                                    time:
+                                                        appointment['time'] ??
+                                                        '',
                                                   ),
                                                   const SizedBox(height: 15),
                                                   Row(
@@ -263,23 +290,37 @@ class _TappointmentState extends State<Tappointment> {
                                                             backgroundColor:
                                                                 Colors.orange,
                                                             side: const BorderSide(
-                                                              color: Color.fromARGB(
-                                                                255,
-                                                                222,
-                                                                221,
-                                                                221,
-                                                              ),
+                                                              color:
+                                                                  Color.fromARGB(
+                                                                    255,
+                                                                    222,
+                                                                    221,
+                                                                    221,
+                                                                  ),
                                                               width: 2,
                                                             ),
                                                           ),
                                                           onPressed: () {
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (
+                                                                      context,
+                                                                    ) => const VideoCallScreen(
+                                                                      user:
+                                                                          'doctor',
+                                                                    ),
+                                                              ),
+                                                            );
                                                             // Implement start session logic
                                                           },
                                                           child: const Text(
                                                             'بدء الجلسة',
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              color: Colors.white,
+                                                              color:
+                                                                  Colors.white,
                                                             ),
                                                           ),
                                                         ),

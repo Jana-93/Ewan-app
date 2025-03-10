@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter_application_1/callVideo/presentation/views/video_call_screen.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
@@ -369,6 +370,14 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           ),
                         ),
                         onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      const VideoCallScreen(user: 'patient'),
+                            ),
+                          );
                           // Implement start session logic
                         },
                         child: const Text(
