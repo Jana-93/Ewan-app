@@ -12,7 +12,7 @@ class TherapistHomePage extends StatefulWidget {
 }
 
 class _TherapistHomePageState extends State<TherapistHomePage> {
-  int _selectedIndex = 3;
+  int _selectedIndex = 2; //  3 خانات
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -34,12 +34,6 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         );
         break;
       case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => FeedbackScreen()),
-        );
-        break;
-      case 3:
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => TherapistHomePage()),
@@ -182,61 +176,61 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
   }
 
   Widget buildMenuItem(String title, IconData icon, BuildContext context) {
-  return Container(
-    width: 360,
-    height: 130,
-    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.2),
-          blurRadius: 10,
-          spreadRadius: 2,
-          offset: Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Icon(icon, size: 40, color: Colors.orange),
-        ),
-        Expanded(
-          flex: 2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.left,
-              ),
-              SizedBox(height: 8),
-              GestureDetector(
-                onTap: () {
-                  // Handle navigation or actions
-                },
-                child: Text(
-                  'عرض التفاصيل',
-                  style: TextStyle(fontSize: 12, color: Color(0xFFFCB47A)),
+    return Container(
+      width: 360,
+      height: 130,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Icon(icon, size: 40, color: Colors.orange),
+          ),
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                   textAlign: TextAlign.left,
                 ),
-              ),
-            ],
+                SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () {
+                    // Handle navigation or actions
+                  },
+                  child: Text(
+                    'عرض التفاصيل',
+                    style: TextStyle(fontSize: 12, color: Color(0xFFFCB47A)),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   Widget navBar() {
     return Container(
@@ -259,11 +253,9 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildNavItem(Icons.home, 3),
-          _buildNavItem(Icons.folder, 2),
-          _buildNavItem(Icons.calendar_month, 1),
-            _buildNavItem(Icons.person, 0),
-          
+          _buildNavItem(Icons.person, 0), // TherapistProfilePage
+          _buildNavItem(Icons.calendar_today, 1), // Tappointment
+          _buildImageItem("assets/images/ewan.png", 2), // TherapistHomePage (صورة)
         ],
       ),
     );
@@ -283,7 +275,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
               top: 15,
               bottom: 0,
               left: 30,
-              right: 25,
+              right: 30,
             ),
             child: Icon(
               icon,
@@ -294,8 +286,30 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
       ),
     );
   }
-}
 
+  Widget _buildImageItem(String imagePath, int index) {
+    bool isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () {
+        _onItemTapped(index);
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            alignment: Alignment.center,
+            margin: const EdgeInsets.only(right: 15),
+            child: ImageIcon(
+              AssetImage(imagePath),
+              size: 60,
+              color: isSelected ? Colors.deepOrange : Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 void main() {
   runApp(
     MaterialApp(debugShowCheckedModeBanner: false, home: TherapistHomePage()),
