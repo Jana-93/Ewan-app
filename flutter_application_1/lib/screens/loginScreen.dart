@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(content: Text("لم يتم العثور على دور المستخدم. يرجى الاتصال بالدعم الفني.")),
       );
     } on FirebaseAuthException catch (e) {
-      // استخدام الرسالة الافتراضية من Firebase
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? "حدث خطأ أثناء تسجيل الدخول.")),
       );

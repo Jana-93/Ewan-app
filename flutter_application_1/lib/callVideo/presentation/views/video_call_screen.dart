@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter_application_1/callVideo/data/model/agora_manager_model.dart';
 import 'package:flutter_application_1/callVideo/presentation/views/game_screen.dart';
+import 'package:flutter_application_1/screens/childFeedback.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class VideoCallScreen extends StatefulWidget {
   final String user;
@@ -228,6 +230,16 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       _outroVideoController!.pause();
       Navigator.pop(context);
     });
+    _navigateToChildFeedbackScreen();
+  }
+
+  void _navigateToChildFeedbackScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChildFeedback(),
+      ),
+    );
   }
 
   @override
