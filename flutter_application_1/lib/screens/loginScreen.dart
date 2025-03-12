@@ -48,6 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
           context,
           MaterialPageRoute(builder: (context) => TherapistHomePage()),
         );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(" تم تسجيل الدخول بنجاح كطبيب! ",textDirection: TextDirection.rtl)),
+        );
         return;
       }
 
@@ -60,29 +63,26 @@ class _LoginScreenState extends State<LoginScreen> {
           context,
           MaterialPageRoute(builder: (context) => Homepage()),
         );
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(" تم تسجيل الدخول بنجاح كوالد! ",textDirection: TextDirection.rtl)),
+        );
+        
         return;
       }
 
       // If the user is not found in either collection, handle the error
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User role not found. Please contact support.")),
+        SnackBar(content: Text("لم يتم العثور على دور المستخدم. يرجى الاتصال بالدعم الفني.")),
       );
     } on FirebaseAuthException catch (e) {
-      String errorMessage = "حدث خطأ ";
-
-      if (e.code == 'user-not-found') {
-        errorMessage = 'البريد الإلكتروني غير مسجل';
-      } else if (e.code == 'wrong-password') {
-        errorMessage = 'كلمة المرور غير صحيحة';
-      } else if (e.code == 'invalid-email') {
-        errorMessage = 'البريد الإلكتروني غير صحيح';
-      } else if (e.code == 'network-request-failed') {
-        errorMessage = 'تحقق من اتصال الإنترنت';
-      }
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      // استخدام الرسالة الافتراضية من Firebase
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? "حدث خطأ أثناء تسجيل الدخول.")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.")),
+      );
     }
   }
 
