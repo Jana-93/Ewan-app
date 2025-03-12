@@ -67,7 +67,7 @@ class _GameScreenState extends State<GameScreen> {
       appBar: AppBar(title: const Text('صفحة اللعبة')),
       body: Stack(
         children: [
-          const Center(child: Text('محتوا صفحة اللعبة')),
+          const Center(child: Text('محتوى صفحة اللعبة')),
           Positioned(
             left: _floatingPosition.dx,
             top: _floatingPosition.dy,
