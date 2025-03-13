@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'HomePage.dart'; // Parent Home Screen
-import 'loginScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore for storing user data
 import 'userpage.dart';
+import 'package:uuid/uuid.dart'; // Import uuid package
 
 class AddChild extends StatefulWidget {
   AddChild({super.key});
@@ -21,6 +20,9 @@ class _AddChildState extends State<AddChild> {
   String? selectedChildAge; // Variable to hold the selected age
   final TextEditingController _childStatusController = TextEditingController();
 
+  // Add childId as a variable
+  String? childId; // This will hold the childId
+
   /// Function to Register Child
   Future<void> registerChild() async {
     try {
@@ -30,11 +32,10 @@ class _AddChildState extends State<AddChild> {
         throw Exception("المستخدم غير مسجل دخول");
       }
 
-      
       if (_childNameController.text.trim().isEmpty) {
         throw Exception("يرجى إدخال اسم الطفل");
       }
-      
+
       if (selectedChildAge == null) {
         throw Exception("يرجى اختيار عمر الطفل");
       }
@@ -43,8 +44,13 @@ class _AddChildState extends State<AddChild> {
         throw Exception("يرجى إدخال حالة الطفل");
       }
 
+      // Generate a unique childId
+      var uuid = Uuid();
+      childId = uuid.v4(); // Assign a unique ID to childId
+
       // Always store in "children" collection, and add the parentId (user's uid)
       await FirebaseFirestore.instance.collection("children").add({
+        "childId": childId, // Add the generated childId
         "childName": _childNameController.text.trim(),
         "childAge": selectedChildAge, // Use selected child age
         "childStatus": _childStatusController.text.trim(),
@@ -79,7 +85,7 @@ class _AddChildState extends State<AddChild> {
       );
     } catch (e) {
       print("Error: $e");
-    
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
