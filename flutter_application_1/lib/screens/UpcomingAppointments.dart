@@ -2,29 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-
 class UpcomingAppointments extends StatefulWidget {
   const UpcomingAppointments({super.key});
-
 
   @override
   State<UpcomingAppointments> createState() => _UpcomingAppointmentsState();
 }
 
-
 class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-
-  // دالة لجلب المواعيد القادمة
+  // Function to fetch upcoming appointments
   Stream<List<Map<String, dynamic>>> getUpcomingAppointments() {
     return _firestore
         .collection('appointments')
-        .where('status', isEqualTo: 'upcoming') // المواعيد القادمة فقط
+        .where('status', isEqualTo: 'upcoming') // Only upcoming appointments
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -77,81 +72,96 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: getUpcomingAppointments(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
                           }
                           if (snapshot.hasError) {
-                            return Center(child: Text('Error: ${snapshot.error}'));
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
                           }
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return const Center(child: Text('لا توجد مواعيد قادمة.'));
+                            return const Center(
+                              child: Text('لا توجد مواعيد قادمة.'),
+                            );
                           }
 
-
-                          List<Map<String, dynamic>> appointments = snapshot.data!;
-
+                          // Remove duplicates based on a combination of fields
+                          Set<String> seenAppointments = Set<String>();
+                          List<Map<String, dynamic>> uniqueAppointments =
+                              snapshot.data!.where((appointment) {
+                                String id =
+                                    '${appointment['childName']}_${appointment['date']}_${appointment['time']}';
+                                if (seenAppointments.contains(id)) {
+                                  return false;
+                                } else {
+                                  seenAppointments.add(id);
+                                  return true;
+                                }
+                              }).toList();
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
-                            children: appointments.map((appointment) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 10,
-                                      spreadRadius: 5,
-                                      offset: const Offset(0, 5),
+                            children:
+                                uniqueAppointments.map((appointment) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          blurRadius: 10,
+                                          spreadRadius: 5,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                margin: const EdgeInsets.only(bottom: 20),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(15),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(15),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
                                         children: [
-                                          Text(
-                                            appointment['clientName'] ?? "No Name",
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                appointment['childName'] ??
+                                                    "No Name",
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                appointment['category'] ?? '',
+                                                style: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          const SizedBox(height: 5),
-                                          Text(
-                                            appointment['category'] ?? '',
-                                            style: const TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                          const SizedBox(height: 15),
+                                          ScheduleCard(
+                                            date:
+                                                appointment['date'] as String?,
+                                            time:
+                                                appointment['time'] as String?,
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 15),
-                                      ScheduleCard(
-                                        date: appointment['date'] ?? '',
-                                        time: appointment['time'] ?? '',
-                                      ),
-                                      const SizedBox(height: 15),
-                                      Text(
-                                        'حالة الموعد: ${appointment['status'] ?? 'قادم'}',
-                                        style: const TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                                    ),
+                                  );
+                                }).toList(),
                           );
                         },
                       ),
@@ -167,75 +177,73 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
   }
 }
 
-
 class ScheduleCard extends StatelessWidget {
-  final String date;
-  final String time;
-
+  final String? date; // Allow date to be null
+  final String? time; // Allow time to be null
 
   const ScheduleCard({Key? key, required this.date, required this.time})
-      : super(key: key);
-
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (date.isNotEmpty) {
-      DateTime parsedDate = DateTime.parse(date);
-      String formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
+    String formattedDate = "Invalid Date";
 
-
-      return Container(
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 238, 235, 235),
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 15,
-              spreadRadius: 5,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: [
-                const Icon(
-                  Icons.calendar_today,
-                  color: Colors.orange,
-                  size: 16,
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  formattedDate,
-                  style: const TextStyle(color: Colors.orange, fontSize: 14),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                const Icon(Icons.access_time, color: Colors.orange, size: 16),
-                const SizedBox(width: 5),
-                Text(
-                  time.isNotEmpty ? time : '10:00 صباحًا',
-                  style: const TextStyle(color: Colors.orange, fontSize: 14),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    } else {
-      return Container();
+    try {
+      if (date != null && date!.isNotEmpty) {
+        DateTime parsedDate = DateTime.parse(date!);
+        formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
+      } else {
+        formattedDate = "No Date Available";
+      }
+    } catch (e) {
+      // Handle date parsing error
+      print("Error parsing date: $e");
     }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 238, 235, 235),
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            spreadRadius: 5,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Row(
+            children: [
+              const Icon(Icons.calendar_today, color: Colors.orange, size: 16),
+              const SizedBox(width: 5),
+              Text(
+                formattedDate,
+                style: const TextStyle(color: Colors.orange, fontSize: 14),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const Icon(Icons.access_time, color: Colors.orange, size: 16),
+              const SizedBox(width: 5),
+              Text(
+                time?.isNotEmpty == true ? time! : '10:00 صباحًا',
+                style: const TextStyle(color: Colors.orange, fontSize: 14),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
-
 
 void main() {
   runApp(

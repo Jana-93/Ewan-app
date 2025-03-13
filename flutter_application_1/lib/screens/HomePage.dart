@@ -6,7 +6,7 @@ import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
 import 'dart:ui';
-import 'package:flutter_application_1/feedbackScreen.dart';
+import 'package:flutter_application_1/screens/feedback.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -161,7 +161,9 @@ class _HomepageState extends State<Homepage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => FeedbackScreen()),
+              MaterialPageRoute(
+                builder: (context) => FeedbackScreen(isDoctor: false),
+              ),
             );
           },
         ),

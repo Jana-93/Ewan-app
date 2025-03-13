@@ -61,7 +61,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 trailing: IconButton(
                   icon: const Icon(Icons.message, color: Colors.orange),
                   onPressed: () {
-                    _showFeedbackDialog(context, session['clientName'], session['childId']);
+                    _showFeedbackDialog(
+                      context,
+                      session['clientName'],
+                      session['childId'],
+                    );
                   },
                 ),
               );
@@ -73,7 +77,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   }
 
   // عرض مربع حوار لإرسال feedback
-  void _showFeedbackDialog(BuildContext context, String childName, String childId) {
+  void _showFeedbackDialog(
+    BuildContext context,
+    String childName,
+    String childId,
+  ) {
     TextEditingController feedbackController = TextEditingController();
 
     showDialog(
@@ -83,9 +91,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           title: Text("إرسال Feedback لـ $childName"),
           content: TextField(
             controller: feedbackController,
-            decoration: const InputDecoration(
-              hintText: "أدخل Feedback هنا...",
-            ),
+            decoration: const InputDecoration(hintText: "أدخل Feedback هنا..."),
             maxLines: 3,
           ),
           actions: [
@@ -116,9 +122,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
 void main() {
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: FeedbackScreen(),
-    ),
+    MaterialApp(debugShowCheckedModeBanner: false, home: FeedbackScreen()),
   );
 }

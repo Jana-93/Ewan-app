@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application_1/feedbackScreen.dart';
+
+import 'package:flutter_application_1/screens/PastAppointments.dart';
 import 'package:flutter_application_1/screens/Tappointment.dart';
+import 'package:flutter_application_1/screens/UpcomingAppointments.dart';
+import 'package:flutter_application_1/screens/feedback.dart';
 import 'package:flutter_application_1/screens/user_info_page_t.dart';
 import 'package:animate_do/animate_do.dart';
 
@@ -85,7 +88,9 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
-                        return Center(child: Text('حدث خطأ أثناء جلب البيانات'));
+                        return Center(
+                          child: Text('حدث خطأ أثناء جلب البيانات'),
+                        );
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Center(child: Text('لا توجد بيانات'));
                       } else {
@@ -121,10 +126,11 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                               ),
                               CircleAvatar(
                                 radius: 35,
-                                backgroundImage: profileImageUrl.isNotEmpty
-                                    ? NetworkImage(profileImageUrl)
-                                    : AssetImage('assets/images/doctor.jpg')
-                                        as ImageProvider,
+                                backgroundImage:
+                                    profileImageUrl.isNotEmpty
+                                        ? NetworkImage(profileImageUrl)
+                                        : AssetImage('assets/images/doctor.jpg')
+                                            as ImageProvider,
                               ),
                             ],
                           ),
@@ -151,11 +157,23 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                           duration: const Duration(milliseconds: 1400),
                           child: Column(
                             children: [
-                              buildMenuItem('المواعيد السابقة', Icons.history, context),
+                              buildMenuItem(
+                                'المواعيد السابقة',
+                                Icons.history,
+                                context,
+                              ),
                               SizedBox(height: 16),
-                              buildMenuItem('المواعيد القادمة', Icons.schedule, context),
+                              buildMenuItem(
+                                'المواعيد القادمة',
+                                Icons.schedule,
+                                context,
+                              ),
                               SizedBox(height: 16),
-                              buildMenuItem('تقدم المراجعين', Icons.bar_chart, context),
+                              buildMenuItem(
+                                'تقدم المراجعين',
+                                Icons.bar_chart,
+                                context,
+                              ),
                             ],
                           ),
                         ),
@@ -195,10 +213,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 1,
-            child: Icon(icon, size: 40, color: Colors.orange),
-          ),
+          Expanded(flex: 1, child: Icon(icon, size: 40, color: Colors.orange)),
           Expanded(
             flex: 2,
             child: Column(
@@ -216,7 +231,34 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                 SizedBox(height: 8),
                 GestureDetector(
                   onTap: () {
-                    // Handle navigation or actions
+                    // Handle navigation based on the title
+                    switch (title) {
+                      case 'المواعيد السابقة':
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PastAppointments(),
+                          ),
+                        );
+                        break;
+                      case 'المواعيد القادمة':
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UpcomingAppointments(),
+                          ),
+                        );
+                        break;
+                      case 'تقدم المراجعين':
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => FeedbackScreen(isDoctor: true),
+                          ),
+                        );
+                        break;
+                    }
                   },
                   child: Text(
                     'عرض التفاصيل',
@@ -255,7 +297,10 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         children: [
           _buildNavItem(Icons.person, 0), // TherapistProfilePage
           _buildNavItem(Icons.calendar_today, 1), // Tappointment
-          _buildImageItem("assets/images/ewan.png", 2), // TherapistHomePage (صورة)
+          _buildImageItem(
+            "assets/images/ewan.png",
+            2,
+          ), // TherapistHomePage (صورة)
         ],
       ),
     );
@@ -310,6 +355,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
     );
   }
 }
+
 void main() {
   runApp(
     MaterialApp(debugShowCheckedModeBanner: false, home: TherapistHomePage()),

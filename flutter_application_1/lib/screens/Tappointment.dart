@@ -58,9 +58,12 @@ class _TappointmentState extends State<Tappointment> {
               .collection('children')
               .where('childName', isEqualTo: childName)
               .get();
+
       if (snapshot.docs.isNotEmpty) {
+        print("Child data found: ${snapshot.docs.first.data()}");
         return snapshot.docs.first.data() as Map<String, dynamic>;
       } else {
+        print("No child found with name: $childName");
         throw Exception("Child not found");
       }
     } catch (e) {
