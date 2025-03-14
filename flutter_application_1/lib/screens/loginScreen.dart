@@ -6,6 +6,7 @@ import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/T_signup.dart';
 import 'package:flutter_application_1/screens/TherapistHomePage.dart';
 import 'package:flutter_application_1/screens/psignup.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // إضافة flutter_screenutil
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -49,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => TherapistHomePage()),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(" تم تسجيل الدخول بنجاح كطبيب! ",textDirection: TextDirection.rtl)),
+          SnackBar(content: Text(" تم تسجيل الدخول بنجاح كطبيب! ", textDirection: TextDirection.rtl)),
         );
         return;
       }
@@ -64,9 +65,8 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => Homepage()),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(" تم تسجيل الدخول بنجاح كوالد! ",textDirection: TextDirection.rtl)),
+          SnackBar(content: Text(" تم تسجيل الدخول بنجاح كوالد! ", textDirection: TextDirection.rtl)),
         );
-        
         return;
       }
 
@@ -75,7 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(content: Text("لم يتم العثور على دور المستخدم. يرجى الاتصال بالدعم الفني.")),
       );
     } on FirebaseAuthException catch (e) {
-      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? "حدث خطأ أثناء تسجيل الدخول.")),
       );
@@ -113,54 +112,54 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                const SizedBox(height: 40),
+                SizedBox(height: 40.h), // استخدام .h للارتفاعات
                 Padding(
-                  padding: const EdgeInsets.all(30),
+                  padding: EdgeInsets.all(30.r), // استخدام .r للنصف قطر
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       FadeInUp(
                         duration: const Duration(milliseconds: 1000),
-                        child: const Text(
+                        child: Text(
                           "تسجيل الدخول",
-                          style: TextStyle(color: Colors.white, fontSize: 40),
+                          style: TextStyle(color: Colors.white, fontSize: 40.sp), // استخدام .sp للنصوص
                           textAlign: TextAlign.right,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                     ],
                   ),
                 ),
                 Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      topRight: Radius.circular(50),
+                      topLeft: Radius.circular(50.r), // استخدام .r للنصف قطر
+                      topRight: Radius.circular(50.r),
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(30),
+                    padding: EdgeInsets.all(30.r),
                     child: Column(
                       children: <Widget>[
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         FadeInUp(
                           duration: const Duration(milliseconds: 1400),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: <Widget>[
-                              const Text(
+                              Text(
                                 "البريد الإلكتروني",
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: 16,
+                                  fontSize: 16.sp, // استخدام .sp للنصوص
                                 ),
                               ),
-                              const SizedBox(height: 15),
+                              SizedBox(height: 15.h),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(10.r), // استخدام .r للنصف قطر
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Color.fromRGBO(225, 95, 27, .3),
@@ -183,19 +182,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              const Text(
+                              SizedBox(height: 5.h),
+                              Text(
                                 "كلمة المرور",
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: 16,
+                                  fontSize: 16.sp, // استخدام .sp للنصوص
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10.h),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(10.r), // استخدام .r للنصف قطر
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Color.fromRGBO(225, 95, 27, .3),
@@ -231,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 50),
+                        SizedBox(height: 50.h),
                         FadeInUp(
                           duration: const Duration(milliseconds: 1600),
                           child: SizedBox(
@@ -241,33 +240,34 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFF6872F),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
+                                  borderRadius: BorderRadius.circular(50.r), // استخدام .r للنصف قطر
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 15.h, // استخدام .h للارتفاعات
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 "تسجيل الدخول",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 16.sp, // استخدام .sp للنصوص
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        SizedBox(height: 30.h),
                         FadeInUp(
                           duration: const Duration(milliseconds: 1650),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
+                              Text(
                                 "ليس لديك حساب؟ ",
                                 style: TextStyle(
                                   color: Colors.grey,
-                                  fontSize: 16,
+                                  fontSize: 16.sp, // استخدام .sp للنصوص
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -303,43 +303,43 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
-                                            50,
+                                            50.r, // استخدام .r للنصف قطر
                                           ),
                                           side: BorderSide(
                                             color: const Color(0xFFFCB47A),
                                           ),
                                         ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 15,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 15.h, // استخدام .h للارتفاعات
                                         ),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         "تسجيل دخول جديد",
                                         style: TextStyle(
                                           color: Colors.orangeAccent,
                                           fontWeight: FontWeight.bold,
+                                          fontSize: 16.sp, // استخدام .sp للنصوص
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              SizedBox(height: 10.h),
                               GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder:
-                                          (context) => TherapistSignUpPage(),
+                                      builder: (context) => TherapistSignUpPage(),
                                     ),
                                   );
                                 },
-                                child: const Text(
+                                child: Text(
                                   "تسجيل الدخول كطبيب ",
                                   style: TextStyle(
                                     color: Color(0xFFFCB47A),
-                                    fontSize: 16,
+                                    fontSize: 16.sp, // استخدام .sp للنصوص
                                     fontWeight: FontWeight.bold,
                                     decoration: TextDecoration.underline,
                                     decorationColor: Color(0xFFFCB47A),
@@ -349,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        SizedBox(height: 30.h),
                       ],
                     ),
                   ),

@@ -39,7 +39,8 @@ dependencies:
   flutter_stripe: ^11.4.0 
   intl: ^0.20.2
   uuid: ^4.5.1
-  responsive_framework: ^0.2.0
+  flutter_screenutil: ^5.9.3
+  
   
 
 

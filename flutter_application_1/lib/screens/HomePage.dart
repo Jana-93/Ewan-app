@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-
 import 'package:flutter_application_1/screens/appointmentpage.dart';
 import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
-import 'dart:ui';
 import 'package:flutter_application_1/screens/feedback.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -71,47 +70,47 @@ class _HomepageState extends State<Homepage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              const SizedBox(height: 60),
+              SizedBox(height: 60.h),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     FadeInUp(
                       duration: const Duration(milliseconds: 1000),
-                      child: const Text(
+                      child: Text(
                         "أهلاً",
-                        style: TextStyle(color: Colors.white, fontSize: 40),
+                        style: TextStyle(color: Colors.white, fontSize: 40.sp),
                         textAlign: TextAlign.right,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
+                    topLeft: Radius.circular(50.r),
+                    topRight: Radius.circular(50.r),
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(30),
+                  padding: EdgeInsets.all(30.r),
                   child: Column(
                     children: <Widget>[
-                      const SizedBox(height: 30),
+                      SizedBox(height: 30.h),
                       _buildHealthConsultation(),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       FadeInUp(
                         duration: const Duration(milliseconds: 1400),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10.h),
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: EdgeInsets.all(10.r),
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(color: Colors.white),
@@ -151,7 +150,7 @@ class _HomepageState extends State<Homepage> {
             );
           },
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 16.h),
         _buildHealthConsultationSection(
           title: "اطّلع على تقدم طفلك",
           description:
@@ -179,12 +178,12 @@ class _HomepageState extends State<Homepage> {
     required VoidCallback onTap,
   }) {
     return Container(
-      width: 360,
-      height: 130,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      width: 360.w,
+      height: 130.h,
+      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -205,24 +204,24 @@ class _HomepageState extends State<Homepage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                   textAlign: TextAlign.right,
                 ),
-                SizedBox(height: 2),
+                SizedBox(height: 2.h),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
                   textAlign: TextAlign.right,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 GestureDetector(
                   onTap: onTap,
                   child: Text(
                     actionText,
-                    style: TextStyle(fontSize: 12, color: Color(0xFFFCB47A)),
+                    style: TextStyle(fontSize: 12.sp, color: Color(0xFFFCB47A)),
                     textAlign: TextAlign.right,
                   ),
                 ),
@@ -238,12 +237,12 @@ class _HomepageState extends State<Homepage> {
   //nav bar
   Widget navBar() {
     return Container(
-      height: 60,
+      height: 60.h,
       width: double.infinity,
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -276,11 +275,11 @@ class _HomepageState extends State<Homepage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(
-              top: 15,
+            margin: EdgeInsets.only(
+              top: 15.h,
               bottom: 0,
-              left: 30,
-              right: 30,
+              left: 30.w,
+              right: 30.w,
             ),
             child: Icon(
               icon,
@@ -303,10 +302,10 @@ class _HomepageState extends State<Homepage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(right: 15),
+            margin: EdgeInsets.only(right: 15.w),
             child: ImageIcon(
               AssetImage(imagePath),
-              size: 60,
+              size: 60.sp,
               color: isSelected ? Colors.deepOrange : Colors.grey,
             ),
           ),

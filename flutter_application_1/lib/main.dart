@@ -3,9 +3,9 @@ import 'package:flutter_application_1/screens/childFeedback.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'screens/loginScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // Import the login screen
 Future<void> main() async {
@@ -24,31 +24,41 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginScreen(),
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(useMaterial3: true),
-      // Move between screens
-      // initialRoute: "/",
-      // routes: {
-      //   "/": (context) => const Getstarted(),
-      //   "/login": (context) => LoginScreen(),
-      //   "/authin": (context) => Authentication(),
-      // },
+    return ScreenUtilInit(
+      designSize: Size(
+        MediaQuery.of(context).size.width,
+        MediaQuery.of(context).size.height,
+      ),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
+          home: LoginScreen(),
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData.light(useMaterial3: true),
+          // Move between screens
+          // initialRoute: "/",
+          // routes: {
+          //   "/": (context) => const Getstarted(),
+          //   "/login": (context) => LoginScreen(),
+          //   "/authin": (context) => Authentication(),
+          // },
 
-      // StreamBuilder(
-      //     stream: FirebaseAuth.instance.authStateChanges(),
-      //     builder: (context, snapshot) {
-      //       if (snapshot.connectionState == ConnectionState.waiting) {
-      //         return Center(
-      //             child: CircularProgressIndicator(
-      //           color: Colors.white,
-      //         ));
+          // StreamBuilder(
+          //     stream: FirebaseAuth.instance.authStateChanges(),
+          //     builder: (context, snapshot) {
+          //       if (snapshot.connectionState == ConnectionState.waiting) {
+          //         return Center(
+          //             child: CircularProgressIndicator(
+          //           color: Colors.white,
+          //         ));
 
-      //       }else if(snapshot.hasError){
-      //         return showSnackBar(context,"something want error");
-      //       }
-      //     }),
+          //       }else if(snapshot.hasError){
+          //         return showSnackBar(context,"something want error");
+          //       }
+          //     }),
+        );
+      },
     );
   }
 }
