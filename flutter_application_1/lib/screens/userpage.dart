@@ -8,6 +8,7 @@ import 'package:flutter_application_1/screens/appointmentpage.dart';
 import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/EditChild.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -121,9 +122,9 @@ class _UserPageState extends State<UserPage> {
                       children: [
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.only(top: 50),
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
+                          padding: EdgeInsets.only(top: 50.h),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
@@ -133,58 +134,59 @@ class _UserPageState extends State<UserPage> {
                               ],
                             ),
                             borderRadius: BorderRadius.only(
-                              bottomRight: Radius.circular(15),
-                              bottomLeft: Radius.circular(15),
+                              bottomRight: Radius.circular(15.r),
+                              bottomLeft: Radius.circular(15.r),
                             ),
                           ),
                           child: Column(
                             children: [
-                              const Text(
+                              Text(
                                 "الملف الشخصي",
                                 style: TextStyle(
-                                  fontSize: 25,
+                                  fontSize: 25.sp,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10.h),
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
+                                borderRadius: BorderRadius.circular(50.r),
                                 child: Image.asset(
                                   "assets/images/user-icon.jpg",
-                                  width: 100,
-                                  height: 100,
+                                  width: 100.w,
+                                  height: 90.h,
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10.h),
                               Text(
                                 "$firstName $lastName",
-                                style: const TextStyle(
-                                  fontSize: 20,
+                                style: TextStyle(
+                                  fontSize: 20.sp,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10.h),
                               Text(
                                 email,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white70,
+                                  fontSize: 14.sp,
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
                         ...snapshot.data!.map((childData) {
                           return _buildProfileOption(
                             childData['childIcon'],
                             childData['childName'],
                             context,
                             () {
-                              // يمكنك إضافة أي عمل إضافي هنا عند النقر على العنصر
+                            
                             },
                             onDelete: () {
                               _showDeleteDialog(context, childData['childId'],
@@ -236,12 +238,12 @@ class _UserPageState extends State<UserPage> {
   // Navigation Bar
   Widget navBar() {
     return Container(
-      height: 60,
+      height: 60.h,
       width: double.infinity,
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -274,11 +276,11 @@ class _UserPageState extends State<UserPage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(
-              top: 15,
+            margin: EdgeInsets.only(
+              top: 15.h,
               bottom: 0,
-              left: 30,
-              right: 30,
+              left: 30.w,
+              right: 30.w,
             ),
             child: Icon(
               icon,
@@ -301,12 +303,10 @@ class _UserPageState extends State<UserPage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(
-              right: 15,
-            ),
+            margin: EdgeInsets.only(right: 15.w),
             child: ImageIcon(
               AssetImage(imagePath),
-              size: 60,
+              size: 60.sp,
               color: isSelected ? Colors.deepOrange : Colors.grey,
             ),
           ),
@@ -319,12 +319,12 @@ class _UserPageState extends State<UserPage> {
       IconData icon, String title, BuildContext context, VoidCallback onTap,
       {VoidCallback? onDelete, VoidCallback? onEdit}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.orange),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black12,
@@ -335,18 +335,18 @@ class _UserPageState extends State<UserPage> {
         ),
         child: ListTile(
           leading: Icon(icon, color: Colors.orange),
-          title: Text(title, style: const TextStyle(fontSize: 16)),
+          title: Text(title, style: TextStyle(fontSize: 16.sp)),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (onEdit != null)
                 IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
+                  icon: Icon(Icons.edit, color: Colors.blue, size: 24.sp),
                   onPressed: onEdit,
                 ),
               if (onDelete != null)
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: Icon(Icons.delete, color: Colors.red, size: 24.sp),
                   onPressed: onDelete,
                 ),
             ],
@@ -358,38 +358,54 @@ class _UserPageState extends State<UserPage> {
   }
 
   // Dialog confirmation for deletion
-  void _showDeleteDialog(
-      BuildContext context, String childId, String childName) {
+  void _showDeleteDialog(BuildContext context, String childId, String childName) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("تأكيد الحذف"),
-          content: Text("هل أنت متأكد من حذف الطفل '$childName'?"),
-          backgroundColor: Colors.white,
-          actions: [
-            TextButton(
-              onPressed: () async {
-                try {
-                  await FirebaseFirestore.instance
-                      .collection('children')
-                      .doc(childId)
-                      .delete();
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: Text(
+              "تأكيد الحذف",
+              style: TextStyle(fontSize: 18.sp,fontFamily: "NotoKufiArabic"),
+              textAlign: TextAlign.center,
+            ),
+            content: Text(
+              "هل أنت متأكد من حذف الطفل '$childName'؟",
+              style: TextStyle(fontSize: 16.sp),
+              textAlign: TextAlign.center,
+            ),
+            backgroundColor: Colors.white,
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection('children')
+                        .doc(childId)
+                        .delete();
+                    Navigator.of(context).pop();
+                    setState(() {});
+                  } catch (e) {
+                    print("حدث خطأ أثناء الحذف: $e");
+                  }
+                },
+                child: Text(
+                  "حذف",
+                  style: TextStyle(color: Colors.red, fontSize: 16.sp),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
                   Navigator.of(context).pop();
-                  setState(() {});
-                } catch (e) {
-                  print("حدث خطأ أثناء الحذف: $e");
-                }
-              },
-              child: const Text("حذف", style: TextStyle(color: Colors.red)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("إلغاء"),
-            ),
-          ],
+                },
+                child: Text(
+                  "إلغاء",
+                  style: TextStyle(fontSize: 16.sp,color: Colors.lightBlue),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

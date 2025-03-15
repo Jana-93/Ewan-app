@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'userpage.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EditChild extends StatefulWidget {
   final String childId;
@@ -31,11 +32,10 @@ class _EditChildState extends State<EditChild> {
 
   Future<void> _loadChildData() async {
     try {
-      DocumentSnapshot childDoc =
-          await FirebaseFirestore.instance
-              .collection("children")
-              .doc(widget.childId)
-              .get();
+      DocumentSnapshot childDoc = await FirebaseFirestore.instance
+          .collection("children")
+          .doc(widget.childId)
+          .get();
 
       if (childDoc.exists) {
         setState(() {
@@ -52,7 +52,7 @@ class _EditChildState extends State<EditChild> {
         SnackBar(
           content: Text(
             "حدث خطأ أثناء تحميل بيانات الطفل",
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white, fontSize: 14.sp),
             textAlign: TextAlign.center,
           ),
           backgroundColor: Colors.red,
@@ -65,33 +65,75 @@ class _EditChildState extends State<EditChild> {
   Future<void> _updateChildData() async {
     try {
       if (_formKey.currentState!.validate()) {
-        await FirebaseFirestore.instance
-            .collection("children")
-            .doc(widget.childId)
-            .update({
-              "childName": _childNameController.text.trim(),
-              "childAge": _selectedAge,
-              "childStatus": _childStatusController.text.trim(),
-            });
+        // Show confirmation dialog
+        bool confirmUpdate = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "تأكيد الحفظ",
+                style: TextStyle(fontSize: 18.sp,fontFamily: "NotoKufiArabic"),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "هل أنت متأكد من حفظ التعديلات؟",
+                style: TextStyle(fontSize: 16.sp),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // Return false if canceled
+                  },
+                  child: Text(
+                    "إلغاء",
+                    style: TextStyle(fontSize: 16.sp,color: Colors.lightBlue),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true); // Return true if confirmed
+                  },
+                  child: Text(
+                    "حفظ",
+                    style: TextStyle(fontSize: 16.sp,color: Colors.deepOrange),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "تم تحديث بيانات الطفل بنجاح",
-              style: const TextStyle(color: Colors.white),
-              textAlign: TextAlign.center,
+        // If user confirmed, proceed with the update
+        if (confirmUpdate == true) {
+          await FirebaseFirestore.instance
+              .collection("children")
+              .doc(widget.childId)
+              .update({
+            "childName": _childNameController.text.trim(),
+            "childAge": _selectedAge,
+            "childStatus": _childStatusController.text.trim(),
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "تم تحديث بيانات الطفل بنجاح",
+                style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                textAlign: TextAlign.center,
+              ),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 2),
             ),
-            backgroundColor: Colors.orange,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+          );
 
-        if (!mounted) return;
+          if (!mounted) return;
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => UserPage()),
-        );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => UserPage()),
+          );
+        }
       }
     } catch (e) {
       print("Error updating child data: $e");
@@ -99,7 +141,7 @@ class _EditChildState extends State<EditChild> {
         SnackBar(
           content: Text(
             "حدث خطأ أثناء تحديث بيانات الطفل",
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white, fontSize: 14.sp),
             textAlign: TextAlign.center,
           ),
           backgroundColor: Colors.red,
@@ -130,56 +172,56 @@ class _EditChildState extends State<EditChild> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  const SizedBox(height: 70),
+                  SizedBox(height: 70.h),
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20.r),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        const SizedBox(height: 10),
-                        const Text(
+                        SizedBox(height: 10.h),
+                        Text(
                           "تعديل بيانات الطفل",
-                          style: TextStyle(color: Colors.white, fontSize: 30),
+                          style: TextStyle(color: Colors.white, fontSize: 30.sp),
                           textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(40),
+                        topLeft: Radius.circular(40.r),
+                        topRight: Radius.circular(40.r),
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(30),
+                      padding: EdgeInsets.all(30.r),
                       child: Form(
                         key: _formKey,
                         child: Column(
                           children: <Widget>[
-                            const Icon(
+                            Icon(
                               Icons.account_circle_outlined,
-                              size: 100,
-                              color: Color.fromARGB(255, 248, 141, 1),
+                              size: 100.sp,
+                              color: const Color.fromARGB(255, 248, 141, 1),
                             ),
-                            const SizedBox(height: 5),
+                            SizedBox(height: 5.h),
                             _buildInputField(
                               "اسم الطفل",
                               controller: _childNameController,
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: 20.h),
                             _buildAgeDropdown(), // Dropdown for child's age
-                            const SizedBox(height: 20),
+                            SizedBox(height: 20.h),
                             _buildInputField(
                               "حالة الطفل",
                               controller: _childStatusController,
                             ),
-                            const SizedBox(height: 40),
+                            SizedBox(height: 40.h),
                             SizedBox(
                               width: double.infinity,
-                              height: 50,
+                              height: 50.h,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color.fromARGB(
@@ -189,21 +231,21 @@ class _EditChildState extends State<EditChild> {
                                     1,
                                   ),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(10.r),
                                   ),
                                 ),
                                 onPressed: _updateChildData,
-                                child: const Text(
+                                child: Text(
                                   "حفظ التعديلات",
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 20.sp,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: 20.h),
                           ],
                         ),
                       ),
@@ -214,13 +256,13 @@ class _EditChildState extends State<EditChild> {
             ),
           ),
           Positioned(
-            top: 40,
-            right: 20,
+            top: 40.h,
+            right: 20.w,
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_circle_right_outlined,
                 color: Colors.white,
-                size: 30,
+                size: 30.sp,
               ),
               onPressed: () {
                 Navigator.pushReplacement(
@@ -239,12 +281,12 @@ class _EditChildState extends State<EditChild> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(label, style: const TextStyle(color: Colors.black, fontSize: 16)),
-        const SizedBox(height: 5),
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
+        SizedBox(height: 5.h),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(225, 95, 27, .3),
@@ -256,11 +298,11 @@ class _EditChildState extends State<EditChild> {
           child: TextFormField(
             controller: controller,
             textAlign: TextAlign.right,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
+                horizontal: 20.w,
+                vertical: 15.h,
               ),
             ),
             validator: (value) {
@@ -279,15 +321,15 @@ class _EditChildState extends State<EditChild> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const Text(
+        Text(
           "عمر الطفل",
-          style: TextStyle(color: Colors.black, fontSize: 16),
+          style: TextStyle(color: Colors.black, fontSize: 16.sp),
         ),
-        const SizedBox(height: 5),
+        SizedBox(height: 5.h),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(225, 95, 27, .3),
@@ -298,23 +340,22 @@ class _EditChildState extends State<EditChild> {
           ),
           child: DropdownButtonFormField<String>(
             value: _selectedAge,
-            items:
-                _ages.map((String age) {
-                  return DropdownMenuItem<String>(
-                    value: age,
-                    child: Text(age, textAlign: TextAlign.right),
-                  );
-                }).toList(),
+            items: _ages.map((String age) {
+              return DropdownMenuItem<String>(
+                value: age,
+                child: Text(age, textAlign: TextAlign.right),
+              );
+            }).toList(),
             onChanged: (String? newValue) {
               setState(() {
                 _selectedAge = newValue; // Update selected age
               });
             },
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
+                horizontal: 20.w,
+                vertical: 15.h,
               ),
             ),
             validator: (value) {
