@@ -4,7 +4,7 @@ class AgoraManagerModel {
   }
 
   static String get token {
-    return "007eJxTYEhY9aDtyIS1rpwbnMonzMxc+X6nvYKlZUa6QdSh+z+avrYpMJglpyQbpJlbmJhYmJtYGlpapBqbWFokWlpYJJmkWJqZFCecT28IZGRIYTzNzMgAgSA+C0NyYk4OAwMAi3cfvw==";
+    return "007eJxTYBCz0JHrVVQtsZjnfXxCtUPiq5NT/+awRjXM/Nax2P7c6TMKDGbJKckGaeYWJiYW5iaWhpYWqcYmlhaJlhYWSSYplmYmYqzX0hsCGRmMjsxjYIRCEJ+FITkxJ4eBAQDiVR4F";
   }
 
   static String get channelName {
