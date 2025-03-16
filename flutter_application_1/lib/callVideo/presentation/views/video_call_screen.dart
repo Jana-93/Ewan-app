@@ -7,7 +7,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class VideoCallScreen extends StatefulWidget {
   final String user;
   const VideoCallScreen({super.key, required this.user});
@@ -42,21 +41,22 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   Future<void> _initVideos() async {
-    _introVideoController =
-        VideoPlayerController.asset('assets/video/first.mp4')
-          ..initialize().then((_) {
-            setState(() {});
-            _introVideoController!.play();
-            _introVideoController!.addListener(() {
-              if (!_introVideoController!.value.isPlaying &&
-                  _introVideoController!.value.position >=
-                      _introVideoController!.value.duration) {
-                setState(() {
-                  _isIntroVideoPlaying = false;
-                });
-              }
+    _introVideoController = VideoPlayerController.asset(
+        'assets/video/first.mp4',
+      )
+      ..initialize().then((_) {
+        setState(() {});
+        _introVideoController!.play();
+        _introVideoController!.addListener(() {
+          if (!_introVideoController!.value.isPlaying &&
+              _introVideoController!.value.position >=
+                  _introVideoController!.value.duration) {
+            setState(() {
+              _isIntroVideoPlaying = false;
             });
-          });
+          }
+        });
+      });
 
     _outroVideoController = VideoPlayerController.asset('assets/video/end.mp4')
       ..initialize().then((_) {
@@ -68,10 +68,12 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     await [Permission.microphone, Permission.camera].request();
 
     _engine = createAgoraRtcEngine();
-    await _engine.initialize(RtcEngineContext(
-      appId: AgoraManagerModel.appId,
-      channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
-    ));
+    await _engine.initialize(
+      RtcEngineContext(
+        appId: AgoraManagerModel.appId,
+        channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+      ),
+    );
 
     _engine.registerEventHandler(
       RtcEngineEventHandler(
@@ -111,7 +113,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   void _listenForGameScreenNavigation() {
     if (widget.user == "doctor") {
-      _firestore.collection('calls').doc("calls").snapshots().listen((snapshot) {
+      _firestore.collection('calls').doc("calls").snapshots().listen((
+        snapshot,
+      ) {
         if (snapshot.exists && snapshot.data()?['navigateToGame'] == true) {
           _navigateToGameScreen();
         }
@@ -120,7 +124,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   void _listenForRemoteCameraState() {
-    _firestore.collection('cameraState').doc("cameraState").snapshots().listen((snapshot) {
+    _firestore.collection('cameraState').doc("cameraState").snapshots().listen((
+      snapshot,
+    ) {
       if (snapshot.exists) {
         setState(() {
           if (widget.user == "doctor") {
@@ -199,21 +205,68 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   void _navigateToGameScreen() {
     if (widget.user == "patient") {
-      _firestore.collection('calls').doc("calls").set({
-        'navigateToGame': true,
-      });
+      _firestore.collection('calls').doc("calls").set({'navigateToGame': true});
     }
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => GameScreen(
-          engine: _engine,
-          remoteUid: _remoteUid,
-          localUserJoined: _localUserJoined,
-          initialCameraOff: _remoteCameraOff,
-          initialMuted: _remoteMuted,
-        ),
+        builder:
+            (context) => GameScreen(
+              engine: _engine,
+              remoteUid: _remoteUid,
+              localUserJoined: _localUserJoined,
+              initialCameraOff: _remoteCameraOff,
+              initialMuted: _remoteMuted,
+            ),
       ),
+    );
+  }
+
+  void _showAlertDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text('انهاء', style: TextStyle(color: Colors.orange)),
+            content: const Text('هل انت متأكد من انهاء الجلسة؟'),
+            actions: <Widget>[
+              Align(
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize:
+                      MainAxisSize.min, // To prevent taking full width
+                  children: [
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        _endCall();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('نعم'),
+                    ),
+                    const SizedBox(width: 15), // Space between buttons
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('لا'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -236,9 +289,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   void _navigateToChildFeedbackScreen() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => ChildFeedback(),
-      ),
+      MaterialPageRoute(builder: (context) => ChildFeedback()),
     );
   }
 
@@ -248,25 +299,29 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-            backgroundColor: Colors.orange,
-            title: const Text('مكالمة فيديو',
-                style: TextStyle(color: Colors.white))),
+          backgroundColor: Colors.orange,
+          title: const Text(
+            'مكالمة فيديو',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
         body: Stack(
           children: [
             if (_isIntroVideoPlaying && widget.user == "patient")
               Stack(
                 children: [
                   Center(
-                    child: _introVideoController!.value.isInitialized
-                        ? SizedBox(
-                            width: double.infinity,
-                          child: AspectRatio(
-                              aspectRatio:
-                                  _introVideoController!.value.aspectRatio,
-                              child: VideoPlayer(_introVideoController!),
-                            ),
-                        )
-                        : const CircularProgressIndicator(),
+                    child:
+                        _introVideoController!.value.isInitialized
+                            ? SizedBox(
+                              width: double.infinity,
+                              child: AspectRatio(
+                                aspectRatio:
+                                    _introVideoController!.value.aspectRatio,
+                                child: VideoPlayer(_introVideoController!),
+                              ),
+                            )
+                            : const CircularProgressIndicator(),
                   ),
                   Positioned(
                     top: 20,
@@ -286,16 +341,17 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               Stack(
                 children: [
                   Center(
-                    child: _outroVideoController!.value.isInitialized
-                        ? SizedBox(
-                            width: double.infinity,
-                          child: AspectRatio(
-                              aspectRatio:
-                                  _outroVideoController!.value.aspectRatio,
-                              child: VideoPlayer(_outroVideoController!),
-                            ),
-                        )
-                        : const CircularProgressIndicator(),
+                    child:
+                        _outroVideoController!.value.isInitialized
+                            ? SizedBox(
+                              width: double.infinity,
+                              child: AspectRatio(
+                                aspectRatio:
+                                    _outroVideoController!.value.aspectRatio,
+                                child: VideoPlayer(_outroVideoController!),
+                              ),
+                            )
+                            : const CircularProgressIndicator(),
                   ),
                   Positioned(
                     top: 20,
@@ -335,14 +391,16 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                           onPressed: _toggleMute,
                         ),
                         IconButton(
-                          icon: Icon(_isCameraOn
-                              ? Icons.videocam
-                              : Icons.videocam_off),
+                          icon: Icon(
+                            _isCameraOn ? Icons.videocam : Icons.videocam_off,
+                          ),
                           onPressed: _toggleCamera,
                         ),
                         IconButton(
                           icon: const Icon(Icons.call_end),
-                          onPressed: _endCall,
+                          onPressed: () {
+                            _showAlertDialog(context);
+                          },
                           color: Colors.red,
                         ),
                       ],
@@ -402,19 +460,20 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         if (_remoteUid != null)
           _remoteCameraOff
               ? Center(
-                  child: Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.videocam_off, size: 100),
-                  ),
-                )
+                child: Container(
+                  color: Colors.grey[200],
+                  child: const Icon(Icons.videocam_off, size: 100),
+                ),
+              )
               : AgoraVideoView(
-                  controller: VideoViewController.remote(
-                    rtcEngine: _engine,
-                    canvas: VideoCanvas(uid: _remoteUid),
-                    connection:
-                        RtcConnection(channelId: AgoraManagerModel.channelName),
+                controller: VideoViewController.remote(
+                  rtcEngine: _engine,
+                  canvas: VideoCanvas(uid: _remoteUid),
+                  connection: RtcConnection(
+                    channelId: AgoraManagerModel.channelName,
                   ),
-                )
+                ),
+              )
         else
           const Column(
             mainAxisAlignment: MainAxisAlignment.center,
