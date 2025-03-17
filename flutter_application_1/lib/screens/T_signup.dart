@@ -9,6 +9,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TherapistSignUpPage extends StatefulWidget {
   @override
@@ -22,8 +23,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
   String? selectedSpecialty;
   String? selectedExperience;
   File? profileImage;
@@ -35,15 +35,8 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   String licenseFileName = "";
 
   final List<String> specialties = ['علاج سلوكي', 'علاج معرفي', 'علاج نفسي'];
-  final List<String> experienceYears = [
-    '1 سنة',
-    '2 سنة',
-    '3 سنوات',
-    '4 سنوات',
-    '5+ سنوات',
-  ];
+  final List<String> experienceYears = ['1 سنة', '2 سنة', '3 سنوات', '4 سنوات', '5+ سنوات'];
 
-  // دالة التحقق من كلمة المرور
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return "هذا الحقل مطلوب";
@@ -60,7 +53,6 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     return null;
   }
 
-  // دالة التحقق من تطابق كلمة المرور
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
       return "هذا الحقل مطلوب";
@@ -105,28 +97,19 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         throw Exception("CLOUDINARY_CLOUD_NAME is not set in .env file");
       }
 
-      var uri = Uri.parse(
-        "https://api.cloudinary.com/v1_1/$cloudName/$resourceType/upload",
-      );
+      var uri = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/$resourceType/upload");
       var request = http.MultipartRequest("POST", uri);
 
       var fileBytes = await file.readAsBytes();
-      var multipartFile = http.MultipartFile.fromBytes(
-        'file',
-        fileBytes,
-        filename: file.path.split("/").last,
-      );
+      var multipartFile = http.MultipartFile.fromBytes('file', fileBytes, filename: file.path.split("/").last);
 
       request.files.add(multipartFile);
       request.fields['upload_preset'] = 'therapist files';
 
-      // Send the request and wait for the response
       var response = await request.send();
       var responseBody = await response.stream.bytesToString();
 
-      // Parse response to extract URL
       if (response.statusCode == 200) {
-        // Extract and return the URL from the response
         final Map<String, dynamic> responseData = jsonDecode(responseBody);
         return responseData['secure_url'] as String;
       } else {
@@ -147,17 +130,11 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           SnackBar(
             content: Text(
               "كلمة المرور غير متطابقة",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.red,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -165,24 +142,16 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         return;
       }
 
-      if (profileImage == null ||
-          qualificationFile == null ||
-          licenseFile == null) {
+      if (profileImage == null || qualificationFile == null || licenseFile == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               "يرجى رفع جميع الملفات المطلوبة",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.red,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -191,7 +160,6 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
       }
 
       try {
-        // إظهار مؤشر التحميل
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -204,33 +172,21 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           },
         );
 
-        // رفع الملفات إلى Cloudinary
         String? profileUrl = await uploadToCloudinary(profileImage!, 'image');
-        String? qualificationUrl = await uploadToCloudinary(
-          qualificationFile!,
-          'raw',
-        );
+        String? qualificationUrl = await uploadToCloudinary(qualificationFile!, 'raw');
         String? licenseUrl = await uploadToCloudinary(licenseFile!, 'raw');
 
-        if (profileUrl == null ||
-            qualificationUrl == null ||
-            licenseUrl == null) {
-          Navigator.pop(context); // إغلاق مؤشر التحميل
+        if (profileUrl == null || qualificationUrl == null || licenseUrl == null) {
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
                 "فشل رفع الملفات، يرجى المحاولة مرة أخرى",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
               behavior: SnackBarBehavior.floating,
               duration: Duration(seconds: 2),
             ),
@@ -238,105 +194,72 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           return;
         }
 
-        // إنشاء حساب باستخدام البريد الإلكتروني وكلمة المرور
-        UserCredential userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim(),
-            );
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
         String userId = userCredential.user!.uid;
 
-        // حفظ بيانات المعالج في Firestore
-        await FirebaseFirestore.instance
-            .collection('therapists')
-            .doc(userId)
-            .set({
-              'uid': userId,
-              'firstName': firstNameController.text,
-              'lastName': lastNameController.text,
-              'email': emailController.text,
-              'phone': phoneController.text,
-              'specialty': selectedSpecialty,
-              'experience': selectedExperience,
-              'profileImage': profileUrl,
-              'qualificationFile': qualificationUrl,
-              'licenseFile': licenseUrl,
-            });
+        await FirebaseFirestore.instance.collection('therapists').doc(userId).set({
+          'uid': userId,
+          'firstName': firstNameController.text,
+          'lastName': lastNameController.text,
+          'email': emailController.text,
+          'phone': phoneController.text,
+          'specialty': selectedSpecialty,
+          'experience': selectedExperience,
+          'profileImage': profileUrl,
+          'qualificationFile': qualificationUrl,
+          'licenseFile': licenseUrl,
+        });
 
-        // إغلاق مؤشر التحميل
         Navigator.pop(context);
 
-        // إظهار رسالة نجاح
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               "تم إنشاء الحساب بنجاح",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Color(0xFFFCB47A),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
         );
 
-        // الانتقال إلى شاشة تسجيل الدخول
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       } on FirebaseAuthException catch (e) {
-        // إغلاق مؤشر التحميل
         Navigator.pop(context);
-
-        // التعامل مع الأخطاء
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               e.message ?? "حدث خطأ ما",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.red,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
         );
       } catch (e) {
-        // إغلاق مؤشر التحميل
         Navigator.pop(context);
-
-        // التعامل مع الأخطاء العامة
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               e.toString(),
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.red,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -365,170 +288,121 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                const SizedBox(height: 50),
+                SizedBox(height: 50.h),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       FadeInUp(
                         duration: const Duration(milliseconds: 1000),
-                        child: const Text(
+                        child: Text(
                           "حساب جديد",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 37,
-                            fontFamily: "NotoKufiArabic",
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 37.sp, fontFamily: "NotoKufiArabic"),
                           textAlign: TextAlign.right,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                     ],
                   ),
                 ),
                 Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      topRight: Radius.circular(40),
+                      topLeft: Radius.circular(40.r),
+                      topRight: Radius.circular(40.r),
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(30),
+                    padding: EdgeInsets.all(30.r),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         children: <Widget>[
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10.h),
                           GestureDetector(
                             onTap: pickProfileImage,
                             child: CircleAvatar(
-                              radius: 40,
+                              radius: 40.r,
                               backgroundColor: Colors.grey,
-                              backgroundImage:
-                                  profileImage != null
-                                      ? FileImage(profileImage!)
-                                      : null,
-                              child:
-                                  profileImage == null
-                                      ? Icon(Icons.person, size: 40)
-                                      : null,
+                              backgroundImage: profileImage != null ? FileImage(profileImage!) : null,
+                              child: profileImage == null ? Icon(Icons.person, size: 40.sp) : null,
                             ),
                           ),
                           if (profileImage != null)
                             Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
+                              padding: EdgeInsets.only(top: 8.h),
                               child: Text(
                                 profileFileName,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
+                                style: TextStyle(fontSize: 12.sp, color: Colors.grey),
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                          const SizedBox(height: 20),
-                          _buildInputField(
-                            "الاسم الأول",
-                            controller: firstNameController,
-                          ),
-                          const SizedBox(height: 20),
-                          _buildInputField(
-                            "الاسم الأخير",
-                            controller: lastNameController,
-                          ),
-                          const SizedBox(height: 20),
-                          _buildInputField(
-                            "البريد الإلكتروني",
-                            controller: emailController,
-                          ),
-                          const SizedBox(height: 20),
-                          _buildPasswordField(
-                            "كلمة المرور",
-                            controller: passwordController,
-                            validator: _validatePassword,
-                          ),
-                          const SizedBox(height: 20),
-                          _buildPasswordField(
-                            "إعادة كتابة كلمة المرور",
-                            controller: confirmPasswordController,
-                            validator: _validateConfirmPassword,
-                          ),
-                          const SizedBox(height: 20),
-                          _buildInputField(
-                            "رقم الجوال",
-                            controller: phoneController,
-                          ),
-                          const SizedBox(height: 20),
-                          _buildDropdown(
-                            "التخصص الدقيق",
-                            value: selectedSpecialty,
-                            items: specialties,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedSpecialty = value as String;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          _buildDropdown(
-                            "سنوات الخبرة",
-                            value: selectedExperience,
-                            items: experienceYears,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedExperience = value as String;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
+                          _buildInputField("الاسم الأول", controller: firstNameController),
+                          SizedBox(height: 20.h),
+                          _buildInputField("الاسم الأخير", controller: lastNameController),
+                          SizedBox(height: 20.h),
+                          _buildInputField("البريد الإلكتروني", controller: emailController),
+                          SizedBox(height: 20.h),
+                          _buildPasswordField("كلمة المرور", controller: passwordController, validator: _validatePassword),
+                          SizedBox(height: 20.h),
+                          _buildPasswordField("إعادة كتابة كلمة المرور", controller: confirmPasswordController, validator: _validateConfirmPassword),
+                          SizedBox(height: 20.h),
+                          _buildInputField("رقم الجوال", controller: phoneController),
+                          SizedBox(height: 20.h),
+                          _buildDropdown("التخصص الدقيق", value: selectedSpecialty, items: specialties, onChanged: (value) {
+                            setState(() {
+                              selectedSpecialty = value as String;
+                            });
+                          }),
+                          SizedBox(height: 20.h),
+                          _buildDropdown("سنوات الخبرة", value: selectedExperience, items: experienceYears, onChanged: (value) {
+                            setState(() {
+                              selectedExperience = value as String;
+                            });
+                          }),
+                          SizedBox(height: 20.h),
                           _buildFilePickerButton(
                             icon: Icons.description,
                             label: 'رفع المؤهلات العلمية',
                             onPressed: () => pickFile('qualification'),
                             fileName: qualificationFileName,
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           _buildFilePickerButton(
                             icon: Icons.assignment,
                             label: 'رفع الرخصة',
                             onPressed: () => pickFile('license'),
                             fileName: licenseFileName,
                           ),
-                          const SizedBox(height: 40),
+                          SizedBox(height: 40.h),
                           FadeInUp(
                             duration: const Duration(milliseconds: 1600),
                             child: SizedBox(
                               width: double.infinity,
-                              height: 50,
+                              height: 50.h,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFF6872F),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 15,
-                                  ),
+                                    borderRadius: BorderRadius.circular(50.r)),
+                                  padding: EdgeInsets.symmetric(vertical: 15.h),
                                 ),
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                     await signUpTherapist();
                                   }
                                 },
-                                child: const Text(
+                                child: Text(
                                   "إنشاء حساب",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                  ),
+                                  style: TextStyle(fontSize: 18.sp, color: Colors.white),
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           FadeInUp(
                             duration: const Duration(milliseconds: 1800),
                             child: Center(
@@ -536,19 +410,12 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                                 onPressed: () {
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LoginScreen(),
-                                    ),
+                                    MaterialPageRoute(builder: (context) => LoginScreen()),
                                   );
                                 },
                                 child: Text(
                                   "تسجيل الدخول كطبيب/ أب ",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Color(0xFFF6872F),
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Color(0xFFF6872F),
-                                  ),
+                                  style: TextStyle(fontSize: 16.sp, color: Color(0xFFF6872F), decoration: TextDecoration.underline, decorationColor: Color(0xFFF6872F)),
                                 ),
                               ),
                             ),
@@ -570,12 +437,12 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(label, style: TextStyle(color: Colors.black, fontSize: 16)),
-        const SizedBox(height: 10),
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
+        SizedBox(height: 10.h),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(225, 95, 27, .3),
@@ -589,12 +456,9 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
             textAlign: TextAlign.right,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
@@ -614,12 +478,12 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(label, style: TextStyle(color: Colors.black, fontSize: 16)),
-        const SizedBox(height: 10),
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
+        SizedBox(height: 10.h),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(225, 95, 27, .3),
@@ -632,12 +496,9 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
             controller: controller,
             obscureText: true,
             textAlign: TextAlign.right,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
             ),
             validator: validator,
           ),
@@ -655,12 +516,12 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(label, style: TextStyle(color: Colors.black, fontSize: 16)),
-        const SizedBox(height: 10),
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
+        SizedBox(height: 10.h),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(225, 95, 27, .3),
@@ -671,17 +532,11 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           ),
           child: DropdownButtonFormField(
             value: value,
-            items:
-                items
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
+            items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
             onChanged: onChanged,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
@@ -705,7 +560,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(225, 95, 27, .3),
@@ -720,10 +575,10 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon, color: Color(0xFFF6872F)),
-                const SizedBox(width: 10),
+                SizedBox(width: 10.w),
                 Text(
                   label,
-                  style: TextStyle(fontSize: 16, color: Colors.black),
+                  style: TextStyle(fontSize: 16.sp, color: Colors.black),
                 ),
               ],
             ),
@@ -731,10 +586,10 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         ),
         if (fileName.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: EdgeInsets.only(top: 8.h),
             child: Text(
               fileName,
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ),

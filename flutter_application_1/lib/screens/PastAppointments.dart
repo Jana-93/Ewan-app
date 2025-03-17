@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PastAppointments extends StatefulWidget {
   const PastAppointments({super.key});
@@ -12,11 +13,10 @@ class PastAppointments extends StatefulWidget {
 class _PastAppointmentsState extends State<PastAppointments> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Function to fetch past appointments
   Stream<List<Map<String, dynamic>>> getPastAppointments() {
     return _firestore
         .collection('appointments')
-        .where('status', isEqualTo: 'completed') // Only completed appointments
+        .where('status', isEqualTo: 'completed')
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
@@ -41,40 +41,40 @@ class _PastAppointmentsState extends State<PastAppointments> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              const SizedBox(height: 60),
+              SizedBox(height: 60.h),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
-                    const Text(
+                    Text(
                       "المواعيد السابقة",
-                      style: TextStyle(color: Colors.white, fontSize: 40),
+                      style: TextStyle(color: Colors.white, fontSize: 40.sp),
                       textAlign: TextAlign.right,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
+                    topLeft: Radius.circular(50.r),
+                    topRight: Radius.circular(50.r),
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(30),
+                  padding: EdgeInsets.all(30.w),
                   child: Column(
                     children: <Widget>[
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: getPastAppointments(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const Center(
+                            return Center(
                               child: CircularProgressIndicator(),
                             );
                           }
@@ -84,7 +84,7 @@ class _PastAppointmentsState extends State<PastAppointments> {
                             );
                           }
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return const Center(
+                            return Center(
                               child: Text('لا يوجد مواعيد سابقة.'),
                             );
                           }
@@ -99,7 +99,7 @@ class _PastAppointmentsState extends State<PastAppointments> {
                                   return Container(
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(20.r),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.black.withOpacity(0.2),
@@ -109,9 +109,9 @@ class _PastAppointmentsState extends State<PastAppointments> {
                                         ),
                                       ],
                                     ),
-                                    margin: const EdgeInsets.only(bottom: 20),
+                                    margin: EdgeInsets.only(bottom: 20.h),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(15),
+                                      padding: EdgeInsets.all(15.w),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
@@ -123,33 +123,34 @@ class _PastAppointmentsState extends State<PastAppointments> {
                                               Text(
                                                 appointment['childName'] ??
                                                     "No Name",
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 16.sp,
                                                 ),
                                               ),
-                                              const SizedBox(height: 5),
+                                              SizedBox(height: 5.h),
                                               Text(
                                                 appointment['category'] ?? '',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.grey,
-                                                  fontSize: 12,
+                                                  fontSize: 12.sp,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 15),
+                                          SizedBox(height: 15.h),
                                           ScheduleCard(
                                             date: appointment['date'] ?? '',
                                             time: appointment['time'] ?? '',
                                           ),
-                                          const SizedBox(height: 15),
+                                          SizedBox(height: 15.h),
                                           Text(
                                             'حالة الموعد: ${appointment['status'] ?? 'مكتمل'}',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               color: Colors.orange,
-                                              fontSize: 14,
+                                              fontSize: 14.sp,
                                             ),
                                           ),
                                         ],
@@ -189,14 +190,13 @@ class ScheduleCard extends StatelessWidget {
         formattedDate = DateFormat('dd/MM/yyyy').format(parsedDate);
       }
     } catch (e) {
-      // Handle date parsing error
       print("Error parsing date: $e");
     }
 
     return Container(
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 238, 235, 235),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -207,28 +207,28 @@ class ScheduleCard extends StatelessWidget {
         ],
       ),
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.w),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Row(
             children: [
-              const Icon(Icons.calendar_today, color: Colors.orange, size: 16),
-              const SizedBox(width: 5),
+              Icon(Icons.calendar_today, color: Colors.orange, size: 16.sp),
+              SizedBox(width: 5.w),
               Text(
                 formattedDate,
-                style: const TextStyle(color: Colors.orange, fontSize: 14),
+                style: TextStyle(color: Colors.orange, fontSize: 14.sp),
               ),
             ],
           ),
           Row(
             children: [
-              const Icon(Icons.access_time, color: Colors.orange, size: 16),
-              const SizedBox(width: 5),
+              Icon(Icons.access_time, color: Colors.orange, size: 16.sp),
+              SizedBox(width: 5.w),
               Text(
                 time.isNotEmpty ? time : '10:00 صباحًا',
-                style: const TextStyle(color: Colors.orange, fontSize: 14),
+                style: TextStyle(color: Colors.orange, fontSize: 14.sp),
               ),
             ],
           ),

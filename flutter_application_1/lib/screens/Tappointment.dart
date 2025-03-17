@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:flutter_application_1/callVideo/presentation/views/video_call_screen.dart';
 import 'package:flutter_application_1/feedbackScreen.dart';
 import 'package:flutter_application_1/firestore_service.dart';
@@ -92,9 +94,9 @@ class _TappointmentState extends State<Tappointment> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              const SizedBox(height: 60),
+              SizedBox(height: 60.h),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
@@ -103,9 +105,12 @@ class _TappointmentState extends State<Tappointment> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
+                          Text(
                             "مواعيدي",
-                            style: TextStyle(color: Colors.white, fontSize: 40),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40.sp,
+                            ),
                             textAlign: TextAlign.right,
                           ),
                         ],
@@ -114,20 +119,20 @@ class _TappointmentState extends State<Tappointment> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
+                    topLeft: Radius.circular(50.r),
+                    topRight: Radius.circular(50.r),
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(30),
+                  padding: EdgeInsets.all(30.r),
                   child: Column(
                     children: <Widget>[
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: _firestoreService.getAppointments(),
                         builder: (context, snapshot) {
@@ -149,9 +154,11 @@ class _TappointmentState extends State<Tappointment> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
-                                const SizedBox(height: 10),
+                                SizedBox(height: 10.h),
                                 Container(
-                                  padding: const EdgeInsets.all(10),
+                                  padding: EdgeInsets.all(
+                                    10.r,
+                                  ),
                                   child: ListView.builder(
                                     shrinkWrap: true,
                                     physics:
@@ -201,7 +208,9 @@ class _TappointmentState extends State<Tappointment> {
                                                 255,
                                               ),
                                               borderRadius:
-                                                  BorderRadius.circular(20),
+                                                  BorderRadius.circular(
+                                                    20.r,
+                                                  ),
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.black
@@ -214,12 +223,14 @@ class _TappointmentState extends State<Tappointment> {
                                             ),
                                             margin:
                                                 !isLastElement
-                                                    ? const EdgeInsets.only(
-                                                      bottom: 20,
+                                                    ? EdgeInsets.only(
+                                                      bottom: 20.h,
                                                     )
                                                     : EdgeInsets.zero,
                                             child: Padding(
-                                              padding: const EdgeInsets.all(15),
+                                              padding: EdgeInsets.all(
+                                                15.r,
+                                              ),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.stretch,
@@ -232,7 +243,9 @@ class _TappointmentState extends State<Tappointment> {
                                                               "assets/images/icon.jpg",
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 10),
+                                                      SizedBox(
+                                                        width: 10.w,
+                                                      ),
                                                       Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -241,38 +254,39 @@ class _TappointmentState extends State<Tappointment> {
                                                           Text(
                                                             childData['childName'] ??
                                                                 "No Name",
-                                                            style:
-                                                                const TextStyle(
-                                                                  color:
-                                                                      Colors
-                                                                          .black,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700,
-                                                                ),
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              fontSize:
+                                                                  16.sp,
+                                                            ),
                                                           ),
-                                                          const SizedBox(
-                                                            height: 5,
+                                                          SizedBox(
+                                                            height: 5.h,
                                                           ),
                                                           Text(
                                                             appointment['category'] ??
                                                                 '',
-                                                            style:
-                                                                const TextStyle(
-                                                                  color:
-                                                                      Colors
-                                                                          .grey,
-                                                                  fontSize: 12,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontSize:
+                                                                  12.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
                                                     ],
                                                   ),
-                                                  const SizedBox(height: 15),
+                                                  SizedBox(
+                                                    height: 15.h,
+                                                  ),
                                                   ScheduleCard(
                                                     date:
                                                         appointment['date'] ??
@@ -281,7 +295,9 @@ class _TappointmentState extends State<Tappointment> {
                                                         appointment['time'] ??
                                                         '',
                                                   ),
-                                                  const SizedBox(height: 15),
+                                                  SizedBox(
+                                                    height: 15.h,
+                                                  ),
                                                   Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -318,10 +334,11 @@ class _TappointmentState extends State<Tappointment> {
                                                             );
                                                             // Implement start session logic
                                                           },
-                                                          child: const Text(
+                                                          child: Text(
                                                             'بدء الجلسة',
                                                             style: TextStyle(
-                                                              fontSize: 16,
+                                                              fontSize:
+                                                                  16.sp,
                                                               color:
                                                                   Colors.white,
                                                             ),
@@ -358,12 +375,16 @@ class _TappointmentState extends State<Tappointment> {
 
   Widget navBar() {
     return Container(
-      height: 60,
+      height: 60.h,
       width: double.infinity,
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+      margin: EdgeInsets.only(
+        left: 16.w,
+        right: 16.w,
+        bottom: 12.h,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -396,11 +417,11 @@ class _TappointmentState extends State<Tappointment> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(
-              top: 15,
+            margin: EdgeInsets.only(
+              top: 15.h,
               bottom: 0,
-              left: 30,
-              right: 30,
+              left: 30.w,
+              right: 30.w,
             ),
             child: Icon(
               icon,
@@ -429,7 +450,7 @@ class ScheduleCard extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 238, 235, 235),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -440,32 +461,42 @@ class ScheduleCard extends StatelessWidget {
           ],
         ),
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.r),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.calendar_today,
                   color: Colors.orange,
-                  size: 16,
+                  size: 16.sp,
                 ),
-                const SizedBox(width: 5),
+                SizedBox(width: 5.w),
                 Text(
                   formattedDate,
-                  style: const TextStyle(color: Colors.orange, fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontSize: 14.sp,
+                  ),
                 ),
               ],
             ),
             Row(
               children: [
-                const Icon(Icons.access_time, color: Colors.orange, size: 16),
-                const SizedBox(width: 5),
+                Icon(
+                  Icons.access_time,
+                  color: Colors.orange,
+                  size: 16.sp,
+                ),
+                SizedBox(width: 5.w),
                 Text(
                   time.isNotEmpty ? time : '10:00 صباحًا',
-                  style: const TextStyle(color: Colors.orange, fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontSize: 14.sp,
+                  ),
                 ),
               ],
             ),

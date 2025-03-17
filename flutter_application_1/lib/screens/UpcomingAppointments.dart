@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UpcomingAppointments extends StatefulWidget {
   const UpcomingAppointments({super.key});
@@ -41,34 +42,34 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              const SizedBox(height: 60),
+              SizedBox(height: 60.h),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
-                    const Text(
+                    Text(
                       "المواعيد القادمة",
-                      style: TextStyle(color: Colors.white, fontSize: 40),
+                      style: TextStyle(color: Colors.white, fontSize: 40.sp),
                       textAlign: TextAlign.right,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
+                    topLeft: Radius.circular(50.r),
+                    topRight: Radius.circular(50.r),
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(30),
+                  padding: EdgeInsets.all(30.r),
                   child: Column(
                     children: <Widget>[
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: getUpcomingAppointments(),
                         builder: (context, snapshot) {
@@ -110,7 +111,7 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
                                   return Container(
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(20.r),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.black.withOpacity(0.2),
@@ -120,9 +121,9 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
                                         ),
                                       ],
                                     ),
-                                    margin: const EdgeInsets.only(bottom: 20),
+                                    margin: EdgeInsets.only(bottom: 20.h),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(15),
+                                      padding: EdgeInsets.all(15.r),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
@@ -134,23 +135,24 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
                                               Text(
                                                 appointment['childName'] ??
                                                     "No Name",
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 16.sp,
                                                 ),
                                               ),
-                                              const SizedBox(height: 5),
+                                              SizedBox(height: 5.h),
                                               Text(
                                                 appointment['category'] ?? '',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.grey,
-                                                  fontSize: 12,
+                                                  fontSize: 12.sp,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 15),
+                                          SizedBox(height: 15.h),
                                           ScheduleCard(
                                             date:
                                                 appointment['date'] as String?,
@@ -203,7 +205,7 @@ class ScheduleCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 238, 235, 235),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -214,28 +216,28 @@ class ScheduleCard extends StatelessWidget {
         ],
       ),
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.r),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Row(
             children: [
-              const Icon(Icons.calendar_today, color: Colors.orange, size: 16),
-              const SizedBox(width: 5),
+              Icon(Icons.calendar_today, color: Colors.orange, size: 16.sp),
+              SizedBox(width: 5.w),
               Text(
                 formattedDate,
-                style: const TextStyle(color: Colors.orange, fontSize: 14),
+                style: TextStyle(color: Colors.orange, fontSize: 14.sp),
               ),
             ],
           ),
           Row(
             children: [
-              const Icon(Icons.access_time, color: Colors.orange, size: 16),
-              const SizedBox(width: 5),
+              Icon(Icons.access_time, color: Colors.orange, size: 16.sp),
+              SizedBox(width: 5.w),
               Text(
                 time?.isNotEmpty == true ? time! : '10:00 صباحًا',
-                style: const TextStyle(color: Colors.orange, fontSize: 14),
+                style: TextStyle(color: Colors.orange, fontSize: 14.sp),
               ),
             ],
           ),

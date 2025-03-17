@@ -30,7 +30,7 @@ class _GameScreenState extends State<GameScreen> {
   Offset _floatingPosition = const Offset(100, 100);
   late bool _remoteMuted;
   late bool _remoteCameraOff;
-  int? _remoteUid; // Store the remote UID here
+  int? _remoteUid;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
@@ -42,11 +42,9 @@ class _GameScreenState extends State<GameScreen> {
     widget.engine.registerEventHandler(
       RtcEngineEventHandler(
         onUserJoined: (connection, uid, elapsed) {
-          // When a remote user joins, update the remote UID
           setState(() => _remoteUid = uid);
         },
         onUserOffline: (connection, uid, reason) {
-          // When a remote user leaves, reset the remote UID
           if (_remoteUid == uid) {
             setState(() => _remoteUid = null);
           }
@@ -64,9 +62,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _listenForRemoteCameraState() {
-    _firestore.collection('cameraState').doc("cameraState").snapshots().listen((
-      snapshot,
-    ) {
+    _firestore.collection('cameraState').doc("cameraState").snapshots().listen((snapshot) {
       if (snapshot.exists) {
         setState(() {
           _remoteCameraOff = snapshot.data()?['doctorCameraOff'] ?? false;
@@ -94,9 +90,9 @@ class _GameScreenState extends State<GameScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
-            SizedBox(height: 60),
+            SizedBox(height: 60.h),
             Padding(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -112,7 +108,7 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                   Text(
                     "صفحة اللعبة",
-                    style: TextStyle(color: Colors.white, fontSize: 40),
+                    style: TextStyle(color: Colors.white, fontSize: 40.sp),
                     textAlign: TextAlign.right,
                   ),
                 ],
@@ -123,8 +119,8 @@ class _GameScreenState extends State<GameScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(40.r),
+                    topRight: Radius.circular(40.r),
                   ),
                 ),
                 child: Stack(
@@ -138,15 +134,15 @@ class _GameScreenState extends State<GameScreen> {
                             setState(() => _floatingPosition += details.delta);
                           },
                           child: SizedBox(
-                            width: 150,
-                            height: 200,
+                            width: 150.w,
+                            height: 200.h,
                             child: Stack(
                               children: [
                                 _remoteVideo(),
                                 if (_remoteMuted)
-                                  const Positioned(
-                                    top: 5,
-                                    right: 5,
+                                  Positioned(
+                                    top: 5.h,
+                                    right: 5.w,
                                     child: Icon(
                                       Icons.mic_off,
                                       color: Colors.white,
@@ -157,12 +153,11 @@ class _GameScreenState extends State<GameScreen> {
                           ),
                         ),
                       ),
-                    // Add the DrawingBoard widget here
                     Positioned(
-                      bottom: 1,
+                      bottom: 1.h,
                       left: 0,
                       right: 0,
-                      height: 300,
+                      height: 300.h,
                       child: DrawingBoard(),
                     ),
                   ],
@@ -179,22 +174,22 @@ class _GameScreenState extends State<GameScreen> {
     if (_remoteUid != null) {
       return _remoteCameraOff
           ? Center(
-            child: Container(
-              color: Colors.grey[200],
-              child: const Icon(Icons.videocam_off, size: 60),
-            ),
-          )
-          : AgoraVideoView(
-            controller: VideoViewController.remote(
-              rtcEngine: widget.engine,
-              canvas: VideoCanvas(uid: _remoteUid),
-              connection: RtcConnection(
-                channelId: AgoraManagerModel.channelName,
+              child: Container(
+                color: Colors.grey[200],
+                child: Icon(Icons.videocam_off, size: 60.sp),
               ),
-            ),
-          );
+            )
+          : AgoraVideoView(
+              controller: VideoViewController.remote(
+                rtcEngine: widget.engine,
+                canvas: VideoCanvas(uid: _remoteUid),
+                connection: RtcConnection(
+                  channelId: AgoraManagerModel.channelName,
+                ),
+              ),
+            );
     } else {
-      return const Center(child: Text('الطرف الاخر ليس متصل'));
+      return Center(child: Text('الطرف الاخر ليس متصل', style: TextStyle(fontSize: 16.sp)));
     }
   }
 }
@@ -216,10 +211,8 @@ class _DrawingBoardState extends State<DrawingBoard> {
     Colors.amberAccent,
     Colors.purple,
     Colors.green,
-    Colors.white, // Eraser color
+    Colors.white,
   ];
-
-  // Add a bool flag to track drawing state
   bool isDrawing = false;
 
   @override
@@ -229,7 +222,6 @@ class _DrawingBoardState extends State<DrawingBoard> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Drawing canvas
           Listener(
             behavior: HitTestBehavior.opaque,
             onPointerDown: (PointerDownEvent event) {
@@ -243,10 +235,7 @@ class _DrawingBoardState extends State<DrawingBoard> {
                       ..isAntiAlias = true
                       ..strokeWidth = strokeWidth
                       ..strokeCap = StrokeCap.round
-                      ..blendMode =
-                          selectedColor == Colors.white
-                              ? BlendMode.clear
-                              : BlendMode.srcOver,
+                      ..blendMode = selectedColor == Colors.white ? BlendMode.clear : BlendMode.srcOver,
                   ),
                 );
               });
@@ -262,10 +251,7 @@ class _DrawingBoardState extends State<DrawingBoard> {
                         ..isAntiAlias = true
                         ..strokeWidth = strokeWidth
                         ..strokeCap = StrokeCap.round
-                        ..blendMode =
-                            selectedColor == Colors.white
-                                ? BlendMode.clear
-                                : BlendMode.srcOver,
+                        ..blendMode = selectedColor == Colors.white ? BlendMode.clear : BlendMode.srcOver,
                     ),
                   );
                 });
@@ -281,53 +267,44 @@ class _DrawingBoardState extends State<DrawingBoard> {
               size: Size.infinite,
             ),
           ),
-
-          // UI Controls - Only interact when not drawing
           IgnorePointer(
             ignoring: isDrawing,
             child: Column(
               children: [
-                // Top controls
                 SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 80, right: 20),
+                    padding: EdgeInsets.only(top: 80.h, right: 20.w),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Slider with a transparent background
                           Container(
-                            width: 200, // Adjust width as needed
+                            width: 200.w,
                             decoration: BoxDecoration(
-                              color:
-                                  Colors
-                                      .transparent, // Make the slider background transparent
+                              color: Colors.transparent,
                             ),
                             child: Slider(
                               min: 0,
                               max: 40,
                               value: strokeWidth,
-                              onChanged:
-                                  (val) => setState(() => strokeWidth = val),
+                              onChanged: (val) => setState(() => strokeWidth = val),
                             ),
                           ),
                           ElevatedButton.icon(
-                            onPressed:
-                                () => setState(() => drawingPoints.clear()),
+                            onPressed: () => setState(() => drawingPoints.clear()),
                             icon: Icon(Icons.clear),
-                            label: Text(" مسح الشاشة"),
+                            label: Text(" مسح الشاشة", style: TextStyle(fontSize: 14.sp)),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                Spacer(), // Push the color palette to the bottom
-                // Bottom color palette
+                Spacer(),
                 Container(
                   color: const Color.fromARGB(255, 249, 236, 222),
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10.w),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(
@@ -349,12 +326,12 @@ class _DrawingBoardState extends State<DrawingBoard> {
     return GestureDetector(
       onTap: () => setState(() => selectedColor = color),
       child: Container(
-        height: isSelected ? 47 : 40,
-        width: isSelected ? 47 : 40,
+        height: isSelected ? 47.h : 40.h,
+        width: isSelected ? 47.w : 40.w,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
+          border: isSelected ? Border.all(color: Colors.white, width: 3.w) : null,
         ),
       ),
     );

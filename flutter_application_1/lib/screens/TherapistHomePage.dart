@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_application_1/screens/PastAppointments.dart';
 import 'package:flutter_application_1/screens/Tappointment.dart';
@@ -15,7 +16,7 @@ class TherapistHomePage extends StatefulWidget {
 }
 
 class _TherapistHomePageState extends State<TherapistHomePage> {
-  int _selectedIndex = 2; //  3 خانات
+  int _selectedIndex = 2;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -79,9 +80,9 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                const SizedBox(height: 60),
+                SizedBox(height: 60.h),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20.r),
                   child: FutureBuilder<Map<String, dynamic>>(
                     future: _fetchUserData(),
                     builder: (context, snapshot) {
@@ -111,7 +112,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                                     "مرحبًا،",
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 30,
+                                      fontSize: 30.sp,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -119,13 +120,13 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                                     "د. $firstName $lastName",
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 20,
+                                      fontSize: 20.sp,
                                     ),
                                   ),
                                 ],
                               ),
                               CircleAvatar(
-                                radius: 35,
+                                radius: 35.r,
                                 backgroundImage:
                                     profileImageUrl.isNotEmpty
                                         ? NetworkImage(profileImageUrl)
@@ -139,20 +140,20 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                     },
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      topRight: Radius.circular(50),
+                      topLeft: Radius.circular(50.r),
+                      topRight: Radius.circular(50.r),
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(30),
+                    padding: EdgeInsets.all(30.r),
                     child: Column(
                       children: <Widget>[
-                        const SizedBox(height: 30),
+                        SizedBox(height: 30.h),
                         FadeInUp(
                           duration: const Duration(milliseconds: 1400),
                           child: Column(
@@ -162,13 +163,13 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                                 Icons.history,
                                 context,
                               ),
-                              SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               buildMenuItem(
                                 'المواعيد القادمة',
                                 Icons.schedule,
                                 context,
                               ),
-                              SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               buildMenuItem(
                                 'تقدم المراجعين',
                                 Icons.bar_chart,
@@ -195,12 +196,12 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
 
   Widget buildMenuItem(String title, IconData icon, BuildContext context) {
     return Container(
-      width: 360,
-      height: 130,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      width: 360.w,
+      height: 130.h,
+      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -213,7 +214,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(flex: 1, child: Icon(icon, size: 40, color: Colors.orange)),
+          Expanded(flex: 1, child: Icon(icon, size: 40.sp, color: Colors.orange)),
           Expanded(
             flex: 2,
             child: Column(
@@ -222,13 +223,13 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                   textAlign: TextAlign.left,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 GestureDetector(
                   onTap: () {
                     // Handle navigation based on the title
@@ -262,7 +263,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                   },
                   child: Text(
                     'عرض التفاصيل',
-                    style: TextStyle(fontSize: 12, color: Color(0xFFFCB47A)),
+                    style: TextStyle(fontSize: 12.sp, color: Color(0xFFFCB47A)),
                     textAlign: TextAlign.left,
                   ),
                 ),
@@ -276,12 +277,12 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
 
   Widget navBar() {
     return Container(
-      height: 60,
+      height: 60.h,
       width: double.infinity,
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -300,7 +301,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
           _buildImageItem(
             "assets/images/ewan.png",
             2,
-          ), // TherapistHomePage (صورة)
+          ),
         ],
       ),
     );
@@ -316,11 +317,11 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(
-              top: 15,
+            margin: EdgeInsets.only(
+              top: 15.h,
               bottom: 0,
-              left: 30,
-              right: 30,
+              left: 30.w,
+              right: 30.w,
             ),
             child: Icon(
               icon,
@@ -343,10 +344,10 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(right: 15),
+            margin: EdgeInsets.only(right: 15.w),
             child: ImageIcon(
               AssetImage(imagePath),
-              size: 60,
+              size: 60.sp,
               color: isSelected ? Colors.deepOrange : Colors.grey,
             ),
           ),

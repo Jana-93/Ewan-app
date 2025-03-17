@@ -4,6 +4,7 @@ import 'HomePage.dart'; // Parent Home Screen
 import 'loginScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore for storing user data
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Psignup extends StatefulWidget {
   Psignup({super.key});
@@ -56,7 +57,7 @@ class _PsignupState extends State<Psignup> {
           content: Text(
             "تم إنشاء الحساب بنجاح ",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -64,7 +65,7 @@ class _PsignupState extends State<Psignup> {
           ),
           backgroundColor: Color(0xFFFCB47A),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
           ),
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 2),
@@ -101,8 +102,6 @@ class _PsignupState extends State<Psignup> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.only(
-                // topLeft: Radius.circular(60),
-                // topRight: Radius.circular(60),
               ),
               gradient: const LinearGradient(
                 begin: Alignment.topCenter,
@@ -113,101 +112,101 @@ class _PsignupState extends State<Psignup> {
                 ],
               ),
             ),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                const SizedBox(height: 50),
+                SizedBox(height: 50.h),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       FadeInUp(
                         duration: const Duration(milliseconds: 1000),
-                        child: const Text(
+                        child: Text(
                           "حساب جديد",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 37,
+                            fontSize: 37.sp,
                             fontFamily: "NotoKufiArabic",
                           ),
                           textAlign: TextAlign.right,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                     ],
                   ),
                 ),
-                // const SizedBox(height: 20),
                 Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      topRight: Radius.circular(40),
+                      topLeft: Radius.circular(40.r),
+                      topRight: Radius.circular(40.r),
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(30),
+                    padding: EdgeInsets.all(30.r),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         children: <Widget>[
-                          // const SizedBox(height: 60),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10.h),
                           _buildInputField(
                             "الاسم الأول",
                             controller: _firstNameController,
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           _buildInputField(
                             "الاسم الأخير",
                             controller: _lastNameController,
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           _buildInputField(
                             "البريد الإلكتروني",
                             controller: _emailController,
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           _buildInputField(
                             "كلمة المرور",
                             controller: _passwordController,
                             obscureText: true,
                             validator: _validatePassword,
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           _buildInputField(
                             "إعادة كتابة كلمة المرور",
                             controller: _confirmPasswordController,
                             obscureText: true,
                             validator: _validateConfirmPassword,
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           _buildInputField(
                             "رقم الجوال",
                             controller: _phoneController,
                           ),
-                          const SizedBox(height: 40),
+                          SizedBox(height: 40.h),
                           FadeInUp(
                             duration: const Duration(milliseconds: 1600),
                             child: SizedBox(
                               width: double.infinity,
-                              height: 50,
+                              height: 50.h,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFF6872F),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
+                                    borderRadius: BorderRadius.circular(
+                                      50.r,
+                                    ),
                                   ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 15,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 15.h,
+                                    horizontal: 20.w,
                                   ),
                                 ),
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    await register(); // Call register function
+                                    await register();
                                     if (!mounted) return;
                                     Navigator.pushReplacement(
                                       context,
@@ -217,17 +216,19 @@ class _PsignupState extends State<Psignup> {
                                     );
                                   }
                                 },
-                                child: const Text(
+                                child: Text(
                                   "إنشاء حساب",
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 18.sp,
                                     color: Colors.white,
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: 20.h,
+                          ),
                           FadeInUp(
                             duration: const Duration(milliseconds: 1800),
                             child: GestureDetector(
@@ -239,10 +240,10 @@ class _PsignupState extends State<Psignup> {
                                   ),
                                 );
                               },
-                              child: const Text(
+                              child: Text(
                                 "لديك حساب؟ سجل الآن",
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 16.sp,
                                   color: Color(0xFFFCB47A),
                                   decoration: TextDecoration.underline,
                                   decorationColor: Color(0xFFFCB47A),
@@ -273,12 +274,15 @@ class _PsignupState extends State<Psignup> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(label, style: const TextStyle(color: Colors.black, fontSize: 16)),
-        const SizedBox(height: 10),
+        Text(
+          label,
+          style: TextStyle(color: Colors.black, fontSize: 16.sp),
+        ),
+        SizedBox(height: 10.h),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(225, 95, 27, .3),
@@ -291,17 +295,17 @@ class _PsignupState extends State<Psignup> {
             controller: controller,
             obscureText: obscureText,
             textAlign: TextAlign.right,
-            // textDirection: TextDirection.rtl,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
+                horizontal: 20.w,
+                vertical: 15.h,
               ),
             ),
             validator: (value) {
+            
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
               if (validator != null) return validator(value);
               return null;

@@ -3,6 +3,7 @@ import 'package:flutter_application_1/screens/Stripe_payment/payment_manger.dart
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/screens/appointmentpage.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PaymentPage extends StatelessWidget {
   final int amount;
@@ -26,17 +27,15 @@ class PaymentPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text("الدفع")),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "أدخل معلومات الدفع",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
-
-            // حقل إدخال رقم البطاقة
+            SizedBox(height: 20.h),
             TextFormField(
               controller: cardNumberController,
               decoration: InputDecoration(
@@ -56,9 +55,7 @@ class PaymentPage extends StatelessWidget {
                 return null;
               },
             ),
-            SizedBox(height: 20),
-
-            // حقل إدخال تاريخ الانتهاء ورمز الأمان
+            SizedBox(height: 20.h),
             Row(
               children: [
                 Expanded(
@@ -95,8 +92,7 @@ class PaymentPage extends StatelessWidget {
                     },
                   ),
                 ),
-                SizedBox(width: 10),
-
+                SizedBox(width: 10.w),
                 Expanded(
                   child: TextFormField(
                     controller: cvcController,
@@ -121,12 +117,9 @@ class PaymentPage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20),
-
-            // زر الدفع
+            SizedBox(height: 20.h),
             ElevatedButton(
               onPressed: () async {
-                // التحقق من صحة البيانات
                 if (cardNumberController.text.length != 16) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -135,9 +128,7 @@ class PaymentPage extends StatelessWidget {
                   );
                   return;
                 }
-                if (!RegExp(
-                  r'^\d{2}/\d{2}$',
-                ).hasMatch(expiryDateController.text)) {
+                if (!RegExp(r'^\d{2}/\d{2}$').hasMatch(expiryDateController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("تاريخ الانتهاء غير صحيح")),
                   );
@@ -153,25 +144,19 @@ class PaymentPage extends StatelessWidget {
                 }
 
                 try {
-                  //await PaymentManager.makePayment(amount, currency);
-
-                  // إضافة الموعد إلى Firestore
                   await FirebaseFirestore.instance
                       .collection('appointments')
                       .add(appointmentData);
 
-                  // إظهار رسالة نجاح
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text("تم الدفع بنجاح!")));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("تم الدفع بنجاح!")),
+                  );
 
-                  // الانتقال إلى صفحة المواعيد
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => Appointmentpage()),
                   );
                 } catch (e) {
-                  // إظهار رسالة خطأ
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("فشل الدفع: ${e.toString()}")),
                   );
@@ -179,11 +164,11 @@ class PaymentPage extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepOrange,
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: Size(double.infinity, 50.h),
               ),
               child: Text(
                 "ادفع الآن",
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: TextStyle(color: Colors.white, fontSize: 18.sp),
               ),
             ),
           ],

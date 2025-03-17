@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // تهيئة Firebase
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -13,13 +14,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FeedbackScreen(isDoctor: false), // غيّر إلى true إذا كنت الدكتور
+      home: FeedbackScreen(isDoctor: false),
     );
   }
 }
 
 class FeedbackScreen extends StatefulWidget {
-  final bool isDoctor; // هل المستخدم دكتور أم ولي أمر؟
+  final bool isDoctor;
   FeedbackScreen({required this.isDoctor});
 
   @override
@@ -30,7 +31,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   final TextEditingController _controller = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // دالة إرسال المراجعة (تعمل فقط إذا كان المستخدم دكتورًا)
   void sendMessage() async {
     if (_controller.text.isNotEmpty) {
       await _firestore.collection("feedback").add({
@@ -47,10 +47,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
-        title: Text("مراجعاتي", style: TextStyle(color: Colors.white)),
+        title: Text("مراجعاتي", style: TextStyle(color: Colors.white, fontSize: 20.sp)),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {}, // إضافة التنقل للصفحة السابقة
+          icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+          onPressed: () {},
         ),
       ),
       body: Column(
@@ -59,7 +59,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             child: StreamBuilder<QuerySnapshot>(
               stream: _firestore
                   .collection("feedback")
-                  .orderBy("timestamp", descending: true) // ترتيب من الأحدث إلى الأقدم
+                  .orderBy("timestamp", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
@@ -71,12 +71,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     return Align(
                       alignment: Alignment.centerRight,
                       child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                        padding: EdgeInsets.all(15),
+                        margin: EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
+                        padding: EdgeInsets.all(15.w),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border.all(color: Colors.orange),
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(15.r),
                           boxShadow: [
                             BoxShadow(color: Colors.black12, blurRadius: 4)
                           ],
@@ -84,7 +84,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         child: Text(
                           feedback["message"],
                           textAlign: TextAlign.right,
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16.sp),
                         ),
                       ),
                     );
@@ -93,9 +93,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               },
             ),
           ),
-          if (widget.isDoctor) // إظهار حقل الإدخال فقط للدكتور
+          if (widget.isDoctor)
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: EdgeInsets.all(10.w),
               child: Row(
                 children: [
                   Expanded(
@@ -104,14 +104,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       decoration: InputDecoration(
                         hintText: "أضف مراجعتك...",
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25),
+                          borderRadius: BorderRadius.circular(25.r),
                           borderSide: BorderSide(color: Colors.orange),
                         ),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.send, color: Colors.orange),
+                    icon: Icon(Icons.send, color: Colors.orange, size: 24.sp),
                     onPressed: sendMessage,
                   ),
                 ],

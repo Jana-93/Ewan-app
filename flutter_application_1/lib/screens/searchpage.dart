@@ -7,7 +7,8 @@ import 'package:flutter_application_1/screens/appointmentpage.dart';
 import 'package:flutter_application_1/firestore_service.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:uuid/uuid.dart'; // Import the uuid package
+import 'package:uuid/uuid.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Searchpage extends StatefulWidget {
   @override
@@ -32,7 +33,7 @@ class _SearchpageState extends State<Searchpage> {
   void initState() {
     super.initState();
     _fetchTherapists();
-    _fetchChildren(); // Fetch children data when the page initializes
+    _fetchChildren();
   }
 
   Future<void> _fetchTherapists() async {
@@ -56,7 +57,7 @@ class _SearchpageState extends State<Searchpage> {
     try {
       List<Map<String, dynamic>> fetchedChildren =
           await _firestoreService.getchildren();
-      print("Fetched Children: $fetchedChildren"); // Debugging: Print fetched children
+      print("Fetched Children: $fetchedChildren");
       setState(() {
         children = fetchedChildren;
       });
@@ -103,7 +104,6 @@ class _SearchpageState extends State<Searchpage> {
     }
   }
 
-  // Widget لصفحة اختيار الوقت
   Future<void> _selectTime(BuildContext context) async {
     final String? selected = await Navigator.push(
       context,
@@ -116,8 +116,6 @@ class _SearchpageState extends State<Searchpage> {
       setState(() {
         selectedTime = selected;
       });
-
-      // الانتقال إلى صفحة الدفع مباشرة بعد اختيار الوقت
       _navigateToPaymentPage();
     }
   }
@@ -192,35 +190,35 @@ class _SearchpageState extends State<Searchpage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
-            const SizedBox(height: 60),
+            SizedBox(height: 60.h),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   FadeInUp(
                     duration: const Duration(milliseconds: 1000),
-                    child: const Text(
+                    child: Text(
                       "الأطباء",
-                      style: TextStyle(color: Colors.white, fontSize: 40),
+                      style: TextStyle(color: Colors.white, fontSize: 40.sp),
                       textAlign: TextAlign.right,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
+                    topLeft: Radius.circular(50.r),
+                    topRight: Radius.circular(50.r),
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(30),
+                  padding: EdgeInsets.all(30.w),
                   child: Column(
                     children: [
                       TextField(
@@ -233,42 +231,45 @@ class _SearchpageState extends State<Searchpage> {
                           hintText: "اختر الطبيب المناسب لك",
                           prefixIcon: Icon(Icons.search),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       Expanded(
                         child: ListView.builder(
                           itemCount: therapists.length,
                           itemBuilder: (context, index) {
                             bool isSelected = selectedTherapistIndex == index;
                             return Card(
-                              margin: EdgeInsets.symmetric(vertical: 8),
+                              margin: EdgeInsets.symmetric(vertical: 8.h),
                               color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
                               child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundImage: therapists[index]["profileImage"] != null
                                       ? NetworkImage(therapists[index]["profileImage"])
-                                      : AssetImage("path_to_default_image.jpg"), // Provide a default image
+                                      : AssetImage("path_to_default_image.jpg"),
                                 ),
                                 title: Text(
                                   "${therapists[index]["firstName"] ?? ""} ${therapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
                                     color: isSelected ? Colors.orange : Colors.black,
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    fontSize: 16.sp,
                                   ),
                                 ),
                                 subtitle: Text(
                                   therapists[index]["specialty"] ?? "No Specialty Information",
                                   style: TextStyle(
                                     color: isSelected ? Colors.orange : Colors.grey,
+                                    fontSize: 14.sp,
                                   ),
                                 ),
                                 trailing: Text(
                                   therapists[index]["experience"] ?? "Experience Unavailable",
                                   style: TextStyle(
                                     color: isSelected ? Colors.orange : Colors.green,
+                                    fontSize: 14.sp,
                                   ),
                                 ),
                                 onTap: () async {
@@ -276,7 +277,7 @@ class _SearchpageState extends State<Searchpage> {
                                     setState(() {
                                       selectedTherapistIndex = index;
                                     });
-                                    await _fetchChildren(); // Fetch children data when a therapist is selected
+                                    await _fetchChildren();
                                   } catch (e) {
                                     print("Error fetching children: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -292,15 +293,15 @@ class _SearchpageState extends State<Searchpage> {
                         ),
                       ),
                       if (selectedTherapistIndex != -1) ...[
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
                         Text(
                           "الأطفال المتاحين",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         if (children.isNotEmpty)
                           Expanded(
                             child: ListView.builder(
@@ -308,7 +309,7 @@ class _SearchpageState extends State<Searchpage> {
                               itemBuilder: (context, index) {
                                 bool isSelected = selectedChildIndex == index;
                                 return Card(
-                                  margin: EdgeInsets.symmetric(vertical: 8),
+                                  margin: EdgeInsets.symmetric(vertical: 8.h),
                                   color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.orange,
                                   child: ListTile(
                                     title: Text(
@@ -316,6 +317,7 @@ class _SearchpageState extends State<Searchpage> {
                                       style: TextStyle(
                                         color: isSelected ? Colors.orange : Colors.black,
                                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                        fontSize: 16.sp,
                                       ),
                                     ),
                                     onTap: () {
@@ -330,17 +332,17 @@ class _SearchpageState extends State<Searchpage> {
                           ),
                         if (children.isEmpty)
                           Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: EdgeInsets.all(16.w),
                             child: Text(
                               "لا يوجد أطفال متاحين",
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 color: Colors.grey,
                               ),
                             ),
                           ),
                         if (selectedChildIndex != -1) ...[
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           TableCalendar(
                             firstDay: DateTime.utc(2010, 10, 16),
                             lastDay: DateTime.utc(2030, 3, 14),
@@ -354,7 +356,7 @@ class _SearchpageState extends State<Searchpage> {
                                 _selectedDay = selectedDay;
                                 _focusedDay = focusedDay;
                               });
-                              await _selectTime(context); // انتقل إلى صفحة اختيار الوقت مباشرة
+                              await _selectTime(context);
                             },
                             onFormatChanged: (format) {
                               setState(() {
@@ -380,7 +382,7 @@ class _SearchpageState extends State<Searchpage> {
                               formatButtonVisible: false,
                               titleTextStyle: TextStyle(
                                 color: Colors.black,
-                                fontSize: 18,
+                                fontSize: 18.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                               leftChevronIcon: Icon(
@@ -394,11 +396,11 @@ class _SearchpageState extends State<Searchpage> {
                             ),
                           ),
                           if (selectedTime != null) ...[
-                            const SizedBox(height: 20),
+                            SizedBox(height: 20.h),
                             Text(
                               "الوقت المحدد: $selectedTime",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 18.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -419,12 +421,12 @@ class _SearchpageState extends State<Searchpage> {
 
   Widget navBar() {
     return Container(
-      height: 60,
+      height: 60.h,
       width: double.infinity,
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -457,11 +459,11 @@ class _SearchpageState extends State<Searchpage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(
-              top: 15,
+            margin: EdgeInsets.only(
+              top: 15.h,
               bottom: 0,
-              left: 30,
-              right: 30,
+              left: 30.w,
+              right: 30.w,
             ),
             child: Icon(
               icon,
@@ -484,10 +486,10 @@ class _SearchpageState extends State<Searchpage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(right: 15),
+            margin: EdgeInsets.only(right: 15.w),
             child: ImageIcon(
               AssetImage(imagePath),
-              size: 60,
+              size: 60.sp,
               color: isSelected ? Colors.deepOrange : Colors.grey,
             ),
           ),
@@ -497,7 +499,6 @@ class _SearchpageState extends State<Searchpage> {
   }
 }
 
-// صفحة اختيار الوقت
 class TimeSelectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -506,7 +507,7 @@ class TimeSelectionPage extends StatelessWidget {
         title: Text("اختر الوقت"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         child: Wrap(
           spacing: 8.0,
           runSpacing: 8.0,
@@ -516,7 +517,7 @@ class TimeSelectionPage extends StatelessWidget {
               label: Text(time),
               selected: false,
               onSelected: (selected) {
-                Navigator.pop(context, time); // إرجاع الوقت المحدد
+                Navigator.pop(context, time);
               },
               selectedColor: Colors.deepOrange,
               labelStyle: TextStyle(

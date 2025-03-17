@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:flutter_application_1/screens/TherapistHomePage.dart';
 import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:flutter_application_1/screens/Tappointment.dart';
@@ -21,7 +23,6 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
     switch (index) {
       case 0:
       
-        
         break;
       case 1:
         Navigator.pushReplacement(
@@ -74,59 +75,59 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.only(top: 50),
-                    decoration: const BoxDecoration(
+                    padding: EdgeInsets.only(top: 50.h),
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [
+                        colors: const [
                           Color.fromARGB(255, 219, 101, 37),
                           Color.fromRGBO(239, 108, 0, 1),
                           Color.fromRGBO(255, 167, 38, 1),
                         ],
                       ),
                       borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(15),
-                        bottomLeft: Radius.circular(15),
+                        bottomRight: Radius.circular(15.r),
+                        bottomLeft: Radius.circular(15.r),
                       ),
                     ),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           "الملف الشخصي",
                           style: TextStyle(
-                            fontSize: 25,
+                            fontSize: 25.sp,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         CircleAvatar(
-                          radius: 50,
+                          radius: 50.r,
                           backgroundImage: NetworkImage(data['profileImage']),
                           backgroundColor: Colors.grey[300],
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         Text(
                           "${data['firstName']} ${data['lastName']}",
-                          style: const TextStyle(
-                            fontSize: 20,
+                          style: TextStyle(
+                            fontSize: 20.sp,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         Text(
                           data['email'],
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white70,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                   ..._buildProfileOptions(data, bio, context),
                 ],
               ),
@@ -152,7 +153,6 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
               .update({'bio': newBio});
         },
       ),
-      
       _buildPriceOption(context),
       _buildProfileOption(Icons.work, "التخصص الدقيق: ${data['specialty']}", context, () {}),
       _buildProfileOption(Icons.timeline, "سنوات الخبرة: ${data['experience']}", context, () {}),
@@ -170,12 +170,12 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
   Widget _buildProfileOption(
       IconData icon, String title, BuildContext context, VoidCallback onTap) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.orange),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black12,
@@ -186,7 +186,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         ),
         child: ListTile(
           leading: Icon(icon, color: Colors.orange),
-          title: Text(title, style: const TextStyle(fontSize: 16)),
+          title: Text(title, style: TextStyle(fontSize: 16.sp)),
           onTap: onTap,
         ),
       ),
@@ -196,12 +196,12 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
   Widget _buildEditableProfileOption(
       IconData icon, String title, String value, BuildContext context, Function(String) onSave) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.orange),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black12,
@@ -212,7 +212,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         ),
         child: ListTile(
           leading: Icon(icon, color: Colors.orange),
-          title: Text(title, style: const TextStyle(fontSize: 16)),
+          title: Text(title, style: TextStyle(fontSize: 16.sp)),
           subtitle: Text(value),
           trailing: IconButton(
             icon: Icon(Icons.edit, color: Colors.blue),
@@ -227,12 +227,12 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
 
   Widget _buildPriceOption(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.orange),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black12,
@@ -243,7 +243,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         ),
         child: ListTile(
           leading: Icon(Icons.monetization_on, color: Colors.orange),
-          title: Text("سعر الجلسة", style: const TextStyle(fontSize: 16)),
+          title: Text("سعر الجلسة", style: TextStyle(fontSize: 16.sp)),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -289,11 +289,11 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
 
   Widget navBar() {
     return Container(
-      height: 60,
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+      height: 60.h,
+      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -308,7 +308,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         children: [
           _buildNavItem(Icons.home, null, 3),
           _buildNavItem(Icons.folder, null, 2),
-            _buildNavItem(Icons.calendar_month, null, 1),
+          _buildNavItem(Icons.calendar_month, null, 1),
           _buildNavItem(Icons.person, null, 0),
         ],
       ),
@@ -329,7 +329,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
             child: imagePath != null
                 ? ImageIcon(
                     AssetImage(imagePath),
-                    size: 30,
+                    size: 30.sp,
                     color: isSelected ? Colors.deepOrange : Colors.grey,
                   )
                 : Icon(
