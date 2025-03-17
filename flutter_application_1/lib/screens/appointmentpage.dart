@@ -72,7 +72,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              SizedBox(height: 60.h),
+              SizedBox(height: 80.h), 
               Padding(
                 padding: EdgeInsets.all(20.r),
                 child: Column(
@@ -94,7 +94,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
                   ],
                 ),
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 10.h), 
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -107,8 +107,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
                   padding: EdgeInsets.all(30.r),
                   child: Column(
                     children: <Widget>[
-                      SizedBox(height: 20.h),
-                      // Use StreamBuilder to fetch appointments from Firestore
+                      SizedBox(height: 10.h), 
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: _firestoreService.getAppointments(),
                         builder: (context, snapshot) {
@@ -196,10 +195,10 @@ class _AppointmentpageState extends State<Appointmentpage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildNavItem(Icons.person, 0),
-          _buildNavItem(Icons.calendar_today, 2),
+          _buildImageItem("assets/images/ewan.png", 3),  
           _buildNavItem(Icons.search, 1),
-          _buildImageItem("assets/images/ewan.png", 3),
+          _buildNavItem(Icons.calendar_today, 2),
+          _buildNavItem(Icons.person, 0),
         ],
       ),
     );
