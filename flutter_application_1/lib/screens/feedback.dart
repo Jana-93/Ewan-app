@@ -36,7 +36,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       await _firestore.collection("feedback").add({
         "message": _controller.text,
         "timestamp": FieldValue.serverTimestamp(),
-        "sender": "doctor"
+        "sender": "doctor",
       });
       _controller.clear();
     }
@@ -47,22 +47,29 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
-        title: Text("مراجعاتي", style: TextStyle(color: Colors.white, fontSize: 20.sp)),
+        title: Text(
+          "مراجعاتي",
+          style: TextStyle(color: Colors.white, fontSize: 20.sp),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
       ),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: _firestore
-                  .collection("feedback")
-                  .orderBy("timestamp", descending: true)
-                  .snapshots(),
+              stream:
+                  _firestore
+                      .collection("feedback")
+                      .orderBy("timestamp", descending: true)
+                      .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                if (!snapshot.hasData)
+                  return Center(child: CircularProgressIndicator());
                 var feedbacks = snapshot.data!.docs;
                 return ListView.builder(
                   itemCount: feedbacks.length,
@@ -71,14 +78,17 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     return Align(
                       alignment: Alignment.centerRight,
                       child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
+                        margin: EdgeInsets.symmetric(
+                          vertical: 5.h,
+                          horizontal: 15.w,
+                        ),
                         padding: EdgeInsets.all(15.w),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border.all(color: Colors.orange),
                           borderRadius: BorderRadius.circular(15.r),
                           boxShadow: [
-                            BoxShadow(color: Colors.black12, blurRadius: 4)
+                            BoxShadow(color: Colors.black12, blurRadius: 4),
                           ],
                         ),
                         child: Text(

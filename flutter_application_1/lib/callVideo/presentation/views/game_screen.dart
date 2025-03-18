@@ -62,7 +62,9 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _listenForRemoteCameraState() {
-    _firestore.collection('cameraState').doc("cameraState").snapshots().listen((snapshot) {
+    _firestore.collection('cameraState').doc("cameraState").snapshots().listen((
+      snapshot,
+    ) {
       if (snapshot.exists) {
         setState(() {
           _remoteCameraOff = snapshot.data()?['doctorCameraOff'] ?? false;
@@ -107,7 +109,7 @@ class _GameScreenState extends State<GameScreen> {
                     },
                   ),
                   Text(
-                    "صفحة اللعبة",
+                    "اللعبة",
                     style: TextStyle(color: Colors.white, fontSize: 40.sp),
                     textAlign: TextAlign.right,
                   ),
@@ -174,22 +176,24 @@ class _GameScreenState extends State<GameScreen> {
     if (_remoteUid != null) {
       return _remoteCameraOff
           ? Center(
-              child: Container(
-                color: Colors.grey[200],
-                child: Icon(Icons.videocam_off, size: 60.sp),
-              ),
-            )
+            child: Container(
+              color: Colors.grey[200],
+              child: Icon(Icons.videocam_off, size: 60.sp),
+            ),
+          )
           : AgoraVideoView(
-              controller: VideoViewController.remote(
-                rtcEngine: widget.engine,
-                canvas: VideoCanvas(uid: _remoteUid),
-                connection: RtcConnection(
-                  channelId: AgoraManagerModel.channelName,
-                ),
+            controller: VideoViewController.remote(
+              rtcEngine: widget.engine,
+              canvas: VideoCanvas(uid: _remoteUid),
+              connection: RtcConnection(
+                channelId: AgoraManagerModel.channelName,
               ),
-            );
+            ),
+          );
     } else {
-      return Center(child: Text('الطرف الاخر ليس متصل', style: TextStyle(fontSize: 16.sp)));
+      return Center(
+        child: Text('الطرف الاخر ليس متصل', style: TextStyle(fontSize: 16.sp)),
+      );
     }
   }
 }
@@ -235,7 +239,10 @@ class _DrawingBoardState extends State<DrawingBoard> {
                       ..isAntiAlias = true
                       ..strokeWidth = strokeWidth
                       ..strokeCap = StrokeCap.round
-                      ..blendMode = selectedColor == Colors.white ? BlendMode.clear : BlendMode.srcOver,
+                      ..blendMode =
+                          selectedColor == Colors.white
+                              ? BlendMode.clear
+                              : BlendMode.srcOver,
                   ),
                 );
               });
@@ -251,7 +258,10 @@ class _DrawingBoardState extends State<DrawingBoard> {
                         ..isAntiAlias = true
                         ..strokeWidth = strokeWidth
                         ..strokeCap = StrokeCap.round
-                        ..blendMode = selectedColor == Colors.white ? BlendMode.clear : BlendMode.srcOver,
+                        ..blendMode =
+                            selectedColor == Colors.white
+                                ? BlendMode.clear
+                                : BlendMode.srcOver,
                     ),
                   );
                 });
@@ -288,13 +298,18 @@ class _DrawingBoardState extends State<DrawingBoard> {
                               min: 0,
                               max: 40,
                               value: strokeWidth,
-                              onChanged: (val) => setState(() => strokeWidth = val),
+                              onChanged:
+                                  (val) => setState(() => strokeWidth = val),
                             ),
                           ),
                           ElevatedButton.icon(
-                            onPressed: () => setState(() => drawingPoints.clear()),
+                            onPressed:
+                                () => setState(() => drawingPoints.clear()),
                             icon: Icon(Icons.clear),
-                            label: Text(" مسح الشاشة", style: TextStyle(fontSize: 14.sp)),
+                            label: Text(
+                              " مسح الشاشة",
+                              style: TextStyle(fontSize: 14.sp),
+                            ),
                           ),
                         ],
                       ),
@@ -331,7 +346,8 @@ class _DrawingBoardState extends State<DrawingBoard> {
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: isSelected ? Border.all(color: Colors.white, width: 3.w) : null,
+          border:
+              isSelected ? Border.all(color: Colors.white, width: 3.w) : null,
         ),
       ),
     );

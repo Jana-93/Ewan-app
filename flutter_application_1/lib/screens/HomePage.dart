@@ -6,6 +6,9 @@ import 'package:flutter_application_1/screens/searchpage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
 import 'package:flutter_application_1/screens/feedback.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -16,6 +19,31 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int selectedIndex = 3;
+  String userFirstName = "";
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    // Get the currently authenticated user
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance
+              .collection('parents')
+              .doc(userId)
+              .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          userFirstName = userDoc.get('firstName') ?? "";
+        });
+      }
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -78,15 +106,33 @@ class _HomepageState extends State<Homepage> {
                   children: <Widget>[
                     FadeInUp(
                       duration: const Duration(milliseconds: 1000),
-                      child: Text(
-                        "أهلاً",
-                        style: TextStyle(color: Colors.white, fontSize: 40.sp),
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: userFirstName,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40.sp,
+                              ),
+                            ),
+                            TextSpan(
+                              text: " ,أهلاً",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                         textAlign: TextAlign.right,
                       ),
                     ),
                   ],
                 ),
               ),
+
               SizedBox(height: 20.h),
               Container(
                 decoration: BoxDecoration(
@@ -97,10 +143,10 @@ class _HomepageState extends State<Homepage> {
                   ),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(30.r),
+                  padding: EdgeInsets.all(20.r),
                   child: Column(
                     children: <Widget>[
-                      SizedBox(height: 30.h),
+                      SizedBox(height: 40.h),
                       _buildHealthConsultation(),
                       SizedBox(height: 20.h),
                       FadeInUp(
@@ -108,7 +154,7 @@ class _HomepageState extends State<Homepage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
-                            SizedBox(height: 10.h),
+                            SizedBox(height: 20.h),
                             Container(
                               padding: EdgeInsets.all(10.r),
                               decoration: BoxDecoration(
@@ -139,10 +185,10 @@ class _HomepageState extends State<Homepage> {
     return Column(
       children: [
         _buildHealthConsultationSection(
-          title: "تحدث إلى مختص صحي الآن",
-          description: "احصل على استشارة طبية عن بعد لطفلك",
+          title: "استشارات طبية عن بُعد",
+          description: " يمكنك الوصول إلى مختصين لتقديم استشارات لطفلك بسهولة",
           imagePath: 'assets/images/doco.jpg',
-          actionText: "تصفح مزودي خدمتنا الصحية عن بعد",
+          actionText: "استكشف خدمتنا الصحية عن بعد",
           onTap: () {
             Navigator.push(
               context,
@@ -179,7 +225,7 @@ class _HomepageState extends State<Homepage> {
   }) {
     return Container(
       width: 360.w,
-      height: 130.h,
+      height: 180.h,
       padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -204,25 +250,41 @@ class _HomepageState extends State<Homepage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: 2.h),
+
                 Text(
                   description,
-                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                  style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                   textAlign: TextAlign.right,
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 18.h),
+
                 GestureDetector(
                   onTap: onTap,
-                  child: Text(
-                    actionText,
-                    style: TextStyle(fontSize: 12.sp, color: Color(0xFFFCB47A)),
-                    textAlign: TextAlign.right,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.orange,
+                        size: 16.sp,
+                      ),
+                      Text(
+                        actionText,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Color(0xFFFCB47A),
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                      SizedBox(width: 3.w),
+                    ],
                   ),
                 ),
               ],
