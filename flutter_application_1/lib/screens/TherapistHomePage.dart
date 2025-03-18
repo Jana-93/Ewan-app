@@ -160,19 +160,19 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                             children: [
                               buildMenuItem(
                                 'المواعيد السابقة',
-                                Icons.history,
+                                'assets/images/c2.webp',
                                 context,
                               ),
                               SizedBox(height: 16.h),
                               buildMenuItem(
                                 'المواعيد القادمة',
-                                Icons.schedule,
+                                'assets/images/c.jfif',
                                 context,
                               ),
                               SizedBox(height: 16.h),
                               buildMenuItem(
                                 'تقدم المراجعين',
-                                Icons.bar_chart,
+                                'assets/images/review.jpg',
                                 context,
                               ),
                             ],
@@ -194,7 +194,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
     );
   }
 
-  Widget buildMenuItem(String title, IconData icon, BuildContext context) {
+  Widget buildMenuItem(String title, String imagePath, BuildContext context) {
     return Container(
       width: 360.w,
       height: 130.h,
@@ -214,22 +214,34 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(flex: 1, child: Icon(icon, size: 40.sp, color: Colors.orange)),
+          // الصورة
+          Expanded(
+            flex: 1,
+            child: Image.asset(
+              imagePath,
+              width: 90.w, // زيادة عرض الصورة
+              height: 80.h, // زيادة ارتفاع الصورة
+              fit: BoxFit.fill, // لجعل الصورة تملأ المساحة المحددة
+            ),
+          ),
+          SizedBox(width: 16.w), // زيادة المسافة بين الصورة والنص
+          // النص
           Expanded(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center, // جعل النص في المنتصف عموديًا
               children: [
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize: 18.sp, // زيادة حجم النص
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                   textAlign: TextAlign.left,
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 8.h), // زيادة المسافة بين العنوان والنص الفرعي
                 GestureDetector(
                   onTap: () {
                     // Handle navigation based on the title
@@ -254,8 +266,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => FeedbackScreen(isDoctor: true),
+                            builder: (context) => FeedbackScreen(isDoctor: true),
                           ),
                         );
                         break;
@@ -263,7 +274,10 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                   },
                   child: Text(
                     'عرض التفاصيل',
-                    style: TextStyle(fontSize: 12.sp, color: Color(0xFFFCB47A)),
+                    style: TextStyle(
+                      fontSize: 14.sp, // زيادة حجم النص الفرعي
+                      color: Color(0xFFFCB47A),
+                    ),
                     textAlign: TextAlign.left,
                   ),
                 ),
