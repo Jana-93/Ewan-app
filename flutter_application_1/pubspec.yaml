@@ -40,6 +40,9 @@ dependencies:
   intl: ^0.20.2
   uuid: ^4.5.1
   flutter_screenutil: ^5.9.3
+  url_launcher: ^6.1.11
+  webview_flutter: ^4.2.2
+
   
   
 

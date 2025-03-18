@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/PaymentPage.dart';
+import 'package:flutter_application_1/screens/ConfirmationPage.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/userpage.dart';
@@ -7,8 +7,8 @@ import 'package:flutter_application_1/screens/appointmentpage.dart';
 import 'package:flutter_application_1/firestore_service.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart'; // أضفنا حزمة url_launcher
 
 class Searchpage extends StatefulWidget {
   @override
@@ -100,6 +100,79 @@ class _SearchpageState extends State<Searchpage> {
     }
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? selected = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("اختر التاريخ"),
+          content: Container(
+            width: double.maxFinite,
+            child: TableCalendar(
+              firstDay: DateTime.utc(2010, 10, 16),
+              lastDay: DateTime.utc(2030, 3, 14),
+              focusedDay: _focusedDay,
+              calendarFormat: _calendarFormat,
+              selectedDayPredicate: (day) {
+                return isSameDay(_selectedDay, day);
+              },
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+                Navigator.pop(context, selectedDay); // إرجاع التاريخ المحدد
+              },
+              onFormatChanged: (format) {
+                setState(() {
+                  _calendarFormat = format;
+                });
+              },
+              onPageChanged: (focusedDay) {
+                _focusedDay = focusedDay;
+              },
+              calendarStyle: CalendarStyle(
+                todayDecoration: BoxDecoration(
+                  color: Colors.orange,
+                  shape: BoxShape.circle,
+                ),
+                selectedDecoration: BoxDecoration(
+                  color: Colors.deepOrange,
+                  shape: BoxShape.circle,
+                ),
+                weekendTextStyle: TextStyle(color: Colors.red),
+                defaultTextStyle: TextStyle(color: Colors.black),
+              ),
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
+                titleTextStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+                leftChevronIcon: Icon(
+                  Icons.chevron_left,
+                  color: Colors.deepOrange,
+                ),
+                rightChevronIcon: Icon(
+                  Icons.chevron_right,
+                  color: Colors.deepOrange,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selected != null) {
+      setState(() {
+        _selectedDay = selected;
+      });
+      await _selectTime(context); // الانتقال إلى صفحة اختيار الوقت
+    }
+  }
+
   Future<void> _selectTime(BuildContext context) async {
     final String? selected = await Navigator.push(
       context,
@@ -110,68 +183,42 @@ class _SearchpageState extends State<Searchpage> {
       setState(() {
         selectedTime = selected;
       });
-      _navigateToPaymentPage();
+
+      // افتح رابط الدفع Stripe في متصفح خارجي
+      await _launchPaymentUrl();
+
+      // الانتقال إلى صفحة التأكيد بعد الدفع
+      _navigateToConfirmationPage(context);
     }
   }
 
-  void _navigateToPaymentPage() async {
-    if (_selectedDay == null || selectedTime == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("يرجى تحديد التاريخ والوقت")));
-      return;
-    }
-
-    String uid = FirebaseAuth.instance.currentUser!.uid;
-    String therapistUid =
-        therapists[selectedTherapistIndex]["uid"] ?? "unknown";
-    String therapistName =
-        "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
-    String childName =
-        "${children[selectedChildIndex]["childName"] ?? "No Name"}";
-
-    final appointmentData = {
-      "userId": uid,
-      "therapistUid": therapistUid,
-      "therapistName": therapistName,
-      "childName": childName,
-      "date":
-          "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
-      "time": selectedTime,
-      "price": therapists[selectedTherapistIndex]["price"] ?? "0",
-      "status": "upcoming",
-    };
-
-    try {
-      await _firestoreService.addAppointment(appointmentData);
-      print("Appointment added successfully");
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder:
-              (context) => PaymentPage(
-                amount:
-                    int.tryParse(
-                      therapists[selectedTherapistIndex]["price"]
-                              ?.replaceAll("ريال", "")
-                              .trim() ??
-                          "0",
-                    ) ??
-                    0,
-                currency: "SAR",
-                appointmentData: appointmentData,
-                onPaymentSuccess: () {
-                  _firestoreService.addAppointment(appointmentData);
-                },
-              ),
-        ),
+  Future<void> _launchPaymentUrl() async {
+    const url = "https://buy.stripe.com/test_6oE7vW3Ub0Bwd6U5kl"; // رابط الدفع
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("تعذر فتح رابط الدفع")),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء حجز الموعد")));
     }
+  }
+
+  void _navigateToConfirmationPage(BuildContext context) {
+    // الانتقال إلى صفحة التأكيد مع تمرير البيانات المطلوبة
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ConfirmationPage(
+          therapists: therapists,
+          selectedTherapistIndex: selectedTherapistIndex,
+          children: children,
+          selectedChildIndex: selectedChildIndex,
+          selectedDay: _selectedDay!,
+          selectedTime: selectedTime!,
+          firestoreService: _firestoreService,
+        ),
+      ),
+    );
   }
 
   @override
@@ -359,6 +406,10 @@ class _SearchpageState extends State<Searchpage> {
                                       setState(() {
                                         selectedChildIndex = index;
                                       });
+                                      // الانتقال مباشرة إلى صفحة اختيار التاريخ بعد اختيار الطفل
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        _selectDate(context);
+                                      });
                                     },
                                   ),
                                 );
@@ -376,71 +427,6 @@ class _SearchpageState extends State<Searchpage> {
                               ),
                             ),
                           ),
-                        if (selectedChildIndex != -1) ...[
-                          SizedBox(height: 20.h),
-                          TableCalendar(
-                            firstDay: DateTime.utc(2010, 10, 16),
-                            lastDay: DateTime.utc(2030, 3, 14),
-                            focusedDay: _focusedDay,
-                            calendarFormat: _calendarFormat,
-                            selectedDayPredicate: (day) {
-                              return isSameDay(_selectedDay, day);
-                            },
-                            onDaySelected: (selectedDay, focusedDay) async {
-                              setState(() {
-                                _selectedDay = selectedDay;
-                                _focusedDay = focusedDay;
-                              });
-                              await _selectTime(context);
-                            },
-                            onFormatChanged: (format) {
-                              setState(() {
-                                _calendarFormat = format;
-                              });
-                            },
-                            onPageChanged: (focusedDay) {
-                              _focusedDay = focusedDay;
-                            },
-                            calendarStyle: CalendarStyle(
-                              todayDecoration: BoxDecoration(
-                                color: Colors.orange,
-                                shape: BoxShape.circle,
-                              ),
-                              selectedDecoration: BoxDecoration(
-                                color: Colors.deepOrange,
-                                shape: BoxShape.circle,
-                              ),
-                              weekendTextStyle: TextStyle(color: Colors.red),
-                              defaultTextStyle: TextStyle(color: Colors.black),
-                            ),
-                            headerStyle: HeaderStyle(
-                              formatButtonVisible: false,
-                              titleTextStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              leftChevronIcon: Icon(
-                                Icons.chevron_left,
-                                color: Colors.deepOrange,
-                              ),
-                              rightChevronIcon: Icon(
-                                Icons.chevron_right,
-                                color: Colors.deepOrange,
-                              ),
-                            ),
-                          ),
-                          if (selectedTime != null) ...[
-                            SizedBox(height: 20.h),
-                            Text(
-                              "الوقت المحدد: $selectedTime",
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ],
                       ],
                     ],
                   ),
@@ -525,7 +511,7 @@ class _SearchpageState extends State<Searchpage> {
             child: ImageIcon(
               AssetImage(imagePath),
               size: 60.sp,
-              color: isSelected ? Colors.deepOrange : Colors.grey,
+              color: isSelected ? Colors.deepOrange : const Color.fromARGB(255, 252, 253, 253),
             ),
           ),
         ],
@@ -538,24 +524,38 @@ class TimeSelectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("اختر الوقت")),
+      appBar: AppBar(
+        title: Text("اختر الوقت"),
+        backgroundColor: Colors.orange, // تغيير لون AppBar إلى البرتقالي
+      ),
       body: Padding(
         padding: EdgeInsets.all(16.w),
-        child: Wrap(
-          spacing: 8.0,
-          runSpacing: 8.0,
-          children: List.generate(10, (index) {
-            String time = "${8 + index}:00 صباحًا";
-            return ChoiceChip(
-              label: Text(time),
-              selected: false,
-              onSelected: (selected) {
-                Navigator.pop(context, time);
-              },
-              selectedColor: Colors.deepOrange,
-              labelStyle: TextStyle(color: Colors.black),
-            );
-          }),
+        child: Column(
+          children: [
+            // إضافة صورة s1 في أعلى الصفحة
+            Image.asset(
+              "assets/images/s1.jpg", // تأكد من وجود الصورة في مجلد assets
+              width: 100.w,
+              height: 100.h,
+            ),
+            SizedBox(height: 20.h),
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: List.generate(10, (index) {
+                String time = "${8 + index}:00 صباحًا";
+                return ChoiceChip(
+                  label: Text(time),
+                  selected: false,
+                  onSelected: (selected) {
+                    Navigator.pop(context, time);
+                  },
+                  selectedColor: Colors.orange, // تغيير لون المربعات إلى البرتقالي
+                  labelStyle: TextStyle(color: Colors.deepOrange),
+                );
+              }),
+            ),
+          ],
         ),
       ),
     );

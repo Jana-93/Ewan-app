@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 // Import the login screen
 Future<void> main() async {
@@ -57,6 +58,9 @@ class MyApp extends StatelessWidget {
           //         return showSnackBar(context,"something want error");
           //       }
           //     }),
+          
+    
+
         );
       },
     );
