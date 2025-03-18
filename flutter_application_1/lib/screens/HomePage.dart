@@ -98,7 +98,7 @@ class _HomepageState extends State<Homepage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              SizedBox(height: 60.h),
+              SizedBox(height: 40.h),
               Padding(
                 padding: EdgeInsets.all(10.r),
                 child: Column(
@@ -133,7 +133,7 @@ class _HomepageState extends State<Homepage> {
                 ),
               ),
 
-              SizedBox(height: 20.h),
+              // SizedBox(height: 6.h),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -278,7 +278,7 @@ class _HomepageState extends State<Homepage> {
                       Text(
                         actionText,
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 13.sp,fontWeight: FontWeight.w700,
                           color: Color(0xFFFCB47A),
                         ),
                         textAlign: TextAlign.right,
