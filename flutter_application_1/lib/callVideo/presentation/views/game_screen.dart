@@ -81,7 +81,7 @@ class _GameScreenState extends State<GameScreen> {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
+            begin: Alignment.topLeft,
             colors: const [
               Color.fromARGB(255, 219, 101, 37),
               Color.fromRGBO(239, 108, 0, 1),
@@ -94,7 +94,7 @@ class _GameScreenState extends State<GameScreen> {
           children: <Widget>[
             SizedBox(height: 60.h),
             Padding(
-              padding: EdgeInsets.all(20.w),
+              padding: EdgeInsets.all(10.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
