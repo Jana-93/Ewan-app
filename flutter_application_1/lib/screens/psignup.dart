@@ -25,6 +25,10 @@ class _PsignupState extends State<Psignup> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  // State to track password visibility
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
+
   /// Function to Register Parents
   Future<void> register() async {
     try {
@@ -90,6 +94,18 @@ class _PsignupState extends State<Psignup> {
   ///  Confirm Password Validation
   String? _validateConfirmPassword(String value) {
     if (value != _passwordController.text) return "كلمة المرور غير متطابقة";
+    return null;
+  }
+
+  ///  Email Validation
+  String? _validateEmail(String value) {
+    if (value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    // Regular expression for email validation
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return "البريد الإلكتروني غير صحيح";
+    }
     return null;
   }
 
@@ -165,20 +181,36 @@ class _PsignupState extends State<Psignup> {
                           _buildInputField(
                             "البريد الإلكتروني",
                             controller: _emailController,
+                            validator: _validateEmail,
                           ),
                           SizedBox(height: 20.h),
-                          _buildInputField(
+                          _buildPasswordField(
                             "كلمة المرور",
                             controller: _passwordController,
-                            obscureText: true,
-                            validator: _validatePassword,
+                            obscureText: !_isPasswordVisible,
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                            icon: _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           SizedBox(height: 20.h),
-                          _buildInputField(
+                          _buildPasswordField(
                             "إعادة كتابة كلمة المرور",
                             controller: _confirmPasswordController,
-                            obscureText: true,
-                            validator: _validateConfirmPassword,
+                            obscureText: !_isConfirmPasswordVisible,
+                            onPressed: () {
+                              setState(() {
+                                _isConfirmPasswordVisible =
+                                    !_isConfirmPasswordVisible;
+                              });
+                            },
+                            icon: _isConfirmPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           SizedBox(height: 20.h),
                           _buildInputField(
@@ -305,7 +337,65 @@ class _PsignupState extends State<Psignup> {
               ),
             ),
             validator: (value) {
-            
+              if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
+              if (validator != null) return validator(value);
+              return null;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  ///  Reusable Password Field with Visibility Icon
+  Widget _buildPasswordField(
+    String label, {
+    required TextEditingController controller,
+    required bool obscureText,
+    required VoidCallback onPressed,
+    required IconData icon,
+    String? Function(String)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          label,
+          style: TextStyle(color: Colors.black, fontSize: 16.sp),
+        ),
+        SizedBox(height: 10.h),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(225, 95, 27, .3),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            obscureText: obscureText,
+            textAlign: TextAlign.right,
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 15.h,
+              ),
+              
+              prefixIcon: IconButton(
+                icon: Icon(icon),
+                onPressed: onPressed,
+                color: Colors.grey,
+              ),
+            ),
+            validator: (value) {
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
               if (validator != null) return validator(value);
               return null;

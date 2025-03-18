@@ -6,7 +6,7 @@ import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/T_signup.dart';
 import 'package:flutter_application_1/screens/TherapistHomePage.dart';
 import 'package:flutter_application_1/screens/psignup.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // إضافة flutter_screenutil
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -20,6 +20,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
   Future<void> login() async {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
@@ -27,6 +33,14 @@ class _LoginScreenState extends State<LoginScreen> {
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('يرجى إدخال البريد الإلكتروني وكلمة المرور')),
+      );
+      return;
+    }
+
+    
+    if (!isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('صيغة البريد الإلكتروني غير صحيحة')),
       );
       return;
     }
@@ -112,9 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                SizedBox(height: 40.h), // استخدام .h للارتفاعات
+                SizedBox(height: 40.h),
                 Padding(
-                  padding: EdgeInsets.all(30.r), // استخدام .r للنصف قطر
+                  padding: EdgeInsets.all(30.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
@@ -122,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         duration: const Duration(milliseconds: 1000),
                         child: Text(
                           "تسجيل الدخول",
-                          style: TextStyle(color: Colors.white, fontSize: 40.sp), // استخدام .sp للنصوص
+                          style: TextStyle(color: Colors.white, fontSize: 40.sp),
                           textAlign: TextAlign.right,
                         ),
                       ),
@@ -134,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50.r), // استخدام .r للنصف قطر
+                      topLeft: Radius.circular(50.r),
                       topRight: Radius.circular(50.r),
                     ),
                   ),
@@ -152,14 +166,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 "البريد الإلكتروني",
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: 16.sp, // استخدام .sp للنصوص
+                                  fontSize: 16.sp,
                                 ),
                               ),
                               SizedBox(height: 15.h),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.r), // استخدام .r للنصف قطر
+                                  borderRadius: BorderRadius.circular(10.r),
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Color.fromRGBO(225, 95, 27, .3),
@@ -187,14 +201,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 "كلمة المرور",
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: 16.sp, // استخدام .sp للنصوص
+                                  fontSize: 16.sp,
                                 ),
                               ),
                               SizedBox(height: 10.h),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.r), // استخدام .r للنصف قطر
+                                  borderRadius: BorderRadius.circular(10.r),
                                   boxShadow: const [
                                     BoxShadow(
                                       color: Color.fromRGBO(225, 95, 27, .3),
@@ -240,10 +254,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFF6872F),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50.r), // استخدام .r للنصف قطر
+                                  borderRadius: BorderRadius.circular(50.r),
                                 ),
                                 padding: EdgeInsets.symmetric(
-                                  vertical: 15.h, // استخدام .h للارتفاعات
+                                  vertical: 15.h,
                                 ),
                               ),
                               child: Text(
@@ -251,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16.sp, // استخدام .sp للنصوص
+                                  fontSize: 16.sp,
                                 ),
                               ),
                             ),
@@ -267,7 +281,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 "ليس لديك حساب؟ ",
                                 style: TextStyle(
                                   color: Colors.grey,
-                                  fontSize: 16.sp, // استخدام .sp للنصوص
+                                  fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -303,14 +317,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
-                                            50.r, // استخدام .r للنصف قطر
+                                            50.r,
                                           ),
                                           side: BorderSide(
                                             color: const Color(0xFFFCB47A),
                                           ),
                                         ),
                                         padding: EdgeInsets.symmetric(
-                                          vertical: 15.h, // استخدام .h للارتفاعات
+                                          vertical: 15.h,
                                         ),
                                       ),
                                       child: Text(
@@ -318,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         style: TextStyle(
                                           color: Colors.orangeAccent,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16.sp, // استخدام .sp للنصوص
+                                          fontSize: 16.sp,
                                         ),
                                       ),
                                     ),
@@ -339,7 +353,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   "تسجيل الدخول كطبيب ",
                                   style: TextStyle(
                                     color: Color(0xFFFCB47A),
-                                    fontSize: 16.sp, // استخدام .sp للنصوص
+                                    fontSize: 16.sp,
                                     fontWeight: FontWeight.bold,
                                     decoration: TextDecoration.underline,
                                     decorationColor: Color(0xFFFCB47A),
