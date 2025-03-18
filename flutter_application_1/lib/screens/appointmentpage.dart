@@ -367,7 +367,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     Expanded(
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.orange,
+                          backgroundColor: Color(0xFFF6872F),
                           side: const BorderSide(
                             color: Color.fromARGB(255, 222, 221, 221),
                             width: 2,

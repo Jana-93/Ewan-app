@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChildFeedback extends StatefulWidget {
@@ -48,10 +49,8 @@ class _ChildFeedbackState extends State<ChildFeedback> {
             SizedBox(height: 20.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: _emojis
-                  .asMap()
-                  .entries
-                  .map((entry) {
+              children:
+                  _emojis.asMap().entries.map((entry) {
                     int index = entry.key;
                     String emoji = entry.value;
                     return GestureDetector(
@@ -63,19 +62,16 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                       child: Container(
                         padding: EdgeInsets.all(3.w),
                         decoration: BoxDecoration(
-                          color: _selectedRating == index + 1
-                              ? Colors.orange.withOpacity(0.3)
-                              : Colors.transparent,
+                          color:
+                              _selectedRating == index + 1
+                                  ? Colors.orange.withOpacity(0.3)
+                                  : Colors.transparent,
                           borderRadius: BorderRadius.circular(10.r),
                         ),
-                        child: Text(
-                          emoji,
-                          style: TextStyle(fontSize: 30.sp),
-                        ),
+                        child: Text(emoji, style: TextStyle(fontSize: 30.sp)),
                       ),
                     );
-                  })
-                  .toList(),
+                  }).toList(),
             ),
             SizedBox(height: 40.h),
             Row(
@@ -83,11 +79,18 @@ class _ChildFeedbackState extends State<ChildFeedback> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => Homepage()),
+                    );
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.grey[300]!),
-                    foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.grey[300]!,
+                    ),
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                      Colors.black,
+                    ),
                     elevation: MaterialStateProperty.all<double>(0),
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
@@ -100,7 +103,10 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                   ),
                   child: Text(
                     'إلغاء',
-                    style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 ElevatedButton(
@@ -108,28 +114,40 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                     if (_selectedRating == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('الرجاء تحديد تقييم!', textDirection: TextDirection.rtl),
+                          content: Text(
+                            'الرجاء تحديد تقييم!',
+                            textDirection: TextDirection.rtl,
+                          ),
                         ),
                       );
                     } else {
                       print('التقييم المحدد: $_selectedRating');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('شكرًا على تقييمك!', textDirection: TextDirection.rtl),
+                          content: Text(
+                            'شكرًا على تقييمك!',
+                            textDirection: TextDirection.rtl,
+                          ),
                         ),
+                      );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Homepage()),
                       );
                     }
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                      (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.pressed)) {
-                          return Colors.orange.withOpacity(0.5);
-                        }
-                        return Colors.transparent;
-                      },
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>((
+                      Set<MaterialState> states,
+                    ) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Color(0xFFF6872F).withOpacity(0.5);
+                      }
+                      return Color(0xFFF6872F);
+                    }),
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                      Colors.white,
                     ),
-                    foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                     elevation: MaterialStateProperty.all<double>(0),
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
@@ -140,22 +158,11 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                       EdgeInsets.symmetric(horizontal: 30.w, vertical: 15.h),
                     ),
                   ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        colors: const [
-                          Color.fromARGB(255, 219, 101, 37),
-                          Color.fromRGBO(239, 108, 0, 1),
-                          Color.fromRGBO(255, 167, 38, 1),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 14.h),
-                    child: Text(
-                      'إرسال التقييم',
-                      style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+                  child: Text(
+                    'إرسال التقييم',
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
