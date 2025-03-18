@@ -31,7 +31,7 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
           width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
+              begin: Alignment.topLeft,
               colors: [
                 const Color.fromARGB(255, 219, 101, 37),
                 const Color.fromRGBO(239, 108, 0, 1),
@@ -44,7 +44,7 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
             children: <Widget>[
               SizedBox(height: 60.h),
               Padding(
-                padding: EdgeInsets.all(20.r),
+                padding: EdgeInsets.all(10.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[

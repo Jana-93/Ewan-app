@@ -69,7 +69,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topCenter,
+                begin: Alignment.topLeft,
                 colors: const [
                   Color.fromARGB(255, 219, 101, 37),
                   Color.fromRGBO(239, 108, 0, 1),
@@ -82,7 +82,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
               children: <Widget>[
                 SizedBox(height: 60.h),
                 Padding(
-                  padding: EdgeInsets.all(20.r),
+                  padding: EdgeInsets.all(10.r),
                   child: FutureBuilder<Map<String, dynamic>>(
                     future: _fetchUserData(),
                     builder: (context, snapshot) {
@@ -230,7 +230,8 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center, // جعل النص في المنتصف عموديًا
+              mainAxisAlignment:
+                  MainAxisAlignment.center, // جعل النص في المنتصف عموديًا
               children: [
                 Text(
                   title,
@@ -266,7 +267,8 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FeedbackScreen(isDoctor: true),
+                            builder:
+                                (context) => FeedbackScreen(isDoctor: true),
                           ),
                         );
                         break;
@@ -312,10 +314,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         children: [
           _buildNavItem(Icons.person, 0), // TherapistProfilePage
           _buildNavItem(Icons.calendar_today, 1), // Tappointment
-          _buildImageItem(
-            "assets/images/ewan.png",
-            2,
-          ),
+          _buildImageItem("assets/images/ewan.png", 2),
         ],
       ),
     );

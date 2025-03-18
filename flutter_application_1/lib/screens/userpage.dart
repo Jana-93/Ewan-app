@@ -27,19 +27,27 @@ class _UserPageState extends State<UserPage> {
     switch (index) {
       case 0:
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => UserPage()));
+          context,
+          MaterialPageRoute(builder: (context) => UserPage()),
+        );
         break;
       case 1:
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Searchpage()));
+          context,
+          MaterialPageRoute(builder: (context) => Searchpage()),
+        );
         break;
       case 2:
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => Appointmentpage()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Appointmentpage()),
+        );
         break;
       case 3:
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Homepage()));
+          context,
+          MaterialPageRoute(builder: (context) => Homepage()),
+        );
         break;
     }
   }
@@ -47,10 +55,11 @@ class _UserPageState extends State<UserPage> {
   Future<List<Map<String, dynamic>>> _getChildrenData() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      var snapshot = await FirebaseFirestore.instance
-          .collection("children")
-          .where("parentId", isEqualTo: user.uid)
-          .get();
+      var snapshot =
+          await FirebaseFirestore.instance
+              .collection("children")
+              .where("parentId", isEqualTo: user.uid)
+              .get();
       return snapshot.docs.map((doc) {
         return {
           "childName": doc['childName'],
@@ -102,11 +111,14 @@ class _UserPageState extends State<UserPage> {
 
                   if (userSnapshot.hasError) {
                     return const Center(
-                        child: Text('حدث خطأ في تحميل البيانات.'));
+                      child: Text('حدث خطأ في تحميل البيانات.'),
+                    );
                   }
 
                   if (!userSnapshot.hasData) {
-                    return const Center(child: Text('لا توجد بيانات للمستخدم.'));
+                    return const Center(
+                      child: Text('لا توجد بيانات للمستخدم.'),
+                    );
                   }
 
                   var userData = userSnapshot.data!;
@@ -114,7 +126,8 @@ class _UserPageState extends State<UserPage> {
                       userData['firstName'] ?? 'الاسم الأول غير متوفر';
                   String lastName =
                       userData['lastName'] ?? 'الاسم الأخير غير متوفر';
-                  String email = FirebaseAuth.instance.currentUser?.email ??
+                  String email =
+                      FirebaseAuth.instance.currentUser?.email ??
                       'البريد الإلكتروني غير متوفر';
 
                   return SingleChildScrollView(
@@ -125,8 +138,8 @@ class _UserPageState extends State<UserPage> {
                           padding: EdgeInsets.only(top: 50.h),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
+                              begin: Alignment.topLeft,
+
                               colors: [
                                 Color.fromARGB(255, 219, 101, 37),
                                 Color.fromRGBO(239, 108, 0, 1),
@@ -185,32 +198,46 @@ class _UserPageState extends State<UserPage> {
                             childData['childIcon'],
                             childData['childName'],
                             context,
-                            () {
-                            
-                            },
+                            () {},
                             onDelete: () {
-                              _showDeleteDialog(context, childData['childId'],
-                                  childData['childName']);
+                              _showDeleteDialog(
+                                context,
+                                childData['childId'],
+                                childData['childName'],
+                              );
                             },
                             onEdit: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EditChild(
-                                      childId: childData['childId']),
+                                  builder:
+                                      (context) => EditChild(
+                                        childId: childData['childId'],
+                                      ),
                                 ),
                               );
                             },
                           );
                         }).toList(),
-                        _buildProfileOption(Icons.add, "إضافة طفل", context, () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AddChild()),
-                          );
-                        }),
                         _buildProfileOption(
-                            Icons.logout, "تسجيل الخروج", context, _logout),
+                          Icons.add,
+                          "إضافة طفل",
+                          context,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddChild(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildProfileOption(
+                          Icons.logout,
+                          "تسجيل الخروج",
+                          context,
+                          _logout,
+                        ),
                       ],
                     ),
                   );
@@ -316,8 +343,13 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildProfileOption(
-      IconData icon, String title, BuildContext context, VoidCallback onTap,
-      {VoidCallback? onDelete, VoidCallback? onEdit}) {
+    IconData icon,
+    String title,
+    BuildContext context,
+    VoidCallback onTap, {
+    VoidCallback? onDelete,
+    VoidCallback? onEdit,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
       child: Container(
@@ -358,7 +390,11 @@ class _UserPageState extends State<UserPage> {
   }
 
   // Dialog confirmation for deletion
-  void _showDeleteDialog(BuildContext context, String childId, String childName) {
+  void _showDeleteDialog(
+    BuildContext context,
+    String childId,
+    String childName,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -367,7 +403,7 @@ class _UserPageState extends State<UserPage> {
           child: AlertDialog(
             title: Text(
               "تأكيد الحذف",
-              style: TextStyle(fontSize: 18.sp,fontFamily: "NotoKufiArabic"),
+              style: TextStyle(fontSize: 18.sp, fontFamily: "NotoKufiArabic"),
               textAlign: TextAlign.center,
             ),
             content: Text(
@@ -401,7 +437,7 @@ class _UserPageState extends State<UserPage> {
                 },
                 child: Text(
                   "إلغاء",
-                  style: TextStyle(fontSize: 16.sp,color: Colors.lightBlue),
+                  style: TextStyle(fontSize: 16.sp, color: Colors.lightBlue),
                 ),
               ),
             ],

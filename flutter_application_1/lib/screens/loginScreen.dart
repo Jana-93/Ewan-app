@@ -20,7 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  
   bool isValidEmail(String email) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email);
@@ -37,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    
     if (!isValidEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('صيغة البريد الإلكتروني غير صحيحة')),
@@ -64,7 +62,12 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => TherapistHomePage()),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(" تم تسجيل الدخول بنجاح كطبيب! ", textDirection: TextDirection.rtl)),
+          SnackBar(
+            content: Text(
+              " تم تسجيل الدخول بنجاح كطبيب! ",
+              textDirection: TextDirection.rtl,
+            ),
+          ),
         );
         return;
       }
@@ -79,14 +82,23 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => Homepage()),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(" تم تسجيل الدخول بنجاح كوالد! ", textDirection: TextDirection.rtl)),
+          SnackBar(
+            content: Text(
+              " تم تسجيل الدخول بنجاح كوالد! ",
+              textDirection: TextDirection.rtl,
+            ),
+          ),
         );
         return;
       }
 
       // If the user is not found in either collection, handle the error
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("لم يتم العثور على دور المستخدم. يرجى الاتصال بالدعم الفني.")),
+        SnackBar(
+          content: Text(
+            "لم يتم العثور على دور المستخدم. يرجى الاتصال بالدعم الفني.",
+          ),
+        ),
       );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -115,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topCenter,
+                begin: Alignment.topLeft,
                 colors: [
                   Color.fromARGB(255, 219, 101, 37),
                   Color.fromRGBO(239, 108, 0, 1),
@@ -128,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: <Widget>[
                 SizedBox(height: 40.h),
                 Padding(
-                  padding: EdgeInsets.all(30.r),
+                  padding: EdgeInsets.all(20.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
@@ -136,7 +148,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         duration: const Duration(milliseconds: 1000),
                         child: Text(
                           "تسجيل الدخول",
-                          style: TextStyle(color: Colors.white, fontSize: 40.sp),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 40.sp,
+                          ),
                           textAlign: TextAlign.right,
                         ),
                       ),
@@ -256,9 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50.r),
                                 ),
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 15.h,
-                                ),
+                                padding: EdgeInsets.symmetric(vertical: 15.h),
                               ),
                               child: Text(
                                 "تسجيل الدخول",
@@ -345,7 +358,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => TherapistSignUpPage(),
+                                      builder:
+                                          (context) => TherapistSignUpPage(),
                                     ),
                                   );
                                 },

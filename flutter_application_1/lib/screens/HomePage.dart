@@ -87,7 +87,7 @@ class _HomepageState extends State<Homepage> {
           width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
+              begin: Alignment.topLeft,
               colors: const [
                 Color.fromARGB(255, 219, 101, 37),
                 Color.fromRGBO(239, 108, 0, 1),
@@ -100,7 +100,7 @@ class _HomepageState extends State<Homepage> {
             children: <Widget>[
               SizedBox(height: 60.h),
               Padding(
-                padding: EdgeInsets.all(20.r),
+                padding: EdgeInsets.all(10.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[

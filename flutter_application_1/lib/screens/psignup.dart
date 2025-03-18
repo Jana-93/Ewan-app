@@ -117,10 +117,9 @@ class _PsignupState extends State<Psignup> {
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-              ),
+              borderRadius: const BorderRadius.only(),
               gradient: const LinearGradient(
-                begin: Alignment.topCenter,
+                begin: Alignment.topLeft,
                 colors: [
                   Color.fromARGB(255, 219, 101, 37),
                   Color.fromRGBO(239, 108, 0, 1),
@@ -133,7 +132,7 @@ class _PsignupState extends State<Psignup> {
               children: <Widget>[
                 SizedBox(height: 50.h),
                 Padding(
-                  padding: EdgeInsets.all(20.r),
+                  padding: EdgeInsets.all(10.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
@@ -193,9 +192,10 @@ class _PsignupState extends State<Psignup> {
                                 _isPasswordVisible = !_isPasswordVisible;
                               });
                             },
-                            icon: _isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                            icon:
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                           ),
                           SizedBox(height: 20.h),
                           _buildPasswordField(
@@ -208,9 +208,10 @@ class _PsignupState extends State<Psignup> {
                                     !_isConfirmPasswordVisible;
                               });
                             },
-                            icon: _isConfirmPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                            icon:
+                                _isConfirmPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                           ),
                           SizedBox(height: 20.h),
                           _buildInputField(
@@ -227,9 +228,7 @@ class _PsignupState extends State<Psignup> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFF6872F),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      50.r,
-                                    ),
+                                    borderRadius: BorderRadius.circular(50.r),
                                   ),
                                   padding: EdgeInsets.symmetric(
                                     vertical: 15.h,
@@ -258,9 +257,7 @@ class _PsignupState extends State<Psignup> {
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: 20.h,
-                          ),
+                          SizedBox(height: 20.h),
                           FadeInUp(
                             duration: const Duration(milliseconds: 1800),
                             child: GestureDetector(
@@ -306,10 +303,7 @@ class _PsignupState extends State<Psignup> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          label,
-          style: TextStyle(color: Colors.black, fontSize: 16.sp),
-        ),
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
         SizedBox(height: 10.h),
         Container(
           decoration: BoxDecoration(
@@ -359,10 +353,7 @@ class _PsignupState extends State<Psignup> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          label,
-          style: TextStyle(color: Colors.black, fontSize: 16.sp),
-        ),
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
         SizedBox(height: 10.h),
         Container(
           decoration: BoxDecoration(
@@ -388,7 +379,7 @@ class _PsignupState extends State<Psignup> {
                 horizontal: 20.w,
                 vertical: 15.h,
               ),
-              
+
               prefixIcon: IconButton(
                 icon: Icon(icon),
                 onPressed: onPressed,

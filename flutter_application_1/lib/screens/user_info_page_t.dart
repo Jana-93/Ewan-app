@@ -22,7 +22,6 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
     });
     switch (index) {
       case 0:
-      
         break;
       case 1:
         Navigator.pushReplacement(
@@ -31,7 +30,6 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         );
         break;
       case 2:
-      
         break;
       case 3:
         Navigator.pushReplacement(
@@ -51,7 +49,11 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         body: FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance.collection('therapists').doc(uid).get(),
+          future:
+              FirebaseFirestore.instance
+                  .collection('therapists')
+                  .doc(uid)
+                  .get(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -78,8 +80,8 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
                     padding: EdgeInsets.only(top: 50.h),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+                        begin: Alignment.topLeft,
+
                         colors: const [
                           Color.fromARGB(255, 219, 101, 37),
                           Color.fromRGBO(239, 108, 0, 1),
@@ -119,9 +121,7 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
                         SizedBox(height: 10.h),
                         Text(
                           data['email'],
-                          style: TextStyle(
-                            color: Colors.white70,
-                          ),
+                          style: TextStyle(color: Colors.white70),
                         ),
                         SizedBox(height: 20.h),
                       ],
@@ -139,24 +139,39 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
     );
   }
 
-  List<Widget> _buildProfileOptions(Map<String, dynamic> data, String bio, BuildContext context) {
+  List<Widget> _buildProfileOptions(
+    Map<String, dynamic> data,
+    String bio,
+    BuildContext context,
+  ) {
     return [
-      _buildEditableProfileOption(
-        Icons.info,
-        "نبذة عني",
-        bio,
-        context,
-        (newBio) async {
-          await FirebaseFirestore.instance
-              .collection('therapists')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .update({'bio': newBio});
-        },
-      ),
+      _buildEditableProfileOption(Icons.info, "نبذة عني", bio, context, (
+        newBio,
+      ) async {
+        await FirebaseFirestore.instance
+            .collection('therapists')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .update({'bio': newBio});
+      }),
       _buildPriceOption(context),
-      _buildProfileOption(Icons.work, "التخصص الدقيق: ${data['specialty']}", context, () {}),
-      _buildProfileOption(Icons.timeline, "سنوات الخبرة: ${data['experience']}", context, () {}),
-      _buildProfileOption(Icons.phone, "رقم الجوال: ${data['phone']}", context, () {}),
+      _buildProfileOption(
+        Icons.work,
+        "التخصص الدقيق: ${data['specialty']}",
+        context,
+        () {},
+      ),
+      _buildProfileOption(
+        Icons.timeline,
+        "سنوات الخبرة: ${data['experience']}",
+        context,
+        () {},
+      ),
+      _buildProfileOption(
+        Icons.phone,
+        "رقم الجوال: ${data['phone']}",
+        context,
+        () {},
+      ),
       _buildProfileOption(Icons.logout, "تسجيل الخروج", context, () {
         FirebaseAuth.instance.signOut();
         Navigator.pushReplacement(
@@ -168,7 +183,11 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
   }
 
   Widget _buildProfileOption(
-      IconData icon, String title, BuildContext context, VoidCallback onTap) {
+    IconData icon,
+    String title,
+    BuildContext context,
+    VoidCallback onTap,
+  ) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
       child: Container(
@@ -194,7 +213,12 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
   }
 
   Widget _buildEditableProfileOption(
-      IconData icon, String title, String value, BuildContext context, Function(String) onSave) {
+    IconData icon,
+    String title,
+    String value,
+    BuildContext context,
+    Function(String) onSave,
+  ) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
       child: Container(
@@ -271,7 +295,9 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
                         .doc(FirebaseAuth.instance.currentUser!.uid)
                         .update({'sessionPrice': selectedPrice});
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("تم حفظ سعر الجلسة: $selectedPrice ﷼")),
+                      SnackBar(
+                        content: Text("تم حفظ سعر الجلسة: $selectedPrice ﷼"),
+                      ),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -326,24 +352,31 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         children: [
           Container(
             alignment: Alignment.center,
-            child: imagePath != null
-                ? ImageIcon(
-                    AssetImage(imagePath),
-                    size: 30.sp,
-                    color: isSelected ? Colors.deepOrange : Colors.grey,
-                  )
-                : Icon(
-                    icon,
-                    color: isSelected ? Colors.deepOrange : Colors.grey,
-                  ),
+            child:
+                imagePath != null
+                    ? ImageIcon(
+                      AssetImage(imagePath),
+                      size: 30.sp,
+                      color: isSelected ? Colors.deepOrange : Colors.grey,
+                    )
+                    : Icon(
+                      icon,
+                      color: isSelected ? Colors.deepOrange : Colors.grey,
+                    ),
           ),
         ],
       ),
     );
   }
 
-  void _showEditDialog(BuildContext context, String initialValue, Function(String) onSave) {
-    TextEditingController controller = TextEditingController(text: initialValue);
+  void _showEditDialog(
+    BuildContext context,
+    String initialValue,
+    Function(String) onSave,
+  ) {
+    TextEditingController controller = TextEditingController(
+      text: initialValue,
+    );
 
     showDialog(
       context: context,

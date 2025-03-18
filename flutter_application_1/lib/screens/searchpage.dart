@@ -45,11 +45,9 @@ class _SearchpageState extends State<Searchpage> {
       });
     } catch (e) {
       print("Error fetching therapists: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("حدث خطأ أثناء جلب المعالجين"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")));
     }
   }
 
@@ -63,11 +61,9 @@ class _SearchpageState extends State<Searchpage> {
       });
     } catch (e) {
       print("Error fetching children: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("حدث خطأ أثناء جلب الأطفال"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب الأطفال")));
     }
   }
 
@@ -107,9 +103,7 @@ class _SearchpageState extends State<Searchpage> {
   Future<void> _selectTime(BuildContext context) async {
     final String? selected = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => TimeSelectionPage(),
-      ),
+      MaterialPageRoute(builder: (context) => TimeSelectionPage()),
     );
 
     if (selected != null) {
@@ -122,25 +116,27 @@ class _SearchpageState extends State<Searchpage> {
 
   void _navigateToPaymentPage() async {
     if (_selectedDay == null || selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("يرجى تحديد التاريخ والوقت"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("يرجى تحديد التاريخ والوقت")));
       return;
     }
 
     String uid = FirebaseAuth.instance.currentUser!.uid;
-    String therapistUid = therapists[selectedTherapistIndex]["uid"] ?? "unknown";
-    String therapistName = "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
-    String childName = "${children[selectedChildIndex]["childName"] ?? "No Name"}";
+    String therapistUid =
+        therapists[selectedTherapistIndex]["uid"] ?? "unknown";
+    String therapistName =
+        "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
+    String childName =
+        "${children[selectedChildIndex]["childName"] ?? "No Name"}";
 
     final appointmentData = {
       "userId": uid,
       "therapistUid": therapistUid,
       "therapistName": therapistName,
       "childName": childName,
-      "date": "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
+      "date":
+          "${_selectedDay!.year}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}",
       "time": selectedTime,
       "price": therapists[selectedTherapistIndex]["price"] ?? "0",
       "status": "upcoming",
@@ -153,22 +149,28 @@ class _SearchpageState extends State<Searchpage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PaymentPage(
-            amount: int.tryParse(therapists[selectedTherapistIndex]["price"]?.replaceAll("ريال", "").trim() ?? "0") ?? 0,
-            currency: "SAR",
-            appointmentData: appointmentData,
-            onPaymentSuccess: () {
-              _firestoreService.addAppointment(appointmentData);
-            },
-          ),
+          builder:
+              (context) => PaymentPage(
+                amount:
+                    int.tryParse(
+                      therapists[selectedTherapistIndex]["price"]
+                              ?.replaceAll("ريال", "")
+                              .trim() ??
+                          "0",
+                    ) ??
+                    0,
+                currency: "SAR",
+                appointmentData: appointmentData,
+                onPaymentSuccess: () {
+                  _firestoreService.addAppointment(appointmentData);
+                },
+              ),
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("حدث خطأ أثناء حجز الموعد"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء حجز الموعد")));
     }
   }
 
@@ -179,7 +181,7 @@ class _SearchpageState extends State<Searchpage> {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
+            begin: Alignment.topLeft,
             colors: [
               const Color.fromARGB(255, 219, 101, 37),
               const Color.fromRGBO(239, 108, 0, 1),
@@ -192,7 +194,7 @@ class _SearchpageState extends State<Searchpage> {
           children: <Widget>[
             SizedBox(height: 60.h),
             Padding(
-              padding: EdgeInsets.all(20.w),
+              padding: EdgeInsets.all(10.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
@@ -243,32 +245,54 @@ class _SearchpageState extends State<Searchpage> {
                             bool isSelected = selectedTherapistIndex == index;
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8.h),
-                              color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.white,
+                              color:
+                                  isSelected
+                                      ? Colors.orange.withOpacity(0.2)
+                                      : Colors.white,
                               child: ListTile(
                                 leading: CircleAvatar(
-                                  backgroundImage: therapists[index]["profileImage"] != null
-                                      ? NetworkImage(therapists[index]["profileImage"])
-                                      : AssetImage("path_to_default_image.jpg"),
+                                  backgroundImage:
+                                      therapists[index]["profileImage"] != null
+                                          ? NetworkImage(
+                                            therapists[index]["profileImage"],
+                                          )
+                                          : AssetImage(
+                                            "path_to_default_image.jpg",
+                                          ),
                                 ),
                                 title: Text(
                                   "${therapists[index]["firstName"] ?? ""} ${therapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.black,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    color:
+                                        isSelected
+                                            ? Colors.orange
+                                            : Colors.black,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                     fontSize: 16.sp,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  therapists[index]["specialty"] ?? "No Specialty Information",
+                                  therapists[index]["specialty"] ??
+                                      "No Specialty Information",
                                   style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.grey,
+                                    color:
+                                        isSelected
+                                            ? Colors.orange
+                                            : Colors.grey,
                                     fontSize: 14.sp,
                                   ),
                                 ),
                                 trailing: Text(
-                                  therapists[index]["experience"] ?? "Experience Unavailable",
+                                  therapists[index]["experience"] ??
+                                      "Experience Unavailable",
                                   style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.green,
+                                    color:
+                                        isSelected
+                                            ? Colors.orange
+                                            : Colors.green,
                                     fontSize: 14.sp,
                                   ),
                                 ),
@@ -282,7 +306,9 @@ class _SearchpageState extends State<Searchpage> {
                                     print("Error fetching children: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text("حدث خطأ أثناء جلب الأطفال"),
+                                        content: Text(
+                                          "حدث خطأ أثناء جلب الأطفال",
+                                        ),
                                       ),
                                     );
                                   }
@@ -310,13 +336,22 @@ class _SearchpageState extends State<Searchpage> {
                                 bool isSelected = selectedChildIndex == index;
                                 return Card(
                                   margin: EdgeInsets.symmetric(vertical: 8.h),
-                                  color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.orange,
+                                  color:
+                                      isSelected
+                                          ? Colors.orange.withOpacity(0.2)
+                                          : Colors.orange,
                                   child: ListTile(
                                     title: Text(
                                       "${children[index]["childName"] ?? "No Name"}",
                                       style: TextStyle(
-                                        color: isSelected ? Colors.orange : Colors.black,
-                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                        color:
+                                            isSelected
+                                                ? Colors.orange
+                                                : Colors.black,
+                                        fontWeight:
+                                            isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
                                         fontSize: 16.sp,
                                       ),
                                     ),
@@ -503,9 +538,7 @@ class TimeSelectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("اختر الوقت"),
-      ),
+      appBar: AppBar(title: Text("اختر الوقت")),
       body: Padding(
         padding: EdgeInsets.all(16.w),
         child: Wrap(
@@ -520,9 +553,7 @@ class TimeSelectionPage extends StatelessWidget {
                 Navigator.pop(context, time);
               },
               selectedColor: Colors.deepOrange,
-              labelStyle: TextStyle(
-                color: Colors.black,
-              ),
+              labelStyle: TextStyle(color: Colors.black),
             );
           }),
         ),

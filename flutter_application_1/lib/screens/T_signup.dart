@@ -23,7 +23,8 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   String? selectedSpecialty;
   String? selectedExperience;
   File? profileImage;
@@ -35,7 +36,13 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   String licenseFileName = "";
 
   final List<String> specialties = ['علاج سلوكي', 'علاج معرفي', 'علاج نفسي'];
-  final List<String> experienceYears = ['1 سنة', '2 سنة', '3 سنوات', '4 سنوات', '5+ سنوات'];
+  final List<String> experienceYears = [
+    '1 سنة',
+    '2 سنة',
+    '3 سنوات',
+    '4 سنوات',
+    '5+ سنوات',
+  ];
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -97,11 +104,17 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         throw Exception("CLOUDINARY_CLOUD_NAME is not set in .env file");
       }
 
-      var uri = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/$resourceType/upload");
+      var uri = Uri.parse(
+        "https://api.cloudinary.com/v1_1/$cloudName/$resourceType/upload",
+      );
       var request = http.MultipartRequest("POST", uri);
 
       var fileBytes = await file.readAsBytes();
-      var multipartFile = http.MultipartFile.fromBytes('file', fileBytes, filename: file.path.split("/").last);
+      var multipartFile = http.MultipartFile.fromBytes(
+        'file',
+        fileBytes,
+        filename: file.path.split("/").last,
+      );
 
       request.files.add(multipartFile);
       request.fields['upload_preset'] = 'therapist files';
@@ -130,11 +143,17 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           SnackBar(
             content: Text(
               "كلمة المرور غير متطابقة",
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.red,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -142,16 +161,24 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         return;
       }
 
-      if (profileImage == null || qualificationFile == null || licenseFile == null) {
+      if (profileImage == null ||
+          qualificationFile == null ||
+          licenseFile == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               "يرجى رفع جميع الملفات المطلوبة",
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.red,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -173,20 +200,31 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         );
 
         String? profileUrl = await uploadToCloudinary(profileImage!, 'image');
-        String? qualificationUrl = await uploadToCloudinary(qualificationFile!, 'raw');
+        String? qualificationUrl = await uploadToCloudinary(
+          qualificationFile!,
+          'raw',
+        );
         String? licenseUrl = await uploadToCloudinary(licenseFile!, 'raw');
 
-        if (profileUrl == null || qualificationUrl == null || licenseUrl == null) {
+        if (profileUrl == null ||
+            qualificationUrl == null ||
+            licenseUrl == null) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
                 "فشل رفع الملفات، يرجى المحاولة مرة أخرى",
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
                 textAlign: TextAlign.center,
               ),
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
               behavior: SnackBarBehavior.floating,
               duration: Duration(seconds: 2),
             ),
@@ -194,25 +232,29 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           return;
         }
 
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-        );
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+              email: emailController.text.trim(),
+              password: passwordController.text.trim(),
+            );
 
         String userId = userCredential.user!.uid;
 
-        await FirebaseFirestore.instance.collection('therapists').doc(userId).set({
-          'uid': userId,
-          'firstName': firstNameController.text,
-          'lastName': lastNameController.text,
-          'email': emailController.text,
-          'phone': phoneController.text,
-          'specialty': selectedSpecialty,
-          'experience': selectedExperience,
-          'profileImage': profileUrl,
-          'qualificationFile': qualificationUrl,
-          'licenseFile': licenseUrl,
-        });
+        await FirebaseFirestore.instance
+            .collection('therapists')
+            .doc(userId)
+            .set({
+              'uid': userId,
+              'firstName': firstNameController.text,
+              'lastName': lastNameController.text,
+              'email': emailController.text,
+              'phone': phoneController.text,
+              'specialty': selectedSpecialty,
+              'experience': selectedExperience,
+              'profileImage': profileUrl,
+              'qualificationFile': qualificationUrl,
+              'licenseFile': licenseUrl,
+            });
 
         Navigator.pop(context);
 
@@ -220,11 +262,17 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           SnackBar(
             content: Text(
               "تم إنشاء الحساب بنجاح",
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Color(0xFFFCB47A),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -240,11 +288,17 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           SnackBar(
             content: Text(
               e.message ?? "حدث خطأ ما",
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.red,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -255,11 +309,17 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           SnackBar(
             content: Text(
               e.toString(),
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.red,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -277,7 +337,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topCenter,
+                begin: Alignment.topLeft,
                 colors: [
                   Color.fromARGB(255, 219, 101, 37),
                   Color.fromRGBO(239, 108, 0, 1),
@@ -290,7 +350,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
               children: <Widget>[
                 SizedBox(height: 50.h),
                 Padding(
-                  padding: EdgeInsets.all(20.r),
+                  padding: EdgeInsets.all(10.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
@@ -298,7 +358,11 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                         duration: const Duration(milliseconds: 1000),
                         child: Text(
                           "حساب جديد",
-                          style: TextStyle(color: Colors.white, fontSize: 37.sp, fontFamily: "NotoKufiArabic"),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 37.sp,
+                            fontFamily: "NotoKufiArabic",
+                          ),
                           textAlign: TextAlign.right,
                         ),
                       ),
@@ -326,8 +390,14 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                             child: CircleAvatar(
                               radius: 40.r,
                               backgroundColor: Colors.grey,
-                              backgroundImage: profileImage != null ? FileImage(profileImage!) : null,
-                              child: profileImage == null ? Icon(Icons.person, size: 40.sp) : null,
+                              backgroundImage:
+                                  profileImage != null
+                                      ? FileImage(profileImage!)
+                                      : null,
+                              child:
+                                  profileImage == null
+                                      ? Icon(Icons.person, size: 40.sp)
+                                      : null,
                             ),
                           ),
                           if (profileImage != null)
@@ -335,34 +405,67 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                               padding: EdgeInsets.only(top: 8.h),
                               child: Text(
                                 profileFileName,
-                                style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: Colors.grey,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
                           SizedBox(height: 20.h),
-                          _buildInputField("الاسم الأول", controller: firstNameController),
+                          _buildInputField(
+                            "الاسم الأول",
+                            controller: firstNameController,
+                          ),
                           SizedBox(height: 20.h),
-                          _buildInputField("الاسم الأخير", controller: lastNameController),
+                          _buildInputField(
+                            "الاسم الأخير",
+                            controller: lastNameController,
+                          ),
                           SizedBox(height: 20.h),
-                          _buildInputField("البريد الإلكتروني", controller: emailController),
+                          _buildInputField(
+                            "البريد الإلكتروني",
+                            controller: emailController,
+                          ),
                           SizedBox(height: 20.h),
-                          _buildPasswordField("كلمة المرور", controller: passwordController, validator: _validatePassword),
+                          _buildPasswordField(
+                            "كلمة المرور",
+                            controller: passwordController,
+                            validator: _validatePassword,
+                          ),
                           SizedBox(height: 20.h),
-                          _buildPasswordField("إعادة كتابة كلمة المرور", controller: confirmPasswordController, validator: _validateConfirmPassword),
+                          _buildPasswordField(
+                            "إعادة كتابة كلمة المرور",
+                            controller: confirmPasswordController,
+                            validator: _validateConfirmPassword,
+                          ),
                           SizedBox(height: 20.h),
-                          _buildInputField("رقم الجوال", controller: phoneController),
+                          _buildInputField(
+                            "رقم الجوال",
+                            controller: phoneController,
+                          ),
                           SizedBox(height: 20.h),
-                          _buildDropdown("التخصص الدقيق", value: selectedSpecialty, items: specialties, onChanged: (value) {
-                            setState(() {
-                              selectedSpecialty = value as String;
-                            });
-                          }),
+                          _buildDropdown(
+                            "التخصص الدقيق",
+                            value: selectedSpecialty,
+                            items: specialties,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedSpecialty = value as String;
+                              });
+                            },
+                          ),
                           SizedBox(height: 20.h),
-                          _buildDropdown("سنوات الخبرة", value: selectedExperience, items: experienceYears, onChanged: (value) {
-                            setState(() {
-                              selectedExperience = value as String;
-                            });
-                          }),
+                          _buildDropdown(
+                            "سنوات الخبرة",
+                            value: selectedExperience,
+                            items: experienceYears,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedExperience = value as String;
+                              });
+                            },
+                          ),
                           SizedBox(height: 20.h),
                           _buildFilePickerButton(
                             icon: Icons.description,
@@ -387,7 +490,8 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFF6872F),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50.r)),
+                                    borderRadius: BorderRadius.circular(50.r),
+                                  ),
                                   padding: EdgeInsets.symmetric(vertical: 15.h),
                                 ),
                                 onPressed: () async {
@@ -397,7 +501,10 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                                 },
                                 child: Text(
                                   "إنشاء حساب",
-                                  style: TextStyle(fontSize: 18.sp, color: Colors.white),
+                                  style: TextStyle(
+                                    fontSize: 18.sp,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
@@ -410,12 +517,19 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                                 onPressed: () {
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                                    MaterialPageRoute(
+                                      builder: (context) => LoginScreen(),
+                                    ),
                                   );
                                 },
                                 child: Text(
                                   "تسجيل الدخول كطبيب/ أب ",
-                                  style: TextStyle(fontSize: 16.sp, color: Color(0xFFF6872F), decoration: TextDecoration.underline, decorationColor: Color(0xFFF6872F)),
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    color: Color(0xFFF6872F),
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Color(0xFFF6872F),
+                                  ),
                                 ),
                               ),
                             ),
@@ -458,7 +572,10 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 15.h,
+              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
@@ -498,7 +615,10 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
             textAlign: TextAlign.right,
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 15.h,
+              ),
             ),
             validator: validator,
           ),
@@ -532,11 +652,17 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           ),
           child: DropdownButtonFormField(
             value: value,
-            items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            items:
+                items
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
             onChanged: onChanged,
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 15.h,
+              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";

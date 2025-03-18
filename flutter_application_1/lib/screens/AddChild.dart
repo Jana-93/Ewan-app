@@ -44,20 +44,24 @@ class _AddChildState extends State<AddChild> {
         throw Exception("يرجى إدخال اسم الطفل");
       }
 
-   if  (selectedChildAge == null) {
+      if (selectedChildAge == null) {
         throw Exception("يرجى اختيار عمر الطفل");
       }
 
-       if  (_childStatusController.text.trim().isEmpty) {
+      if (_childStatusController.text.trim().isEmpty) {
         throw Exception("يرجى إدخال حالة الطفل");
       }
 
       // Check if a child with the same name already exists
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection("children")
-          .where("childName", isEqualTo: _childNameController.text.trim())
-          .where("parentId", isEqualTo: user.uid) // Ensure it's the same parent
-          .get();
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance
+              .collection("children")
+              .where("childName", isEqualTo: _childNameController.text.trim())
+              .where(
+                "parentId",
+                isEqualTo: user.uid,
+              ) // Ensure it's the same parent
+              .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         throw Exception("يوجد طفل بنفس الاسم بالفعل");
@@ -109,10 +113,7 @@ class _AddChildState extends State<AddChild> {
         SnackBar(
           content: Text(
             e.toString(),
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: Colors.white,
-            ),
+            style: TextStyle(fontSize: 16.sp, color: Colors.white),
             textAlign: TextAlign.center,
           ),
           backgroundColor: const Color.fromARGB(255, 99, 98, 98),
@@ -135,7 +136,7 @@ class _AddChildState extends State<AddChild> {
               width: double.infinity,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter,
+                  begin: Alignment.topLeft,
                   colors: const [
                     Color.fromARGB(255, 219, 101, 37),
                     Color.fromRGBO(239, 108, 0, 1),
@@ -148,7 +149,7 @@ class _AddChildState extends State<AddChild> {
                 children: <Widget>[
                   SizedBox(height: 70.h),
                   Padding(
-                    padding: EdgeInsets.all(20.r),
+                    padding: EdgeInsets.all(10.r),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
@@ -157,7 +158,10 @@ class _AddChildState extends State<AddChild> {
                           duration: const Duration(milliseconds: 1000),
                           child: Text(
                             "تسجيل بيانات الطفل",
-                            style: TextStyle(color: Colors.white, fontSize: 30.sp),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30.sp,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -303,10 +307,7 @@ class _AddChildState extends State<AddChild> {
 
   /// Dropdown for child's age
   Widget _buildAgeDropdown() {
-    List<String> ages = List.generate(
-      7,
-      (index) => (5 + index).toString(),
-    );
+    List<String> ages = List.generate(7, (index) => (5 + index).toString());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -346,20 +347,18 @@ class _AddChildState extends State<AddChild> {
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: Colors.grey,
-              ),
+              icon: Icon(Icons.arrow_drop_down, color: Colors.grey),
               iconEnabledColor: Colors.grey,
-              items: ages.map((age) {
-                return DropdownMenuItem<String>(
-                  value: age,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(age),
-                  ),
-                );
-              }).toList(),
+              items:
+                  ages.map((age) {
+                    return DropdownMenuItem<String>(
+                      value: age,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(age),
+                      ),
+                    );
+                  }).toList(),
               onChanged: (value) {
                 setState(() {
                   selectedChildAge = value; // Update selected child age

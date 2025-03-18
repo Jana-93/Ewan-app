@@ -30,7 +30,7 @@ class _PastAppointmentsState extends State<PastAppointments> {
           width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
+              begin: Alignment.topLeft,
               colors: [
                 const Color.fromARGB(255, 219, 101, 37),
                 const Color.fromRGBO(239, 108, 0, 1),
@@ -43,7 +43,7 @@ class _PastAppointmentsState extends State<PastAppointments> {
             children: <Widget>[
               SizedBox(height: 60.h),
               Padding(
-                padding: EdgeInsets.all(20.w),
+                padding: EdgeInsets.all(10.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
@@ -74,9 +74,7 @@ class _PastAppointmentsState extends State<PastAppointments> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
+                            return Center(child: CircularProgressIndicator());
                           }
                           if (snapshot.hasError) {
                             return Center(
@@ -84,9 +82,7 @@ class _PastAppointmentsState extends State<PastAppointments> {
                             );
                           }
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Center(
-                              child: Text('لا يوجد مواعيد سابقة.'),
-                            );
+                            return Center(child: Text('لا يوجد مواعيد سابقة.'));
                           }
 
                           List<Map<String, dynamic>> appointments =

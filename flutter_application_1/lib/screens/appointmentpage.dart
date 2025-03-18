@@ -61,7 +61,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
           width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
+              begin: Alignment.topLeft,
               colors: [
                 const Color.fromARGB(255, 219, 101, 37),
                 const Color.fromRGBO(239, 108, 0, 1),
@@ -72,9 +72,9 @@ class _AppointmentpageState extends State<Appointmentpage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              SizedBox(height: 80.h), 
+              SizedBox(height: 80.h),
               Padding(
-                padding: EdgeInsets.all(20.r),
+                padding: EdgeInsets.all(10.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
@@ -85,7 +85,10 @@ class _AppointmentpageState extends State<Appointmentpage> {
                         children: [
                           Text(
                             "مواعيدي",
-                            style: TextStyle(color: Colors.white, fontSize: 40.sp),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40.sp,
+                            ),
                             textAlign: TextAlign.right,
                           ),
                         ],
@@ -94,7 +97,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
                   ],
                 ),
               ),
-              SizedBox(height: 10.h), 
+              SizedBox(height: 10.h),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -107,7 +110,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
                   padding: EdgeInsets.all(30.r),
                   child: Column(
                     children: <Widget>[
-                      SizedBox(height: 10.h), 
+                      SizedBox(height: 10.h),
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: _firestoreService.getAppointments(),
                         builder: (context, snapshot) {
@@ -195,7 +198,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildImageItem("assets/images/ewan.png", 3),  
+          _buildImageItem("assets/images/ewan.png", 3),
           _buildNavItem(Icons.search, 1),
           _buildNavItem(Icons.calendar_today, 2),
           _buildNavItem(Icons.person, 0),
@@ -383,7 +386,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         },
                         child: Text(
                           'بدء الجلسة',
-                          style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -406,7 +412,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         },
                         child: Text(
                           'تغيير الموعد',
-                          style: TextStyle(fontSize: 16.sp, color: Colors.orange),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: Colors.orange,
+                          ),
                         ),
                       ),
                     ),
@@ -459,11 +468,7 @@ class ScheduleCard extends StatelessWidget {
           children: <Widget>[
             Row(
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: Colors.orange,
-                  size: 16.sp,
-                ),
+                Icon(Icons.calendar_today, color: Colors.orange, size: 16.sp),
                 SizedBox(width: 5.w),
                 Text(
                   formattedDate,

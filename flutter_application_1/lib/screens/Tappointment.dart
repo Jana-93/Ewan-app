@@ -83,7 +83,7 @@ class _TappointmentState extends State<Tappointment> {
           width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
+              begin: Alignment.topLeft,
               colors: [
                 const Color.fromARGB(255, 219, 101, 37),
                 const Color.fromRGBO(239, 108, 0, 1),
@@ -96,7 +96,7 @@ class _TappointmentState extends State<Tappointment> {
             children: <Widget>[
               SizedBox(height: 60.h),
               Padding(
-                padding: EdgeInsets.all(20.r),
+                padding: EdgeInsets.all(10.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
@@ -156,9 +156,7 @@ class _TappointmentState extends State<Tappointment> {
                               children: <Widget>[
                                 SizedBox(height: 10.h),
                                 Container(
-                                  padding: EdgeInsets.all(
-                                    10.r,
-                                  ),
+                                  padding: EdgeInsets.all(10.r),
                                   child: ListView.builder(
                                     shrinkWrap: true,
                                     physics:
@@ -208,9 +206,7 @@ class _TappointmentState extends State<Tappointment> {
                                                 255,
                                               ),
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                    20.r,
-                                                  ),
+                                                  BorderRadius.circular(20.r),
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.black
@@ -228,9 +224,7 @@ class _TappointmentState extends State<Tappointment> {
                                                     )
                                                     : EdgeInsets.zero,
                                             child: Padding(
-                                              padding: EdgeInsets.all(
-                                                15.r,
-                                              ),
+                                              padding: EdgeInsets.all(15.r),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.stretch,
@@ -243,9 +237,7 @@ class _TappointmentState extends State<Tappointment> {
                                                               "assets/images/icon.jpg",
                                                         ),
                                                       ),
-                                                      SizedBox(
-                                                        width: 10.w,
-                                                      ),
+                                                      SizedBox(width: 10.w),
                                                       Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -260,21 +252,17 @@ class _TappointmentState extends State<Tappointment> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w700,
-                                                              fontSize:
-                                                                  16.sp,
+                                                              fontSize: 16.sp,
                                                             ),
                                                           ),
-                                                          SizedBox(
-                                                            height: 5.h,
-                                                          ),
+                                                          SizedBox(height: 5.h),
                                                           Text(
                                                             appointment['category'] ??
                                                                 '',
                                                             style: TextStyle(
                                                               color:
                                                                   Colors.grey,
-                                                              fontSize:
-                                                                  12.sp,
+                                                              fontSize: 12.sp,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -284,9 +272,7 @@ class _TappointmentState extends State<Tappointment> {
                                                       ),
                                                     ],
                                                   ),
-                                                  SizedBox(
-                                                    height: 15.h,
-                                                  ),
+                                                  SizedBox(height: 15.h),
                                                   ScheduleCard(
                                                     date:
                                                         appointment['date'] ??
@@ -295,9 +281,7 @@ class _TappointmentState extends State<Tappointment> {
                                                         appointment['time'] ??
                                                         '',
                                                   ),
-                                                  SizedBox(
-                                                    height: 15.h,
-                                                  ),
+                                                  SizedBox(height: 15.h),
                                                   Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -337,8 +321,7 @@ class _TappointmentState extends State<Tappointment> {
                                                           child: Text(
                                                             'بدء الجلسة',
                                                             style: TextStyle(
-                                                              fontSize:
-                                                                  16.sp,
+                                                              fontSize: 16.sp,
                                                               color:
                                                                   Colors.white,
                                                             ),
@@ -377,11 +360,7 @@ class _TappointmentState extends State<Tappointment> {
     return Container(
       height: 60.h,
       width: double.infinity,
-      margin: EdgeInsets.only(
-        left: 16.w,
-        right: 16.w,
-        bottom: 12.h,
-      ),
+      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30.r),
@@ -468,35 +447,21 @@ class ScheduleCard extends StatelessWidget {
           children: <Widget>[
             Row(
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: Colors.orange,
-                  size: 16.sp,
-                ),
+                Icon(Icons.calendar_today, color: Colors.orange, size: 16.sp),
                 SizedBox(width: 5.w),
                 Text(
                   formattedDate,
-                  style: TextStyle(
-                    color: Colors.orange,
-                    fontSize: 14.sp,
-                  ),
+                  style: TextStyle(color: Colors.orange, fontSize: 14.sp),
                 ),
               ],
             ),
             Row(
               children: [
-                Icon(
-                  Icons.access_time,
-                  color: Colors.orange,
-                  size: 16.sp,
-                ),
+                Icon(Icons.access_time, color: Colors.orange, size: 16.sp),
                 SizedBox(width: 5.w),
                 Text(
                   time.isNotEmpty ? time : '10:00 صباحًا',
-                  style: TextStyle(
-                    color: Colors.orange,
-                    fontSize: 14.sp,
-                  ),
+                  style: TextStyle(color: Colors.orange, fontSize: 14.sp),
                 ),
               ],
             ),
