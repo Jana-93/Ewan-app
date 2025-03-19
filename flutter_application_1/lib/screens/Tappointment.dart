@@ -182,12 +182,8 @@ class _TappointmentState extends State<Tappointment> {
                                               'Error: ${childSnapshot.error}',
                                             );
                                           }
-                                          if (!childSnapshot.hasData ||
-                                              childSnapshot.data!.isEmpty) {
-                                            return Text(
-                                              'No child data available.',
-                                            );
-                                          }
+                                          
+                                          
 
                                           var childData = childSnapshot.data!;
 
