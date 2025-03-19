@@ -44,10 +44,20 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
             children: <Widget>[
               SizedBox(height: 60.h),
               Padding(
-                padding: EdgeInsets.all(10.r),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
+                padding: EdgeInsets.all(10.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 30.sp,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
                     Text(
                       "المواعيد القادمة",
                       style: TextStyle(color: Colors.white, fontSize: 40.sp),

@@ -19,7 +19,7 @@ class Tappointment extends StatefulWidget {
 
 class _TappointmentState extends State<Tappointment> {
   final FirestoreService _firestoreService = FirestoreService();
-  int selectedIndex = 2;
+  int selectedIndex = 1;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -39,12 +39,6 @@ class _TappointmentState extends State<Tappointment> {
         );
         break;
       case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => FeedbackScreen()),
-        );
-        break;
-      case 3:
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => TherapistHomePage()),
@@ -360,7 +354,7 @@ class _TappointmentState extends State<Tappointment> {
     return Container(
       height: 60.h,
       width: double.infinity,
-      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
+      margin: EdgeInsets.only(left: 35.w, right: 35.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30.r),
@@ -378,9 +372,8 @@ class _TappointmentState extends State<Tappointment> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildNavItem(Icons.person, 0),
-          _buildNavItem(Icons.calendar_today, 2),
-          _buildNavItem(Icons.folder, 1),
-          _buildNavItem(Icons.home, 3),
+          _buildNavItem(Icons.calendar_today, 1),
+          _buildImageItem("assets/images/ewan.png", 2),
         ],
       ),
     );
@@ -404,6 +397,29 @@ class _TappointmentState extends State<Tappointment> {
             ),
             child: Icon(
               icon,
+              color: isSelected ? Colors.deepOrange : Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageItem(String imagePath, int index) {
+    bool isSelected = selectedIndex == index;
+    return GestureDetector(
+      onTap: () {
+        _onItemTapped(index);
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            alignment: Alignment.center,
+            margin: EdgeInsets.only(right: 30.w),
+            child: ImageIcon(
+              AssetImage(imagePath),
+              size: 60.sp,
               color: isSelected ? Colors.deepOrange : Colors.grey,
             ),
           ),

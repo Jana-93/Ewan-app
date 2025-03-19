@@ -14,14 +14,18 @@ class TherapistProfilePage extends StatefulWidget {
 
 class _TherapistProfilePageState extends State<TherapistProfilePage> {
   String? selectedPrice;
-  int _selectedIndex = 0;
+  int selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      selectedIndex = index;
     });
     switch (index) {
       case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TherapistProfilePage()),
+        );
         break;
       case 1:
         Navigator.pushReplacement(
@@ -30,8 +34,6 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         );
         break;
       case 2:
-        break;
-      case 3:
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => TherapistHomePage()),
@@ -316,7 +318,8 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
   Widget navBar() {
     return Container(
       height: 60.h,
-      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
+      width: double.infinity,
+      margin: EdgeInsets.only(left: 35.w, right: 35.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30.r),
@@ -330,19 +333,45 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildNavItem(Icons.home, null, 3),
-          _buildNavItem(Icons.folder, null, 2),
-          _buildNavItem(Icons.calendar_month, null, 1),
-          _buildNavItem(Icons.person, null, 0),
+          _buildImageItem("assets/images/ewan.png", 2),
+          _buildNavItem(Icons.calendar_today, 1),
+          _buildNavItem(Icons.person, 0),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData? icon, String? imagePath, int index) {
-    bool isSelected = _selectedIndex == index;
+  Widget _buildNavItem(IconData icon, int index) {
+    bool isSelected = selectedIndex == index;
+    return GestureDetector(
+      onTap: () {
+        _onItemTapped(index);
+      },
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.center,
+            margin: EdgeInsets.only(
+              top: 15.h,
+              bottom: 0,
+              left: 30.w,
+              right: 30.w,
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.deepOrange : Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageItem(String imagePath, int index) {
+    bool isSelected = selectedIndex == index;
     return GestureDetector(
       onTap: () {
         _onItemTapped(index);
@@ -352,62 +381,55 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
         children: [
           Container(
             alignment: Alignment.center,
-            child:
-                imagePath != null
-                    ? ImageIcon(
-                      AssetImage(imagePath),
-                      size: 30.sp,
-                      color: isSelected ? Colors.deepOrange : Colors.grey,
-                    )
-                    : Icon(
-                      icon,
-                      color: isSelected ? Colors.deepOrange : Colors.grey,
-                    ),
+            margin: EdgeInsets.only(right: 30.w),
+            child: ImageIcon(
+              AssetImage(imagePath),
+              size: 60.sp,
+              color: isSelected ? Colors.deepOrange : Colors.grey,
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  void _showEditDialog(
-    BuildContext context,
-    String initialValue,
-    Function(String) onSave,
-  ) {
-    TextEditingController controller = TextEditingController(
-      text: initialValue,
-    );
+void _showEditDialog(
+  BuildContext context,
+  String initialValue,
+  Function(String) onSave,
+) {
+  TextEditingController controller = TextEditingController(text: initialValue);
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("تعديل النبذة"),
-          content: TextField(
-            controller: controller,
-            maxLines: 3,
-            decoration: InputDecoration(
-              hintText: "أدخل نبذة عنك",
-              border: OutlineInputBorder(),
-            ),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("تعديل النبذة"),
+        content: TextField(
+          controller: controller,
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: "أدخل نبذة عنك",
+            border: OutlineInputBorder(),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("إلغاء"),
-            ),
-            TextButton(
-              onPressed: () {
-                onSave(controller.text);
-                Navigator.of(context).pop();
-              },
-              child: Text("حفظ"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("إلغاء"),
+          ),
+          TextButton(
+            onPressed: () {
+              onSave(controller.text);
+              Navigator.of(context).pop();
+            },
+            child: Text("حفظ"),
+          ),
+        ],
+      );
+    },
+  );
 }

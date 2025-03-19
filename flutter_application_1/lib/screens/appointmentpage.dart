@@ -85,7 +85,10 @@ class _AppointmentpageState extends State<Appointmentpage> {
                         children: [
                           Text(
                             "مواعيدي",
-                            style: TextStyle(color: Colors.white, fontSize: 40.sp),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40.sp,
+                            ),
                             textAlign: TextAlign.right,
                           ),
                         ],
@@ -377,7 +380,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         },
                         child: Text(
                           'تغيير الموعد',
-                          style: TextStyle(fontSize: 16.sp, color: Colors.orange),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: Colors.orange,
+                          ),
                         ),
                       ),
                     ),
@@ -404,7 +410,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         },
                         child: Text(
                           'بدء الجلسة',
-                          style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -457,11 +466,7 @@ class ScheduleCard extends StatelessWidget {
           children: <Widget>[
             Row(
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: Colors.orange,
-                  size: 16.sp,
-                ),
+                Icon(Icons.calendar_today, color: Colors.orange, size: 16.sp),
                 SizedBox(width: 5.w),
                 Text(
                   formattedDate,

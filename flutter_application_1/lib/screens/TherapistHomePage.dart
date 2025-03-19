@@ -16,13 +16,13 @@ class TherapistHomePage extends StatefulWidget {
 }
 
 class _TherapistHomePageState extends State<TherapistHomePage> {
-  int _selectedIndex = 2;
+  int selectedIndex = 2;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      selectedIndex = index;
     });
     switch (index) {
       case 0:
@@ -295,7 +295,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
     return Container(
       height: 60.h,
       width: double.infinity,
-      margin: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 12.h),
+      margin: EdgeInsets.only(left: 35.w, right: 35.w, bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30.r),
@@ -312,16 +312,16 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildNavItem(Icons.person, 0), // TherapistProfilePage
-          _buildNavItem(Icons.calendar_today, 1), // Tappointment
           _buildImageItem("assets/images/ewan.png", 2),
+          _buildNavItem(Icons.calendar_today, 1),
+          _buildNavItem(Icons.person, 0),
         ],
       ),
     );
   }
 
   Widget _buildNavItem(IconData icon, int index) {
-    bool isSelected = _selectedIndex == index;
+    bool isSelected = selectedIndex == index;
     return GestureDetector(
       onTap: () {
         _onItemTapped(index);
@@ -347,7 +347,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
   }
 
   Widget _buildImageItem(String imagePath, int index) {
-    bool isSelected = _selectedIndex == index;
+    bool isSelected = selectedIndex == index;
     return GestureDetector(
       onTap: () {
         _onItemTapped(index);
@@ -357,7 +357,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
         children: [
           Container(
             alignment: Alignment.center,
-            margin: EdgeInsets.only(right: 15.w),
+            margin: EdgeInsets.only(right: 30.w),
             child: ImageIcon(
               AssetImage(imagePath),
               size: 60.sp,

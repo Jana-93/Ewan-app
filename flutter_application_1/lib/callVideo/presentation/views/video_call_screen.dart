@@ -311,6 +311,12 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             'مكالمة فيديو',
             style: TextStyle(color: Colors.white, fontSize: 20.sp),
           ),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
         body: Stack(
           children: [
@@ -365,7 +371,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     right: 20.w,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
+                        backgroundColor: Color(0xFFF6872F),
                         foregroundColor: Colors.white,
                       ),
                       onPressed: _outerIntroVideo,

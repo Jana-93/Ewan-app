@@ -46,20 +46,26 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: Text(
-          "مراجعاتي",
-          style: TextStyle(color: Colors.white, fontSize: 20.sp),
-        ),
+        backgroundColor: const Color.fromRGBO(239, 108, 0, 1),
+
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
+        actions: [
+          Text(
+            "مراجعاتي",
+            style: TextStyle(color: Colors.white, fontSize: 24.sp),
+          ),
+          SizedBox(width: 15.w),
+        ],
       ),
+
       body: Column(
         children: [
+          SizedBox(height: 10.h),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream:
@@ -82,10 +88,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           vertical: 5.h,
                           horizontal: 15.w,
                         ),
+
                         padding: EdgeInsets.all(15.w),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          border: Border.all(color: Colors.orange),
+                          border: Border.all(
+                            color: Color.fromRGBO(239, 108, 0, 1),
+                          ),
                           borderRadius: BorderRadius.circular(15.r),
                           boxShadow: [
                             BoxShadow(color: Colors.black12, blurRadius: 4),
@@ -111,8 +120,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
+                      textAlign: TextAlign.right,
                       decoration: InputDecoration(
-                        hintText: "أضف مراجعتك...",
+                        hintText: " ...اضف مراجعتك ",
+
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25.r),
                           borderSide: BorderSide(color: Colors.orange),
@@ -121,7 +132,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.send, color: Colors.orange, size: 24.sp),
+                    icon: Icon(
+                      Icons.send,
+                      color: Color.fromRGBO(239, 108, 0, 1),
+                      size: 24.sp,
+                    ),
                     onPressed: sendMessage,
                   ),
                 ],

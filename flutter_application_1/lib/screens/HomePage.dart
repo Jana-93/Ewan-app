@@ -100,7 +100,7 @@ class _HomepageState extends State<Homepage> {
             children: <Widget>[
               SizedBox(height: 40.h),
               Padding(
-                padding: EdgeInsets.all(10.r),
+                padding: EdgeInsets.all(20.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
@@ -278,7 +278,8 @@ class _HomepageState extends State<Homepage> {
                       Text(
                         actionText,
                         style: TextStyle(
-                          fontSize: 13.sp,fontWeight: FontWeight.w700,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w700,
                           color: Color(0xFFFCB47A),
                         ),
                         textAlign: TextAlign.right,

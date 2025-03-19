@@ -44,9 +44,19 @@ class _PastAppointmentsState extends State<PastAppointments> {
               SizedBox(height: 60.h),
               Padding(
                 padding: EdgeInsets.all(10.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 30.sp,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
                     Text(
                       "المواعيد السابقة",
                       style: TextStyle(color: Colors.white, fontSize: 40.sp),
@@ -82,7 +92,7 @@ class _PastAppointmentsState extends State<PastAppointments> {
                             );
                           }
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Center(child: Text('لا يوجد مواعيد سابقة.'));
+                            return Center(child: Text('لا يوجد مواعيد سابقة'));
                           }
 
                           List<Map<String, dynamic>> appointments =

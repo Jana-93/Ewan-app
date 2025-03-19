@@ -197,9 +197,9 @@ class _SearchpageState extends State<Searchpage> {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("تعذر فتح رابط الدفع")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("تعذر فتح رابط الدفع")));
     }
   }
 
@@ -208,15 +208,16 @@ class _SearchpageState extends State<Searchpage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => ConfirmationPage(
-          therapists: therapists,
-          selectedTherapistIndex: selectedTherapistIndex,
-          children: children,
-          selectedChildIndex: selectedChildIndex,
-          selectedDay: _selectedDay!,
-          selectedTime: selectedTime!,
-          firestoreService: _firestoreService,
-        ),
+        builder:
+            (context) => ConfirmationPage(
+              therapists: therapists,
+              selectedTherapistIndex: selectedTherapistIndex,
+              children: children,
+              selectedChildIndex: selectedChildIndex,
+              selectedDay: _selectedDay!,
+              selectedTime: selectedTime!,
+              firestoreService: _firestoreService,
+            ),
       ),
     );
   }
@@ -284,7 +285,7 @@ class _SearchpageState extends State<Searchpage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 20.h),
+
                       Expanded(
                         child: ListView.builder(
                           itemCount: therapists.length,
@@ -407,9 +408,10 @@ class _SearchpageState extends State<Searchpage> {
                                         selectedChildIndex = index;
                                       });
                                       // الانتقال مباشرة إلى صفحة اختيار التاريخ بعد اختيار الطفل
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        _selectDate(context);
-                                      });
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                            _selectDate(context);
+                                          });
                                     },
                                   ),
                                 );
@@ -511,7 +513,7 @@ class _SearchpageState extends State<Searchpage> {
             child: ImageIcon(
               AssetImage(imagePath),
               size: 60.sp,
-              color: isSelected ? Colors.deepOrange : const Color.fromARGB(255, 252, 253, 253),
+              color: isSelected ? Colors.deepOrange : Colors.grey,
             ),
           ),
         ],
@@ -525,11 +527,20 @@ class TimeSelectionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("اختر الوقت"),
-        backgroundColor: Colors.orange, // تغيير لون AppBar إلى البرتقالي
+        title: Text("اختر الوقت", style: TextStyle(color: Colors.white)),
+        backgroundColor: Color.fromRGBO(239, 108, 0, 1),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+
+        // تغيير لون AppBar إلى البرتقالي
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(45.w),
+
         child: Column(
           children: [
             // إضافة صورة s1 في أعلى الصفحة
@@ -543,14 +554,19 @@ class TimeSelectionPage extends StatelessWidget {
               spacing: 8.0,
               runSpacing: 8.0,
               children: List.generate(10, (index) {
-                String time = "${8 + index}:00 صباحًا";
+                String time;
+                if (index < 4) {
+                  time = "${8 + index}:00 صباحًا";
+                } else {
+                  time = "${index - 4 + 12}:00 مساءً";
+                }
                 return ChoiceChip(
                   label: Text(time),
                   selected: false,
                   onSelected: (selected) {
                     Navigator.pop(context, time);
                   },
-                  selectedColor: Colors.orange, // تغيير لون المربعات إلى البرتقالي
+                  selectedColor: Colors.orange,
                   labelStyle: TextStyle(color: Colors.deepOrange),
                 );
               }),
