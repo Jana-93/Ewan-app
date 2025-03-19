@@ -208,13 +208,10 @@ class _SearchpageState extends State<Searchpage> {
         ),
       );
 
-      // انتظر لمدة دقيقتين (120 ثانية)
-      await Future.delayed(Duration(seconds: 30));
+      await Future.delayed(Duration(seconds: 10));
 
-      // أغلق المتصفح
       await FlutterWebBrowser.close();
 
-      // انتقل إلى صفحة التأكيد
       _navigateToConfirmationPage(context);
     } catch (e) {
       print("Error launching payment URL: $e");
