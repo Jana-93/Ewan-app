@@ -190,7 +190,7 @@ class _SearchpageState extends State<Searchpage> {
   }
 
   Future<void> _launchPaymentUrl() async {
-    const url = "https://buy.stripe.com/test_6oE7vW3Ub0Bwd6U5kl"; // رابط الدفع
+    const url = "https://buy.stripe.com/test_8wMeYogGXfwq1occMO"; // رابط الدفع
 
     try {
       // افتح المتصفح
