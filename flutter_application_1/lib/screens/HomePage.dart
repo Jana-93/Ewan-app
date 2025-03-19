@@ -8,7 +8,6 @@ import 'package:flutter_application_1/screens/feedback.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -20,6 +19,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   int selectedIndex = 3;
   String userFirstName = "";
+
   @override
   void initState() {
     super.initState();
@@ -31,13 +31,13 @@ class _HomepageState extends State<Homepage> {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       String userId = user.uid;
-      DocumentSnapshot userDoc =
-          await FirebaseFirestore.instance
-              .collection('parents')
-              .doc(userId)
-              .get();
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('parents')
+          .doc(userId)
+          .get();
 
-      if (userDoc.exists) {
+      if (userDoc.exists && mounted) {
+        // Check if the widget is still mounted
         setState(() {
           userFirstName = userDoc.get('firstName') ?? "";
         });
@@ -49,31 +49,28 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       selectedIndex = index;
     });
-    // to move between pages
+    // Use Navigator.push instead of Navigator.pushReplacement
     switch (index) {
       case 0:
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => UserPage()),
         );
         break;
       case 1:
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Searchpage()),
         );
         break;
       case 2:
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Appointmentpage()),
         );
         break;
       case 3:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Homepage()),
-        );
+        // Do nothing if the current page is Homepage
         break;
     }
   }
@@ -132,8 +129,6 @@ class _HomepageState extends State<Homepage> {
                   ],
                 ),
               ),
-
-              // SizedBox(height: 6.h),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -257,14 +252,12 @@ class _HomepageState extends State<Homepage> {
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: 2.h),
-
                 Text(
                   description,
                   style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: 18.h),
-
                 GestureDetector(
                   onTap: onTap,
                   child: Row(
@@ -297,7 +290,7 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  //nav bar
+  // Navigation Bar
   Widget navBar() {
     return Container(
       height: 60.h,
