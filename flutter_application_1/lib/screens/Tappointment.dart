@@ -60,7 +60,7 @@ class _TappointmentState extends State<Tappointment> {
         return snapshot.docs.first.data() as Map<String, dynamic>;
       } else {
         print("No child found with name: $childName");
-        throw Exception("Child not found");
+        throw Exception("child removed");
       }
     } catch (e) {
       print("Error fetching child data: $e");
