@@ -26,7 +26,7 @@ class ConfirmationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("الرجاء الدفع  "),
+        title: Text("تأكيد الحجز   "),
       ),
       body: Center(
         child: Column(
@@ -35,7 +35,7 @@ class ConfirmationPage extends StatelessWidget {
             
             SizedBox(height: 20),
             Text(
-              "   ادفع لتأكيد الحجز!",
+              "    لتأكيد الحجز!",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),

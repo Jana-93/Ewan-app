@@ -8,7 +8,7 @@ import 'package:flutter_application_1/firestore_service.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:url_launcher/url_launcher.dart'; // أضفنا حزمة url_launcher
+import 'package:flutter_web_browser/flutter_web_browser.dart'; // استبدل url_launcher بـ flutter_web_browser
 
 class Searchpage extends StatefulWidget {
   @override
@@ -45,9 +45,9 @@ class _SearchpageState extends State<Searchpage> {
       });
     } catch (e) {
       print("Error fetching therapists: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")),
+      );
     }
   }
 
@@ -61,9 +61,9 @@ class _SearchpageState extends State<Searchpage> {
       });
     } catch (e) {
       print("Error fetching children: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب الأطفال")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("حدث خطأ أثناء جلب الأطفال")),
+      );
     }
   }
 
@@ -121,7 +121,7 @@ class _SearchpageState extends State<Searchpage> {
                   _selectedDay = selectedDay;
                   _focusedDay = focusedDay;
                 });
-                Navigator.pop(context, selectedDay); // إرجاع التاريخ المحدد
+                Navigator.pop(context, selectedDay);
               },
               onFormatChanged: (format) {
                 setState(() {
@@ -169,7 +169,7 @@ class _SearchpageState extends State<Searchpage> {
       setState(() {
         _selectedDay = selected;
       });
-      await _selectTime(context); // الانتقال إلى صفحة اختيار الوقت
+      await _selectTime(context);
     }
   }
 
@@ -186,38 +186,57 @@ class _SearchpageState extends State<Searchpage> {
 
       // افتح رابط الدفع Stripe في متصفح خارجي
       await _launchPaymentUrl();
-
-      // الانتقال إلى صفحة التأكيد بعد الدفع
-      _navigateToConfirmationPage(context);
     }
   }
 
   Future<void> _launchPaymentUrl() async {
     const url = "https://buy.stripe.com/test_6oE7vW3Ub0Bwd6U5kl"; // رابط الدفع
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("تعذر فتح رابط الدفع")));
+
+    try {
+      // افتح المتصفح
+      await FlutterWebBrowser.openWebPage(
+        url: url,
+        customTabsOptions: CustomTabsOptions(
+          colorScheme: CustomTabsColorScheme.dark,
+          toolbarColor: Colors.deepOrange,
+          secondaryToolbarColor: Colors.black,
+          navigationBarColor: Colors.black,
+          addDefaultShareMenuItem: true,
+          instantAppsEnabled: true,
+          showTitle: true,
+          urlBarHidingEnabled: true,
+        ),
+      );
+
+      // انتظر لمدة دقيقتين (120 ثانية)
+      await Future.delayed(Duration(seconds: 30));
+
+      // أغلق المتصفح
+      await FlutterWebBrowser.close();
+
+      // انتقل إلى صفحة التأكيد
+      _navigateToConfirmationPage(context);
+    } catch (e) {
+      print("Error launching payment URL: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("تعذر فتح رابط الدفع")),
+      );
     }
   }
 
   void _navigateToConfirmationPage(BuildContext context) {
-    // الانتقال إلى صفحة التأكيد مع تمرير البيانات المطلوبة
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => ConfirmationPage(
-              therapists: therapists,
-              selectedTherapistIndex: selectedTherapistIndex,
-              children: children,
-              selectedChildIndex: selectedChildIndex,
-              selectedDay: _selectedDay!,
-              selectedTime: selectedTime!,
-              firestoreService: _firestoreService,
-            ),
+        builder: (context) => ConfirmationPage(
+          therapists: therapists,
+          selectedTherapistIndex: selectedTherapistIndex,
+          children: children,
+          selectedChildIndex: selectedChildIndex,
+          selectedDay: _selectedDay!,
+          selectedTime: selectedTime!,
+          firestoreService: _firestoreService,
+        ),
       ),
     );
   }
@@ -231,9 +250,9 @@ class _SearchpageState extends State<Searchpage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             colors: [
-              const Color.fromARGB(255, 219, 101, 37),
-              const Color.fromRGBO(239, 108, 0, 1),
-              const Color.fromRGBO(255, 167, 38, 1),
+              Color.fromARGB(255, 219, 101, 37),
+              Color.fromRGBO(239, 108, 0, 1),
+              Color.fromRGBO(255, 167, 38, 1),
             ],
           ),
         ),
@@ -247,7 +266,7 @@ class _SearchpageState extends State<Searchpage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   FadeInUp(
-                    duration: const Duration(milliseconds: 1000),
+                    duration: Duration(milliseconds: 1000),
                     child: Text(
                       "الأطباء",
                       style: TextStyle(color: Colors.white, fontSize: 40.sp),
@@ -285,7 +304,6 @@ class _SearchpageState extends State<Searchpage> {
                           ),
                         ),
                       ),
-
                       Expanded(
                         child: ListView.builder(
                           itemCount: therapists.length,
@@ -293,32 +311,25 @@ class _SearchpageState extends State<Searchpage> {
                             bool isSelected = selectedTherapistIndex == index;
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8.h),
-                              color:
-                                  isSelected
-                                      ? Colors.orange.withOpacity(0.2)
-                                      : Colors.white,
+                              color: isSelected
+                                  ? Colors.orange.withOpacity(0.2)
+                                  : Colors.white,
                               child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundImage:
                                       therapists[index]["profileImage"] != null
                                           ? NetworkImage(
-                                            therapists[index]["profileImage"],
-                                          )
+                                              therapists[index]["profileImage"],
+                                            )
                                           : AssetImage(
-                                            "path_to_default_image.jpg",
-                                          ),
+                                              "path_to_default_image.jpg",
+                                            ),
                                 ),
                                 title: Text(
                                   "${therapists[index]["firstName"] ?? ""} ${therapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.orange
-                                            : Colors.black,
-                                    fontWeight:
-                                        isSelected
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
+                                    color: isSelected ? Colors.orange : Colors.black,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                     fontSize: 16.sp,
                                   ),
                                 ),
@@ -326,10 +337,7 @@ class _SearchpageState extends State<Searchpage> {
                                   therapists[index]["specialty"] ??
                                       "No Specialty Information",
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.orange
-                                            : Colors.grey,
+                                    color: isSelected ? Colors.orange : Colors.grey,
                                     fontSize: 14.sp,
                                   ),
                                 ),
@@ -337,10 +345,7 @@ class _SearchpageState extends State<Searchpage> {
                                   therapists[index]["experience"] ??
                                       "Experience Unavailable",
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.orange
-                                            : Colors.green,
+                                    color: isSelected ? Colors.orange : Colors.green,
                                     fontSize: 14.sp,
                                   ),
                                 ),
@@ -354,9 +359,7 @@ class _SearchpageState extends State<Searchpage> {
                                     print("Error fetching children: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(
-                                          "حدث خطأ أثناء جلب الأطفال",
-                                        ),
+                                        content: Text("حدث خطأ أثناء جلب الأطفال"),
                                       ),
                                     );
                                   }
@@ -384,22 +387,15 @@ class _SearchpageState extends State<Searchpage> {
                                 bool isSelected = selectedChildIndex == index;
                                 return Card(
                                   margin: EdgeInsets.symmetric(vertical: 8.h),
-                                  color:
-                                      isSelected
-                                          ? Colors.orange.withOpacity(0.2)
-                                          : Colors.orange,
+                                  color: isSelected
+                                      ? Colors.orange.withOpacity(0.2)
+                                      : Colors.orange,
                                   child: ListTile(
                                     title: Text(
                                       "${children[index]["childName"] ?? "No Name"}",
                                       style: TextStyle(
-                                        color:
-                                            isSelected
-                                                ? Colors.orange
-                                                : Colors.black,
-                                        fontWeight:
-                                            isSelected
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
+                                        color: isSelected ? Colors.orange : Colors.black,
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                         fontSize: 16.sp,
                                       ),
                                     ),
@@ -407,11 +403,9 @@ class _SearchpageState extends State<Searchpage> {
                                       setState(() {
                                         selectedChildIndex = index;
                                       });
-                                      // الانتقال مباشرة إلى صفحة اختيار التاريخ بعد اختيار الطفل
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) {
-                                            _selectDate(context);
-                                          });
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        _selectDate(context);
+                                      });
                                     },
                                   ),
                                 );
@@ -455,7 +449,7 @@ class _SearchpageState extends State<Searchpage> {
             color: Colors.black.withOpacity(0.2),
             blurRadius: 15,
             spreadRadius: 5,
-            offset: const Offset(0, 5),
+            offset: Offset(0, 5),
           ),
         ],
       ),
@@ -535,17 +529,13 @@ class TimeSelectionPage extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-
-        // تغيير لون AppBar إلى البرتقالي
       ),
       body: Padding(
         padding: EdgeInsets.all(45.w),
-
         child: Column(
           children: [
-            // إضافة صورة s1 في أعلى الصفحة
             Image.asset(
-              "assets/images/s1.jpg", // تأكد من وجود الصورة في مجلد assets
+              "assets/images/s1.jpg",
               width: 100.w,
               height: 100.h,
             ),
