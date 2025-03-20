@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/HomePage.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_application_1/screens/HomePage.dart';
 
 class ChildFeedback extends StatefulWidget {
   @override
@@ -8,8 +9,7 @@ class ChildFeedback extends StatefulWidget {
 }
 
 class _ChildFeedbackState extends State<ChildFeedback> {
-  int _selectedRating = 0;
-  final List<String> _emojis = ['😠', '😞', '😐', '😊', '😍'];
+  double _selectedRating = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -47,31 +47,23 @@ class _ChildFeedbackState extends State<ChildFeedback> {
               style: TextStyle(fontSize: 15.sp),
             ),
             SizedBox(height: 20.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children:
-                  _emojis.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    String emoji = entry.value;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedRating = index + 1;
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(3.w),
-                        decoration: BoxDecoration(
-                          color:
-                              _selectedRating == index + 1
-                                  ? Colors.orange.withOpacity(0.3)
-                                  : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Text(emoji, style: TextStyle(fontSize: 30.sp)),
-                      ),
-                    );
-                  }).toList(),
+            RatingBar.builder(
+              initialRating: _selectedRating,
+              minRating: 1,
+              direction: Axis.horizontal,
+              allowHalfRating: false,
+              itemCount: 5,
+              itemSize: 40.sp,
+              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+              itemBuilder: (context, _) => Icon(
+                Icons.star,
+                color: Colors.amber,
+              ),
+              onRatingUpdate: (rating) {
+                setState(() {
+                  _selectedRating = rating;
+                });
+              },
             ),
             SizedBox(height: 40.h),
             Row(
@@ -79,10 +71,7 @@ class _ChildFeedbackState extends State<ChildFeedback> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => Homepage()),
-                    );
+                    Navigator.pop(context);
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
@@ -121,30 +110,18 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                         ),
                       );
                     } else {
-                      print('التقييم المحدد: $_selectedRating');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'شكرًا على تقييمك!',
-                            textDirection: TextDirection.rtl,
-                          ),
-                        ),
-                      );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => Homepage()),
-                      );
+                      Navigator.pop(context, _selectedRating);
                     }
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color>((
-                      Set<MaterialState> states,
-                    ) {
-                      if (states.contains(MaterialState.pressed)) {
-                        return Color(0xFFF6872F).withOpacity(0.5);
-                      }
-                      return Color(0xFFF6872F);
-                    }),
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.pressed)) {
+                          return Color(0xFFF6872F).withOpacity(0.5);
+                        }
+                        return Color(0xFFF6872F);
+                      },
+                    ),
                     foregroundColor: MaterialStateProperty.all<Color>(
                       Colors.white,
                     ),
