@@ -8,7 +8,7 @@ import 'package:flutter_application_1/firestore_service.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_web_browser/flutter_web_browser.dart'; // استبدل url_launcher بـ flutter_web_browser
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 
 class Searchpage extends StatefulWidget {
   @override
@@ -27,7 +27,12 @@ class _SearchpageState extends State<Searchpage> {
   String? selectedTime;
 
   List<Map<String, dynamic>> therapists = [];
+  List<Map<String, dynamic>> filteredTherapists = [];
   List<Map<String, dynamic>> children = [];
+
+  
+  List<String> specialties = ["الكل", "علاج نفسي", "علاج سلوكي", "علاج معرفي"];
+  String selectedSpecialty = "الكل";
 
   @override
   void initState() {
@@ -42,6 +47,7 @@ class _SearchpageState extends State<Searchpage> {
           await _firestoreService.getTherapists();
       setState(() {
         therapists = fetchedTherapists;
+        filteredTherapists = therapists;
       });
     } catch (e) {
       print("Error fetching therapists: $e");
@@ -193,7 +199,7 @@ class _SearchpageState extends State<Searchpage> {
     const url = "https://buy.stripe.com/test_8wMeYogGXfwq1occMO"; // رابط الدفع
 
     try {
-      // افتح المتصفح
+      
       await FlutterWebBrowser.openWebPage(
         url: url,
         customTabsOptions: CustomTabsOptions(
@@ -238,44 +244,58 @@ class _SearchpageState extends State<Searchpage> {
     );
   }
 
+  void _filterTherapists() {
+    if (selectedSpecialty == "الكل") {
+      setState(() {
+        filteredTherapists = therapists;
+      });
+    } else {
+      setState(() {
+        filteredTherapists = therapists
+            .where((therapist) => therapist["specialty"] == selectedSpecialty)
+            .toList();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            colors: [
-              Color.fromARGB(255, 219, 101, 37),
-              Color.fromRGBO(239, 108, 0, 1),
-              Color.fromRGBO(255, 167, 38, 1),
-            ],
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            SizedBox(height: 60.h),
-            Padding(
-              padding: EdgeInsets.all(10.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  FadeInUp(
-                    duration: Duration(milliseconds: 1000),
-                    child: Text(
-                      "الأطباء",
-                      style: TextStyle(color: Colors.white, fontSize: 40.sp),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
-                ],
-              ),
+      body: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              colors: [
+                Color.fromARGB(255, 219, 101, 37),
+                Color.fromRGBO(239, 108, 0, 1),
+                Color.fromRGBO(255, 167, 38, 1),
+              ],
             ),
-            SizedBox(height: 20.h),
-            Expanded(
-              child: Container(
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              SizedBox(height: 60.h),
+              Padding(
+                padding: EdgeInsets.all(10.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    FadeInUp(
+                      duration: Duration(milliseconds: 1000),
+                      child: Text(
+                        "الأطباء",
+                        style: TextStyle(color: Colors.white, fontSize: 40.sp),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.h),
+              Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -301,9 +321,35 @@ class _SearchpageState extends State<Searchpage> {
                           ),
                         ),
                       ),
-                      Expanded(
+                      SizedBox(height: 10.h),
+                      
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: specialties.map((specialty) {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4.w),
+                              child: ChoiceChip(
+                                label: Text(specialty),
+                                selected: selectedSpecialty == specialty,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    selectedSpecialty = specialty;
+                                    _filterTherapists();
+                                  });
+                                },
+                                selectedColor: Colors.orange,
+                                labelStyle: TextStyle(color: Colors.deepOrange),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      Container(
+                        height: 400.h,
                         child: ListView.builder(
-                          itemCount: therapists.length,
+                          itemCount: filteredTherapists.length,
                           itemBuilder: (context, index) {
                             bool isSelected = selectedTherapistIndex == index;
                             return Card(
@@ -314,16 +360,16 @@ class _SearchpageState extends State<Searchpage> {
                               child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundImage:
-                                      therapists[index]["profileImage"] != null
+                                      filteredTherapists[index]["profileImage"] != null
                                           ? NetworkImage(
-                                              therapists[index]["profileImage"],
+                                              filteredTherapists[index]["profileImage"],
                                             )
                                           : AssetImage(
                                               "path_to_default_image.jpg",
                                             ),
                                 ),
                                 title: Text(
-                                  "${therapists[index]["firstName"] ?? ""} ${therapists[index]["lastName"] ?? ""}",
+                                  "${filteredTherapists[index]["firstName"] ?? ""} ${filteredTherapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
                                     color: isSelected ? Colors.orange : Colors.black,
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -331,7 +377,7 @@ class _SearchpageState extends State<Searchpage> {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  therapists[index]["specialty"] ??
+                                  filteredTherapists[index]["specialty"] ??
                                       "No Specialty Information",
                                   style: TextStyle(
                                     color: isSelected ? Colors.orange : Colors.grey,
@@ -339,7 +385,7 @@ class _SearchpageState extends State<Searchpage> {
                                   ),
                                 ),
                                 trailing: Text(
-                                  therapists[index]["experience"] ??
+                                  filteredTherapists[index]["experience"] ??
                                       "Experience Unavailable",
                                   style: TextStyle(
                                     color: isSelected ? Colors.orange : Colors.green,
@@ -377,7 +423,8 @@ class _SearchpageState extends State<Searchpage> {
                         ),
                         SizedBox(height: 10.h),
                         if (children.isNotEmpty)
-                          Expanded(
+                          Container(
+                            height: 200.h,
                             child: ListView.builder(
                               itemCount: children.length,
                               itemBuilder: (context, index) {
@@ -425,8 +472,8 @@ class _SearchpageState extends State<Searchpage> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: navBar(),
@@ -535,6 +582,9 @@ class TimeSelectionPage extends StatelessWidget {
               "assets/images/s1.jpg",
               width: 100.w,
               height: 100.h,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.error, color: Colors.red);
+              },
             ),
             SizedBox(height: 20.h),
             Wrap(
