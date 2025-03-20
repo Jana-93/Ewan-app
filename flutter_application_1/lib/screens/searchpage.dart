@@ -54,7 +54,7 @@ class _SearchpageState extends State<Searchpage> {
   Future<void> _fetchChildren() async {
     try {
       List<Map<String, dynamic>> fetchedChildren =
-          await _firestoreService.getchildren();
+          await _firestoreService.getChildrenForCurrentUser();
       print("Fetched Children: $fetchedChildren");
       setState(() {
         children = fetchedChildren;

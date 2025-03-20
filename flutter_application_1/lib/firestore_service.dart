@@ -1,14 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreService {
-  final CollectionReference appointments = FirebaseFirestore.instance
-      .collection('appointments');
-  final CollectionReference therapistsCollection = FirebaseFirestore.instance
-      .collection('therapists');
-  final CollectionReference childrenCollection = FirebaseFirestore.instance
-      .collection('children');
-      final CollectionReference parentsCollection = FirebaseFirestore.instance
-      .collection('parents');
+  final CollectionReference appointments =
+      FirebaseFirestore.instance.collection('appointments');
+  final CollectionReference therapistsCollection =
+      FirebaseFirestore.instance.collection('therapists');
+  final CollectionReference childrenCollection =
+      FirebaseFirestore.instance.collection('children');
+  final CollectionReference parentsCollection =
+      FirebaseFirestore.instance.collection('parents');
 
   Future<void> addAppointment(Map<String, dynamic> data) async {
     try {
@@ -63,10 +64,9 @@ class FirestoreService {
 
   Stream<List<Map<String, dynamic>>> getAppointments() {
     return appointments.snapshots().map(
-      (snapshot) =>
-          snapshot.docs
-              .map((doc) => doc.data() as Map<String, dynamic>)
-              .toList(),
+      (snapshot) => snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList(),
     );
   }
 
@@ -101,50 +101,81 @@ class FirestoreService {
     }
   }
 
- Future<List<Map<String, dynamic>>> getchildren() async {
-  List<Map<String, dynamic>> children = [];
-  try {
-    QuerySnapshot snapshot = await childrenCollection.get();
-    for (var doc in snapshot.docs) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      children.add({
-        "childId": doc.id,
-        "childName": data["childName"],
-        "childAge": data["childAge"],
-        "childStatus": data["childStatus"],
-        "parentId": data["parentId"],
-      });
-    }
-  } catch (e) {
-    print("Error fetching children: $e");
-  }
-  return children;
-}
 
-Future<Map<String, dynamic>> getChildrenData(String childId) async {
-  if (childId.isEmpty) {
-    print('childId is empty');
-    throw Exception("childId is empty");
-  }
-  try {
-    DocumentSnapshot doc = await childrenCollection.doc(childId).get();
-    if (doc.exists) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      return {
-        "childId": doc.id,
-        "childName": data["childName"],
-        "childAge": data["childAge"],
-        "childStatus": data["childStatus"],
-        "parentId": data["parentId"],
-      };
-    } else {
-      throw Exception("Child not found");
+  Future<List<Map<String, dynamic>>> getchildren() async {
+    List<Map<String, dynamic>> children = [];
+    try {
+      QuerySnapshot snapshot = await childrenCollection.get();
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        children.add({
+          "childId": doc.id,
+          "childName": data["childName"],
+          "childAge": data["childAge"],
+          "childStatus": data["childStatus"],
+          "parentId": data["parentId"],
+        });
+      }
+    } catch (e) {
+      print("Error fetching children: $e");
     }
-  } catch (e) {
-    print("Error fetching child data: $e");
-    throw e;
+    return children;
   }
-}
+
+  
+  Future<List<Map<String, dynamic>>> getChildrenForCurrentUser() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("المستخدم غير مسجل دخول");
+    }
+
+    List<Map<String, dynamic>> children = [];
+    try {
+      QuerySnapshot snapshot = await childrenCollection
+          .where("parentId", isEqualTo: user.uid)
+          .get();
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        children.add({
+          "childId": doc.id,
+          "childName": data["childName"],
+          "childAge": data["childAge"],
+          "childStatus": data["childStatus"],
+          "parentId": data["parentId"],
+        });
+      }
+    } catch (e) {
+      print("Error fetching children for current user: $e");
+      throw e;
+    }
+    return children;
+  }
+
+  Future<Map<String, dynamic>> getChildrenData(String childId) async {
+    if (childId.isEmpty) {
+      print('childId is empty');
+      throw Exception("childId is empty");
+    }
+    try {
+      DocumentSnapshot doc = await childrenCollection.doc(childId).get();
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return {
+          "childId": doc.id,
+          "childName": data["childName"],
+          "childAge": data["childAge"],
+          "childStatus": data["childStatus"],
+          "parentId": data["parentId"],
+        };
+      } else {
+        throw Exception("Child not found");
+      }
+    } catch (e) {
+      print("Error fetching child data: $e");
+      throw e;
+    }
+  }
+
   Future<Map<String, dynamic>> getChildByName(String childName) async {
     if (childName.isEmpty) {
       print('childName is empty');
@@ -155,7 +186,8 @@ Future<Map<String, dynamic>> getChildrenData(String childId) async {
           .where('childName', isEqualTo: childName)
           .get();
       if (snapshot.docs.isNotEmpty) {
-        Map<String, dynamic> data = snapshot.docs.first.data() as Map<String, dynamic>;
+        Map<String, dynamic> data =
+            snapshot.docs.first.data() as Map<String, dynamic>;
         return {
           "childId": snapshot.docs.first.id,
           "childName": data["childName"],
@@ -171,6 +203,4 @@ Future<Map<String, dynamic>> getChildrenData(String childId) async {
       throw e;
     }
   }
-
-
 }
