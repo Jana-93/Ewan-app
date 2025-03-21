@@ -24,14 +24,30 @@ class _LoginScreenState extends State<LoginScreen> {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email);
   }
+ bool isValidPassword(String password) {
+    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$');
+    return passwordRegex.hasMatch(password);
+}
 
   Future<void> login() async {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
+    if (email.isEmpty && password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('يرجى إدخال البريد الإلكتروني وكلمة المرور')),
+      );
+      return;
+    }
+    if (email.isEmpty ) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('يرجى إدخال البريد الإلكتروني ')),
+      );
+      return;
+    }
+    if (password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('يرجى إدخال كلمة المرور')),
       );
       return;
     }
@@ -39,6 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!isValidEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('صيغة البريد الإلكتروني غير صحيحة')),
+      );
+      return;
+    }
+    if (!isValidPassword(password)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('صيغة كلمة المرور غير صحيحة')),
       );
       return;
     }
