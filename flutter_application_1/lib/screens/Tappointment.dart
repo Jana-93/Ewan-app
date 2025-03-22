@@ -182,8 +182,6 @@ class _TappointmentState extends State<Tappointment> {
                                               'Error: ${childSnapshot.error}',
                                             );
                                           }
-                                          
-                                          
 
                                           var childData = childSnapshot.data!;
 

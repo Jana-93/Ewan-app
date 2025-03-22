@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter_application_1/callVideo/data/model/agora_manager_model.dart';
 import 'package:flutter_application_1/callVideo/presentation/views/game_screen.dart';
+import 'package:flutter_application_1/screens/feedback.dart';
 import 'package:flutter_application_1/screens/childFeedback.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
@@ -251,7 +252,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       ),
                       onPressed: () {
                         _endCall();
-                        Navigator.of(context).pop();
+                        if (widget.user == 'doctor') {
+                          _navigateToFeedbackScreen();
+                        } else {
+                          Navigator.of(context).pop();
+                        }
                       },
                       child: Text('نعم', style: TextStyle(fontSize: 14.sp)),
                     ),
@@ -273,6 +278,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ),
         );
       },
+    );
+  }
+
+  //feedback nav
+  void _navigateToFeedbackScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FeedbackScreen(isDoctor: true)),
     );
   }
 
