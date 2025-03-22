@@ -25,9 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return emailRegex.hasMatch(email);
   }
  bool isValidPassword(String password) {
-    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$');
+    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$');
     return passwordRegex.hasMatch(password);
 }
+
 
   Future<void> login() async {
     String email = emailController.text.trim();
@@ -58,12 +59,13 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
-    if (!isValidPassword(password)) {
+   else if (!isValidPassword(password)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('صيغة كلمة المرور غير صحيحة')),
       );
       return;
     }
+    
 
     try {
       UserCredential userCredential = await FirebaseAuth.instance
