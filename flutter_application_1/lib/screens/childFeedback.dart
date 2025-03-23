@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ChildFeedback extends StatefulWidget {
   @override
@@ -8,8 +9,7 @@ class ChildFeedback extends StatefulWidget {
 }
 
 class _ChildFeedbackState extends State<ChildFeedback> {
-  int _selectedRating = 0;
-  final List<String> _emojis = ['😠', '😞', '😐', '😊', '😍'];
+  double _rating = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -46,32 +46,26 @@ class _ChildFeedbackState extends State<ChildFeedback> {
               textAlign: TextAlign.right,
               style: TextStyle(fontSize: 15.sp),
             ),
-            SizedBox(height: 20.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children:
-                  _emojis.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    String emoji = entry.value;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedRating = index + 1;
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(3.w),
-                        decoration: BoxDecoration(
-                          color:
-                              _selectedRating == index + 1
-                                  ? Colors.orange.withOpacity(0.3)
-                                  : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Text(emoji, style: TextStyle(fontSize: 30.sp)),
-                      ),
-                    );
-                  }).toList(),
+            SizedBox(height: 30.h),
+            Center(
+              child: RatingBar.builder(
+                initialRating: _rating,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: false,
+                itemCount: 5,
+                itemSize: 40.sp,
+                itemPadding: EdgeInsets.symmetric(horizontal: 4.w),
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  setState(() {
+                    _rating = rating;
+                  });
+                },
+              ),
             ),
             SizedBox(height: 40.h),
             Row(
@@ -111,7 +105,7 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (_selectedRating == 0) {
+                    if (_rating == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -121,7 +115,7 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                         ),
                       );
                     } else {
-                      print('التقييم المحدد: $_selectedRating');
+                      print('التقييم المحدد: $_rating');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
