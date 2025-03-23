@@ -203,4 +203,37 @@ class FirestoreService {
       throw e;
     }
   }
+  // دالة لإضافة تقييم وتحديث متوسط التقييمات
+  Future<void> addRating(String uid, double rating) async {
+    try {
+      // إضافة التقييم الجديد
+      await therapistsCollection.doc(uid).collection('ratings').add({
+        'rating': rating,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // حساب متوسط التقييمات
+      QuerySnapshot ratingsSnapshot = await therapistsCollection
+          .doc(uid)
+          .collection('ratings')
+          .get();
+
+      double totalRating = 0.0;
+      for (var doc in ratingsSnapshot.docs) {
+        totalRating += doc['rating'];
+      }
+
+      double averageRating = totalRating / ratingsSnapshot.docs.length;
+
+      // تحديث متوسط التقييم في وثيقة المعالج
+      await therapistsCollection.doc(uid).update({
+        'averageRating': averageRating,
+      });
+    } catch (e) {
+      print("Error adding rating: $e");
+      throw e;
+    }
+  }
+
+  
 }

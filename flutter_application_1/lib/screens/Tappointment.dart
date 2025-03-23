@@ -298,13 +298,12 @@ class _TappointmentState extends State<Tappointment> {
                                                                 builder:
                                                                     (
                                                                       context,
-                                                                    ) => const VideoCallScreen(
-                                                                      user:
-                                                                          'doctor',
+                                                                    ) => VideoCallScreen(
+                                                                      user: 'doctor',
+                                                                      therapistUid: appointment['therapistUid'], uid: '', // تمرير therapistUid هنا
                                                                     ),
                                                               ),
                                                             );
-                                                            // Implement start session logic
                                                           },
                                                           child: Text(
                                                             'بدء الجلسة',

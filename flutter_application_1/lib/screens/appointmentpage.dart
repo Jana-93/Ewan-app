@@ -310,10 +310,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
               ),
             ],
           ),
-          margin:
-              !widget.isLastElement
-                  ? EdgeInsets.only(bottom: 20.h)
-                  : EdgeInsets.zero,
+          margin: !widget.isLastElement
+              ? EdgeInsets.only(bottom: 20.h)
+              : EdgeInsets.zero,
           child: Padding(
             padding: EdgeInsets.all(15.r),
             child: Column(
@@ -322,10 +321,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 Row(
                   children: [
                     CircleAvatar(
-                      backgroundImage:
-                          therapistData['profileImage'] != null
-                              ? NetworkImage(therapistData['profileImage'])
-                              : AssetImage("assets/images/icon.jpg"),
+                      backgroundImage: therapistData['profileImage'] != null
+                          ? NetworkImage(therapistData['profileImage'])
+                          : AssetImage("assets/images/icon.jpg"),
                     ),
                     SizedBox(width: 10.w),
                     Column(
@@ -341,8 +339,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         ),
                         SizedBox(height: 5.h),
                         Text(
-                          therapistData['specialty'] ??
-                              "No Specialty Information",
+                          therapistData['specialty'] ?? "No Specialty Information",
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: 12.sp,
@@ -401,12 +398,12 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      const VideoCallScreen(user: 'patient'),
+                              builder: (context) => VideoCallScreen(
+                                user: 'patient',
+                                therapistUid: widget.schedule['therapistUid'], uid: '', // تمرير therapistUid هنا
+                              ),
                             ),
                           );
-                          // Implement start session logic
                         },
                         child: Text(
                           'بدء الجلسة',

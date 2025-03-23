@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_application_1/screens/ConfirmationPage.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_application_1/screens/HomePage.dart';
@@ -404,17 +405,31 @@ class _SearchpageState extends State<Searchpage> {
                                     SizedBox(
                                       height: 12.0,
                                     ), // Add space between bio and experience
-                                    Text(
-                                      therapists[index]["experience"] ??
-                                          "Experience Unavailable",
-                                      style: TextStyle(
-                                        color:
-                                            isSelected
-                                                ? Colors.orange
-                                                : Colors.green,
-                                        fontSize: 16.sp,
-                                      ),
-                                      textAlign: TextAlign.right, // Align
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          therapists[index]["experience"] ?? "Experience Unavailable",
+                                          style: TextStyle(
+                                            color: isSelected ? Colors.orange : Colors.green,
+                                            fontSize: 16.sp,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8.w), // مسافة بين سنوات الخبرة والتقييم
+                                        Icon(
+                                          Icons.star,
+                                          color: Colors.orange,
+                                          size: 20.sp,
+                                        ),
+                                        SizedBox(width: 4.w), // مسافة صغيرة بين الأيقونة والنص
+                                        Text(
+                                          "${therapists[index]["averageRating"]?.toStringAsFixed(2) ?? "0.00"}",
+                                          style: TextStyle(
+                                            color: Colors.orange,
+                                            fontSize: 16.sp,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),

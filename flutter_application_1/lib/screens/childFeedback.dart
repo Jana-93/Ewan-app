@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/HomePage.dart';
+import 'package:flutter_application_1/firestore_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_application_1/screens/HomePage.dart';
+
 
 class ChildFeedback extends StatefulWidget {
+  final String uid;  // تم تغيير therapistId إلى uid
+
+  ChildFeedback({required this.uid}); // تم تغيير therapistId إلى uid
+
   @override
   _ChildFeedbackState createState() => _ChildFeedbackState();
 }
 
 class _ChildFeedbackState extends State<ChildFeedback> {
   double _rating = 0;
+  final FirestoreService _firestoreService = FirestoreService(); // إضافة FirestoreService
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +111,7 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_rating == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -116,18 +123,33 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                       );
                     } else {
                       print('التقييم المحدد: $_rating');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'شكرًا على تقييمك!',
-                            textDirection: TextDirection.rtl,
+                      
+                      // إرسال التقييم إلى Firestore باستخدام uid
+                      try {
+                        await _firestoreService.addRating(widget.uid, _rating);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'شكرًا على تقييمك!',
+                              textDirection: TextDirection.rtl,
+                            ),
                           ),
-                        ),
-                      );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => Homepage()),
-                      );
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => Homepage()),
+                        );
+                      } catch (e) {
+                        print("Error sending rating: $e");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'حدث خطأ أثناء إرسال التقييم!',
+                              textDirection: TextDirection.rtl,
+                            ),
+                          ),
+                        );
+                      }
                     }
                   },
                   style: ButtonStyle(

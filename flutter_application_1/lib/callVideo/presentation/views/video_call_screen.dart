@@ -11,7 +11,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class VideoCallScreen extends StatefulWidget {
   final String user;
-  const VideoCallScreen({super.key, required this.user});
+  final String therapistUid;
+  const VideoCallScreen({super.key, required this.user,required this.therapistUid, required String uid});
 
   @override
   State<VideoCallScreen> createState() => _VideoCallScreenState();
@@ -302,15 +303,17 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       _outroVideoController!.pause();
       Navigator.pop(context);
     });
-    _navigateToChildFeedbackScreen();
+    _navigateToChildFeedbackScreen(widget.therapistUid);
   }
 
-  void _navigateToChildFeedbackScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ChildFeedback()),
-    );
-  }
+void _navigateToChildFeedbackScreen(String therapistUid) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ChildFeedback(uid: therapistUid), // قم بتمرير uid هنا
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
