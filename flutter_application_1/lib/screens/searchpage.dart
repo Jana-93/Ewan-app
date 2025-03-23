@@ -9,6 +9,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
+
 class Searchpage extends StatefulWidget {
   @override
   _SearchpageState createState() => _SearchpageState();
@@ -44,9 +45,9 @@ class _SearchpageState extends State<Searchpage> {
       });
     } catch (e) {
       print("Error fetching therapists: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")));
     }
   }
 
@@ -60,9 +61,9 @@ class _SearchpageState extends State<Searchpage> {
       });
     } catch (e) {
       print("Error fetching children: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("حدث خطأ أثناء جلب الأطفال")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب الأطفال")));
     }
   }
 
@@ -214,9 +215,9 @@ class _SearchpageState extends State<Searchpage> {
       _navigateToConfirmationPage(context);
     } catch (e) {
       print("Error launching payment URL: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("تعذر فتح رابط الدفع")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("تعذر فتح رابط الدفع")));
     }
   }
 
@@ -224,15 +225,16 @@ class _SearchpageState extends State<Searchpage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => ConfirmationPage(
-          therapists: therapists,
-          selectedTherapistIndex: selectedTherapistIndex,
-          children: children,
-          selectedChildIndex: selectedChildIndex,
-          selectedDay: _selectedDay!,
-          selectedTime: selectedTime!,
-          firestoreService: _firestoreService,
-        ),
+        builder:
+            (context) => ConfirmationPage(
+              therapists: therapists,
+              selectedTherapistIndex: selectedTherapistIndex,
+              children: children,
+              selectedChildIndex: selectedChildIndex,
+              selectedDay: _selectedDay!,
+              selectedTime: selectedTime!,
+              firestoreService: _firestoreService,
+            ),
       ),
     );
   }
@@ -307,43 +309,114 @@ class _SearchpageState extends State<Searchpage> {
                             bool isSelected = selectedTherapistIndex == index;
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8.h),
-                              color: isSelected
-                                  ? Colors.orange.withOpacity(0.2)
-                                  : Colors.white,
+                              color:
+                                  isSelected
+                                      ? Colors.orange.withOpacity(0.2)
+                                      : Colors.white,
                               child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 35.0,
+                                  horizontal: 16.0,
+                                ),
                                 leading: CircleAvatar(
                                   backgroundImage:
                                       therapists[index]["profileImage"] != null
                                           ? NetworkImage(
-                                              therapists[index]["profileImage"],
-                                            )
+                                            therapists[index]["profileImage"],
+                                          )
                                           : AssetImage(
-                                              "path_to_default_image.jpg",
-                                            ),
+                                            "path_to_default_image.jpg",
+                                          ),
                                 ),
                                 title: Text(
                                   "${therapists[index]["firstName"] ?? ""} ${therapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.black,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    color:
+                                        isSelected
+                                            ? Colors.orange
+                                            : Colors.black,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                     fontSize: 16.sp,
                                   ),
                                 ),
-                                subtitle: Text(
-                                  therapists[index]["specialty"] ??
-                                      "No Specialty Information",
-                                  style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.grey,
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
-                                trailing: Text(
-                                  therapists[index]["experience"] ??
-                                      "Experience Unavailable",
-                                  style: TextStyle(
-                                    color: isSelected ? Colors.orange : Colors.green,
-                                    fontSize: 14.sp,
-                                  ),
+                                subtitle: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment
+                                          .end, // Align subtitle to the right
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: IntrinsicWidth(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 4.0,
+                                            horizontal: 10.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(
+                                              255,
+                                              255,
+                                              172,
+                                              104,
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.orange,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              50,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            therapists[index]["specialty"] ??
+                                                "لا يوجد تخصص",
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ), // Add space between specialty and bio
+                                    Text(
+                                      therapists[index]["bio"] ??
+                                          "empty", // Display the bio
+                                      style: TextStyle(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          66,
+                                          66,
+                                          66,
+                                        ),
+                                        fontSize: 20.sp,
+                                      ),
+                                      textAlign:
+                                          TextAlign
+                                              .right, // Align bio text to the right
+                                    ),
+                                    SizedBox(
+                                      height: 12.0,
+                                    ), // Add space between bio and experience
+                                    Text(
+                                      therapists[index]["experience"] ??
+                                          "Experience Unavailable",
+                                      style: TextStyle(
+                                        color:
+                                            isSelected
+                                                ? Colors.orange
+                                                : Colors.green,
+                                        fontSize: 16.sp,
+                                      ),
+                                      textAlign: TextAlign.right, // Align
+                                    ),
+                                  ],
                                 ),
                                 onTap: () async {
                                   try {
@@ -355,7 +428,9 @@ class _SearchpageState extends State<Searchpage> {
                                     print("Error fetching children: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text("حدث خطأ أثناء جلب الأطفال"),
+                                        content: Text(
+                                          "حدث خطأ أثناء جلب الأطفال",
+                                        ),
                                       ),
                                     );
                                   }
@@ -365,6 +440,7 @@ class _SearchpageState extends State<Searchpage> {
                           },
                         ),
                       ),
+
                       if (selectedTherapistIndex != -1) ...[
                         SizedBox(height: 20.h),
                         Text(
@@ -382,16 +458,22 @@ class _SearchpageState extends State<Searchpage> {
                               itemBuilder: (context, index) {
                                 bool isSelected = selectedChildIndex == index;
                                 return Card(
-                                  margin: EdgeInsets.symmetric(vertical: 8.h),
-                                  color: isSelected
-                                      ? Colors.orange.withOpacity(0.2)
-                                      : Colors.orange,
+                                  color:
+                                      isSelected
+                                          ? Colors.orange.withOpacity(0.2)
+                                          : Colors.orange,
                                   child: ListTile(
                                     title: Text(
                                       "${children[index]["childName"] ?? "No Name"}",
                                       style: TextStyle(
-                                        color: isSelected ? Colors.orange : Colors.black,
-                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                        color:
+                                            isSelected
+                                                ? Colors.orange
+                                                : Colors.black,
+                                        fontWeight:
+                                            isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
                                         fontSize: 16.sp,
                                       ),
                                     ),
@@ -399,9 +481,10 @@ class _SearchpageState extends State<Searchpage> {
                                       setState(() {
                                         selectedChildIndex = index;
                                       });
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        _selectDate(context);
-                                      });
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                            _selectDate(context);
+                                          });
                                     },
                                   ),
                                 );
@@ -530,11 +613,7 @@ class TimeSelectionPage extends StatelessWidget {
         padding: EdgeInsets.all(45.w),
         child: Column(
           children: [
-            Image.asset(
-              "assets/images/s1.jpg",
-              width: 100.w,
-              height: 100.h,
-            ),
+            Image.asset("assets/images/s1.jpg", width: 100.w, height: 100.h),
             SizedBox(height: 20.h),
             Wrap(
               spacing: 8.0,
@@ -563,4 +642,3 @@ class TimeSelectionPage extends StatelessWidget {
     );
   }
 }
-
