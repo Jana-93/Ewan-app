@@ -41,7 +41,7 @@ class _PsignupState extends State<Psignup> {
       // Get the user ID (UID)
       String uid = credential.user!.uid;
 
-      //  Always store in "parents" collection
+      // Always store in "parents" collection
       await FirebaseFirestore.instance.collection("parents").doc(uid).set({
         "firstName": _firstNameController.text.trim(),
         "lastName": _lastNameController.text.trim(),
@@ -50,16 +50,16 @@ class _PsignupState extends State<Psignup> {
         "uid": uid,
       });
 
-      //  Redirect Parent to HomePage
+      // Redirect Parent to LoginScreen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepage()),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "تم إنشاء الحساب بنجاح ",
+            "تم إنشاء الحساب بنجاح",
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
@@ -76,38 +76,80 @@ class _PsignupState extends State<Psignup> {
         ),
       );
     } catch (e) {
-      print(" Error: $e");
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "حدث خطأ أثناء إنشاء الحساب: ${e.toString()}",
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
 
-  ///  Password Validation
+  /// Password Validation
   String? _validatePassword(String value) {
-    if (value.length < 8)
-      return "يجب أن تحتوي كلمة المرور على 8 خانات على الأقل";
-    if (!RegExp(r'[A-Za-z]').hasMatch(value))
-      return "يجب أن تحتوي كلمة المرور على حرف واحد على الأقل";
-    if (!RegExp(r'[0-9]').hasMatch(value))
-      return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
-    return null;
+  if (value.isEmpty) {
+    return "هذا الحقل مطلوب";
+  }
+  if (value.length < 8) {
+    return "يجب أن تحتوي كلمة المرور على 8 خانات على الأقل";
+  }
+  if (!RegExp(r'[a-z]').hasMatch(value)) {
+    return "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل";
+  }
+  if (!RegExp(r'[A-Z]').hasMatch(value)) {
+    return "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل";
+  }
+  if (!RegExp(r'[0-9]').hasMatch(value)) {
+    return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
+  }
+  return null;
   }
 
-  ///  Confirm Password Validation
+  /// Confirm Password Validation
   String? _validateConfirmPassword(String value) {
-    if (value != _passwordController.text) return "كلمة المرور غير متطابقة";
+    if (value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (value != _passwordController.text) {
+      return "كلمة المرور غير متطابقة";
+    }
     return null;
   }
 
-  ///  Email Validation
+  /// Email Validation
   String? _validateEmail(String value) {
     if (value.isEmpty) {
       return "هذا الحقل مطلوب";
     }
-    // Regular expression for email validation
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return "البريد الإلكتروني غير صحيح";
+      return "صيغة البريد الإلكتروني غير صحيحة";
     }
     return null;
   }
+  /// Phone Number Validation
+String? _validatePhone(String value) {
+  if (value.isEmpty) {
+    return "هذا الحقل مطلوب";
+  }
+  if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+    return "يرجى إدخال رقم جوال صحيح (10 أرقام)";
+  }
+  return null;
+}
 
   @override
   Widget build(BuildContext context) {
@@ -192,10 +234,15 @@ class _PsignupState extends State<Psignup> {
                                 _isPasswordVisible = !_isPasswordVisible;
                               });
                             },
-                            icon:
-                                _isPasswordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
+                            onChanged: (value) {
+                              if (_confirmPasswordController.text.isNotEmpty) {
+                                setState(() {});
+                              }
+                            },
+                            icon: _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            validator: _validatePassword,
                           ),
                           SizedBox(height: 20.h),
                           _buildPasswordField(
@@ -208,15 +255,21 @@ class _PsignupState extends State<Psignup> {
                                     !_isConfirmPasswordVisible;
                               });
                             },
-                            icon:
-                                _isConfirmPasswordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
+                            onChanged: (value) {
+                              if (_passwordController.text.isNotEmpty) {
+                                setState(() {});
+                              }
+                            },
+                            icon: _isConfirmPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            validator: _validateConfirmPassword,
                           ),
                           SizedBox(height: 20.h),
                           _buildInputField(
                             "رقم الجوال",
                             controller: _phoneController,
+                            validator: _validatePhone,
                           ),
                           SizedBox(height: 40.h),
                           FadeInUp(
@@ -238,13 +291,6 @@ class _PsignupState extends State<Psignup> {
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                     await register();
-                                    if (!mounted) return;
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => LoginScreen(),
-                                      ),
-                                    );
                                   }
                                 },
                                 child: Text(
@@ -293,12 +339,13 @@ class _PsignupState extends State<Psignup> {
     );
   }
 
-  ///  Reusable Input Field
+  /// Reusable Input Field
   Widget _buildInputField(
     String label, {
     bool obscureText = false,
     TextEditingController? controller,
     String? Function(String)? validator,
+    void Function(String)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -323,6 +370,7 @@ class _PsignupState extends State<Psignup> {
             textAlign: TextAlign.right,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
+            onChanged: onChanged,
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
@@ -331,8 +379,8 @@ class _PsignupState extends State<Psignup> {
               ),
             ),
             validator: (value) {
+              if (validator != null) return validator(value!);
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
-              if (validator != null) return validator(value);
               return null;
             },
           ),
@@ -341,7 +389,7 @@ class _PsignupState extends State<Psignup> {
     );
   }
 
-  ///  Reusable Password Field with Visibility Icon
+  /// Reusable Password Field with Visibility Icon
   Widget _buildPasswordField(
     String label, {
     required TextEditingController controller,
@@ -349,6 +397,7 @@ class _PsignupState extends State<Psignup> {
     required VoidCallback onPressed,
     required IconData icon,
     String? Function(String)? validator,
+    void Function(String)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -373,13 +422,13 @@ class _PsignupState extends State<Psignup> {
             textAlign: TextAlign.right,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
+            onChanged: onChanged,
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 20.w,
                 vertical: 15.h,
               ),
-
               prefixIcon: IconButton(
                 icon: Icon(icon),
                 onPressed: onPressed,
@@ -387,8 +436,8 @@ class _PsignupState extends State<Psignup> {
               ),
             ),
             validator: (value) {
+              if (validator != null) return validator(value!);
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
-              if (validator != null) return validator(value);
               return null;
             },
           ),
