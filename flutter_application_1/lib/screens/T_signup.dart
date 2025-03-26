@@ -23,8 +23,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
   String? selectedSpecialty;
   String? selectedExperience;
   File? profileImage;
@@ -34,6 +33,8 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   String profileFileName = "";
   String qualificationFileName = "";
   String licenseFileName = "";
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   final List<String> specialties = ['علاج سلوكي', 'علاج معرفي', 'علاج نفسي'];
   final List<String> experienceYears = [
@@ -44,6 +45,26 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     '5+ سنوات',
   ];
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return "صيغة البريد الإلكتروني غير صحيحة";
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+      return "يرجى إدخال رقم جوال صحيح (10 أرقام)";
+    }
+    return null;
+  }
+
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return "هذا الحقل مطلوب";
@@ -51,11 +72,14 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     if (value.length < 8) {
       return "يجب أن تحتوي كلمة المرور على 8 خانات على الأقل";
     }
-    if (!RegExp(r'[A-Za-z]').hasMatch(value)) {
-      return "يجب أن تحتوي كلمة المرور على حرف واحد على الأقل";
-    }
     if (!RegExp(r'[0-9]').hasMatch(value)) {
       return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
+    }
+    if (!RegExp(r'[a-z]').hasMatch(value)) {
+      return "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل";
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+      return "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل";
     }
     return null;
   }
@@ -81,9 +105,36 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
   }
 
   Future<void> pickFile(String type) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+      allowMultiple: false,
+    );
 
     if (result != null) {
+      if (result.files.single.extension?.toLowerCase() != 'pdf') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'يجب رفع ملف PDF فقط',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
       setState(() {
         if (type == 'qualification') {
           qualificationFile = File(result.files.single.path!);
@@ -186,6 +237,31 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         return;
       }
 
+      
+      if (!qualificationFileName.toLowerCase().endsWith('.pdf') ||
+          !licenseFileName.toLowerCase().endsWith('.pdf')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'يجب أن تكون جميع الملفات بصيغة PDF',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
       try {
         showDialog(
           context: context,
@@ -254,6 +330,8 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
               'profileImage': profileUrl,
               'qualificationFile': qualificationUrl,
               'licenseFile': licenseUrl,
+              'createdAt': FieldValue.serverTimestamp(),
+              'status': 'pending',
             });
 
         Navigator.pop(context);
@@ -261,7 +339,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "تم إنشاء الحساب بنجاح",
+              "تم إنشاء الحساب بنجاح وجاري مراجعته من قبل الإدارة",
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
@@ -274,7 +352,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
               borderRadius: BorderRadius.circular(10.r),
             ),
             behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 2),
+            duration: Duration(seconds: 4),
           ),
         );
 
@@ -423,7 +501,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                             controller: lastNameController,
                           ),
                           SizedBox(height: 20.h),
-                          _buildInputField(
+                          _buildEmailField(
                             "البريد الإلكتروني",
                             controller: emailController,
                           ),
@@ -432,15 +510,27 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                             "كلمة المرور",
                             controller: passwordController,
                             validator: _validatePassword,
+                            obscureText: _obscurePassword,
+                            toggleVisibility: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                           ),
                           SizedBox(height: 20.h),
                           _buildPasswordField(
                             "إعادة كتابة كلمة المرور",
                             controller: confirmPasswordController,
                             validator: _validateConfirmPassword,
+                            obscureText: _obscureConfirmPassword,
+                            toggleVisibility: () {
+                              setState(() {
+                                _obscureConfirmPassword = !_obscureConfirmPassword;
+                              });
+                            },
                           ),
                           SizedBox(height: 20.h),
-                          _buildInputField(
+                          _buildPhoneField(
                             "رقم الجوال",
                             controller: phoneController,
                           ),
@@ -469,14 +559,14 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                           SizedBox(height: 20.h),
                           _buildFilePickerButton(
                             icon: Icons.description,
-                            label: 'رفع المؤهلات العلمية',
+                            label: 'رفع المؤهلات العلمية (PDF فقط)',
                             onPressed: () => pickFile('qualification'),
                             fileName: qualificationFileName,
                           ),
                           SizedBox(height: 20.h),
                           _buildFilePickerButton(
                             icon: Icons.assignment,
-                            label: 'رفع الرخصة',
+                            label: 'رفع الرخصة (PDF فقط)',
                             onPressed: () => pickFile('license'),
                             fileName: licenseFileName,
                           ),
@@ -587,10 +677,87 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
     );
   }
 
+  Widget _buildEmailField(String label, {TextEditingController? controller}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
+        SizedBox(height: 10.h),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(225, 95, 27, .3),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            textAlign: TextAlign.right,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 15.h,
+              ),
+            ),
+            validator: _validateEmail,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhoneField(String label, {TextEditingController? controller}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
+        SizedBox(height: 10.h),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(225, 95, 27, .3),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            textAlign: TextAlign.right,
+            keyboardType: TextInputType.phone,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 15.h,
+              ),
+              
+            ),
+            validator: _validatePhone,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPasswordField(
     String label, {
     required TextEditingController controller,
-    String? Function(String?)? validator,
+    required String? Function(String?)? validator,
+    required bool obscureText,
+    required VoidCallback toggleVisibility,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -611,13 +778,20 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
           ),
           child: TextFormField(
             controller: controller,
-            obscureText: true,
+            obscureText: obscureText,
             textAlign: TextAlign.right,
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 20.w,
                 vertical: 15.h,
+              ),
+              prefixIcon: IconButton(
+                icon: Icon(
+                  obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.grey,
+                ),
+                onPressed: toggleVisibility,
               ),
             ),
             validator: validator,

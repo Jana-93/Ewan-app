@@ -99,9 +99,8 @@ class _PsignupState extends State<Psignup> {
     }
   }
 
-  /// Password Validation
-  String? _validatePassword(String value) {
-  if (value.isEmpty) {
+String? _validatePassword(String? value) {
+  if (value == null || value.isEmpty) {
     return "هذا الحقل مطلوب";
   }
   if (value.length < 8) {
@@ -117,32 +116,30 @@ class _PsignupState extends State<Psignup> {
     return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
   }
   return null;
-  }
+}
 
-  /// Confirm Password Validation
-  String? _validateConfirmPassword(String value) {
-    if (value.isEmpty) {
-      return "هذا الحقل مطلوب";
-    }
-    if (value != _passwordController.text) {
-      return "كلمة المرور غير متطابقة";
-    }
-    return null;
+String? _validateConfirmPassword(String? value) {
+  if (value == null || value.isEmpty) {
+    return "هذا الحقل مطلوب";
   }
+  if (value != _passwordController.text) {
+    return "كلمة المرور غير متطابقة";
+  }
+  return null;
+}
 
-  /// Email Validation
-  String? _validateEmail(String value) {
-    if (value.isEmpty) {
-      return "هذا الحقل مطلوب";
-    }
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return "صيغة البريد الإلكتروني غير صحيحة";
-    }
-    return null;
+String? _validateEmail(String? value) {
+  if (value == null || value.isEmpty) {
+    return "هذا الحقل مطلوب";
   }
-  /// Phone Number Validation
-String? _validatePhone(String value) {
-  if (value.isEmpty) {
+  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+    return "صيغة البريد الإلكتروني غير صحيحة";
+  }
+  return null;
+}
+
+String? _validatePhone(String? value) {
+  if (value == null || value.isEmpty) {
     return "هذا الحقل مطلوب";
   }
   if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
@@ -266,10 +263,9 @@ String? _validatePhone(String value) {
                             validator: _validateConfirmPassword,
                           ),
                           SizedBox(height: 20.h),
-                          _buildInputField(
+                          _buildPhoneField(
                             "رقم الجوال",
                             controller: _phoneController,
-                            validator: _validatePhone,
                           ),
                           SizedBox(height: 40.h),
                           FadeInUp(
@@ -383,6 +379,48 @@ String? _validatePhone(String value) {
               if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
               return null;
             },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Reusable Phone Field
+  Widget _buildPhoneField(
+    String label, {
+    TextEditingController? controller,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 16.sp)),
+        SizedBox(height: 10.h),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(225, 95, 27, .3),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            textAlign: TextAlign.right,
+            keyboardType: TextInputType.phone,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 15.h,
+              ),
+              
+            ),
+            validator: _validatePhone,
           ),
         ),
       ],
