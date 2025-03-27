@@ -34,7 +34,11 @@ class _SearchpageState extends State<Searchpage> {
   void initState() {
     super.initState();
     _fetchTherapists();
-    _fetchChildren();
+    _fetchCurrentUserParentId().then((parentId) {
+      if (parentId != null) {
+        _fetchChildren(parentId);
+      }
+    });
   }
 
   Future<void> _fetchTherapists() async {
@@ -52,10 +56,10 @@ class _SearchpageState extends State<Searchpage> {
     }
   }
 
-  Future<void> _fetchChildren() async {
+  Future<void> _fetchChildren(String parentId) async {
     try {
-      List<Map<String, dynamic>> fetchedChildren =
-          await _firestoreService.getchildren();
+      List<Map<String, dynamic>> fetchedChildren = await _firestoreService
+          .getChildrenByParentId(parentId);
       print("Fetched Children: $fetchedChildren");
       setState(() {
         children = fetchedChildren;
@@ -66,6 +70,18 @@ class _SearchpageState extends State<Searchpage> {
         context,
       ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب الأطفال")));
     }
+  }
+
+  Future<String?> _fetchCurrentUserParentId() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        return user.uid; // Assuming the parentId is the user's UID
+      }
+    } catch (e) {
+      print("Error fetching current user parent ID: $e");
+    }
+    return null;
   }
 
   void _onItemTapped(int index) {
@@ -319,7 +335,8 @@ class _SearchpageState extends State<Searchpage> {
                                   vertical: 35.0,
                                   horizontal: 16.0,
                                 ),
-                                leading: CircleAvatar(
+
+                                trailing: CircleAvatar(
                                   backgroundImage:
                                       therapists[index]["profileImage"] != null
                                           ? NetworkImage(
@@ -342,6 +359,7 @@ class _SearchpageState extends State<Searchpage> {
                                             : FontWeight.normal,
                                     fontSize: 16.sp,
                                   ),
+                                  textAlign: TextAlign.right,
                                 ),
                                 subtitle: Column(
                                   crossAxisAlignment:
@@ -349,7 +367,7 @@ class _SearchpageState extends State<Searchpage> {
                                           .end, // Align subtitle to the right
                                   children: [
                                     Align(
-                                      alignment: Alignment.centerLeft,
+                                      alignment: Alignment.centerRight,
                                       child: IntrinsicWidth(
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
@@ -409,19 +427,27 @@ class _SearchpageState extends State<Searchpage> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         Text(
-                                          therapists[index]["experience"] ?? "Experience Unavailable",
+                                          therapists[index]["experience"] ??
+                                              "Experience Unavailable",
                                           style: TextStyle(
-                                            color: isSelected ? Colors.orange : Colors.green,
+                                            color:
+                                                isSelected
+                                                    ? Colors.orange
+                                                    : Colors.green,
                                             fontSize: 16.sp,
                                           ),
                                         ),
-                                        SizedBox(width: 8.w), // مسافة بين سنوات الخبرة والتقييم
+                                        SizedBox(
+                                          width: 8.w,
+                                        ), // مسافة بين سنوات الخبرة والتقييم
                                         Icon(
                                           Icons.star,
                                           color: Colors.orange,
                                           size: 20.sp,
                                         ),
-                                        SizedBox(width: 4.w), // مسافة صغيرة بين الأيقونة والنص
+                                        SizedBox(
+                                          width: 4.w,
+                                        ), // مسافة صغيرة بين الأيقونة والنص
                                         Text(
                                           "${therapists[index]["averageRating"]?.toStringAsFixed(2) ?? "0.00"}",
                                           style: TextStyle(
@@ -438,7 +464,7 @@ class _SearchpageState extends State<Searchpage> {
                                     setState(() {
                                       selectedTherapistIndex = index;
                                     });
-                                    await _fetchChildren();
+                                    await _fetchCurrentUserParentId;
                                   } catch (e) {
                                     print("Error fetching children: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -476,7 +502,7 @@ class _SearchpageState extends State<Searchpage> {
                                   color:
                                       isSelected
                                           ? Colors.orange.withOpacity(0.2)
-                                          : Colors.orange,
+                                          : Color.fromARGB(255, 250, 165, 95),
                                   child: ListTile(
                                     title: Text(
                                       "${children[index]["childName"] ?? "No Name"}",
@@ -484,7 +510,7 @@ class _SearchpageState extends State<Searchpage> {
                                         color:
                                             isSelected
                                                 ? Colors.orange
-                                                : Colors.black,
+                                                : Colors.white,
                                         fontWeight:
                                             isSelected
                                                 ? FontWeight.bold

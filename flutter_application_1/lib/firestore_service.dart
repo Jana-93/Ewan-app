@@ -2,14 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreService {
-  final CollectionReference appointments =
-      FirebaseFirestore.instance.collection('appointments');
-  final CollectionReference therapistsCollection =
-      FirebaseFirestore.instance.collection('therapists');
-  final CollectionReference childrenCollection =
-      FirebaseFirestore.instance.collection('children');
-  final CollectionReference parentsCollection =
-      FirebaseFirestore.instance.collection('parents');
+  final CollectionReference appointments = FirebaseFirestore.instance
+      .collection('appointments');
+  final CollectionReference therapistsCollection = FirebaseFirestore.instance
+      .collection('therapists');
+  final CollectionReference childrenCollection = FirebaseFirestore.instance
+      .collection('children');
+  final CollectionReference parentsCollection = FirebaseFirestore.instance
+      .collection('parents');
 
   Future<void> addAppointment(Map<String, dynamic> data) async {
     try {
@@ -63,11 +63,22 @@ class FirestoreService {
   }
 
   Stream<List<Map<String, dynamic>>> getAppointments() {
-    return appointments.snapshots().map(
-      (snapshot) => snapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList(),
-    );
+    // Retrieve the current user's ID
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("User not logged in");
+    }
+
+    // Filter appointments by the current user's ID
+    return appointments
+        .where('userId', isEqualTo: user.uid) // Filter by user ID
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map((doc) => doc.data() as Map<String, dynamic>)
+                  .toList(),
+        );
   }
 
   Future<List<Map<String, dynamic>>> getTherapists() async {
@@ -101,7 +112,6 @@ class FirestoreService {
     }
   }
 
-
   Future<List<Map<String, dynamic>>> getchildren() async {
     List<Map<String, dynamic>> children = [];
     try {
@@ -122,7 +132,6 @@ class FirestoreService {
     return children;
   }
 
-  
   Future<List<Map<String, dynamic>>> getChildrenForCurrentUser() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -131,9 +140,8 @@ class FirestoreService {
 
     List<Map<String, dynamic>> children = [];
     try {
-      QuerySnapshot snapshot = await childrenCollection
-          .where("parentId", isEqualTo: user.uid)
-          .get();
+      QuerySnapshot snapshot =
+          await childrenCollection.where("parentId", isEqualTo: user.uid).get();
       for (var doc in snapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         children.add({
@@ -182,9 +190,10 @@ class FirestoreService {
       throw Exception("childName is empty");
     }
     try {
-      QuerySnapshot snapshot = await childrenCollection
-          .where('childName', isEqualTo: childName)
-          .get();
+      QuerySnapshot snapshot =
+          await childrenCollection
+              .where('childName', isEqualTo: childName)
+              .get();
       if (snapshot.docs.isNotEmpty) {
         Map<String, dynamic> data =
             snapshot.docs.first.data() as Map<String, dynamic>;
@@ -203,6 +212,35 @@ class FirestoreService {
       throw e;
     }
   }
+
+  final CollectionReference children = FirebaseFirestore.instance.collection(
+    'children',
+  );
+
+  // Method to fetch children by parent ID
+  Future<List<Map<String, dynamic>>> getChildrenByParentId(
+    String parentId,
+  ) async {
+    List<Map<String, dynamic>> children = [];
+    try {
+      // Query the Firestore collection using the correct reference
+      QuerySnapshot snapshot =
+          await childrenCollection.where("parentId", isEqualTo: parentId).get();
+
+      // Iterate over the documents in the snapshot
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        children.add({
+          "childName": data["childName"],
+          "parentId": data["parentId"],
+        });
+      }
+    } catch (e) {
+      print("Error fetching children for parent ID: $e");
+    }
+    return children;
+  }
+
   // دالة لإضافة تقييم وتحديث متوسط التقييمات
   Future<void> addRating(String uid, double rating) async {
     try {
@@ -213,10 +251,8 @@ class FirestoreService {
       });
 
       // حساب متوسط التقييمات
-      QuerySnapshot ratingsSnapshot = await therapistsCollection
-          .doc(uid)
-          .collection('ratings')
-          .get();
+      QuerySnapshot ratingsSnapshot =
+          await therapistsCollection.doc(uid).collection('ratings').get();
 
       double totalRating = 0.0;
       for (var doc in ratingsSnapshot.docs) {
@@ -234,6 +270,4 @@ class FirestoreService {
       throw e;
     }
   }
-
-  
 }

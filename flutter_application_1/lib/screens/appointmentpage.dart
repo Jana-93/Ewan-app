@@ -20,6 +20,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
   final FirestoreService _firestoreService = FirestoreService();
 
   void _onItemTapped(int index) {
+    if (selectedIndex == index) return;
     setState(() {
       selectedIndex = index;
     });
@@ -122,9 +123,11 @@ class _AppointmentpageState extends State<Appointmentpage> {
                               return Text('Error: ${snapshot.error}');
                             }
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return Text('No upcoming appointments available.');
+                              return Center(
+                                child: Text('لا يوجد مواعيد قادمة'),
+                              );
                             }
-      
+
                             List<dynamic> upcomingSchedules =
                                 snapshot.data!
                                     .where(
@@ -132,7 +135,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
                                           schedule['status'] == 'upcoming',
                                     )
                                     .toList();
-      
+
                             return FadeInUp(
                               duration: const Duration(milliseconds: 1400),
                               child: Column(
@@ -148,7 +151,8 @@ class _AppointmentpageState extends State<Appointmentpage> {
                                       itemBuilder: (context, index) {
                                         var schedule = upcomingSchedules[index];
                                         bool isLastElement =
-                                            index == upcomingSchedules.length - 1;
+                                            index ==
+                                            upcomingSchedules.length - 1;
                                         return AppointmentCard(
                                           key: ValueKey(
                                             schedule['date'],
@@ -312,9 +316,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
               ),
             ],
           ),
-          margin: !widget.isLastElement
-              ? EdgeInsets.only(bottom: 20.h)
-              : EdgeInsets.zero,
+          margin:
+              !widget.isLastElement
+                  ? EdgeInsets.only(bottom: 20.h)
+                  : EdgeInsets.zero,
           child: Padding(
             padding: EdgeInsets.all(15.r),
             child: Column(
@@ -323,9 +328,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 Row(
                   children: [
                     CircleAvatar(
-                      backgroundImage: therapistData['profileImage'] != null
-                          ? NetworkImage(therapistData['profileImage'])
-                          : AssetImage("assets/images/icon.jpg"),
+                      backgroundImage:
+                          therapistData['profileImage'] != null
+                              ? NetworkImage(therapistData['profileImage'])
+                              : AssetImage("assets/images/icon.jpg"),
                     ),
                     SizedBox(width: 10.w),
                     Column(
@@ -341,7 +347,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         ),
                         SizedBox(height: 5.h),
                         Text(
-                          therapistData['specialty'] ?? "No Specialty Information",
+                          therapistData['specialty'] ??
+                              "No Specialty Information",
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: 12.sp,
@@ -400,10 +407,13 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => VideoCallScreen(
-                                user: 'patient',
-                                therapistUid: widget.schedule['therapistUid'], uid: '', // تمرير therapistUid هنا
-                              ),
+                              builder:
+                                  (context) => VideoCallScreen(
+                                    user: 'patient',
+                                    therapistUid:
+                                        widget.schedule['therapistUid'],
+                                    uid: '', // تمرير therapistUid هنا
+                                  ),
                             ),
                           );
                         },
