@@ -20,7 +20,6 @@ class _AppointmentpageState extends State<Appointmentpage> {
   final FirestoreService _firestoreService = FirestoreService();
 
   void _onItemTapped(int index) {
-    if (selectedIndex == index) return;
     setState(() {
       selectedIndex = index;
     });

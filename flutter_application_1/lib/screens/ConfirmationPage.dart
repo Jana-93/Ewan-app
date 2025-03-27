@@ -23,31 +23,52 @@ class ConfirmationPage extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("تأكيد الحجز   "),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            
-            SizedBox(height: 20),
-            Text(
-              "    لتأكيد الحجز!",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return Material(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            children: [
+              Image.asset("assets/images/tick.jpg", height: 200),
+              // Ensure the correct asset path
+              SizedBox(height: 5),
+              Text(
+                "!تم الدفع بنجاح",
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1,
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                "تم تأكيد حجزك",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 1,
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 30),
+          ElevatedButton(
+            onPressed: () async {
+              // Execute the required code after confirmation
+              await _addAppointment(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 255, 163, 26),
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+              elevation: 5,
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                // تنفيذ الكود المطلوب بعد التأكيد
-                await _addAppointment(context);
-              },
-              child: Text("تأكيد الحجز"),
-            ),
-          ],
-        ),
+            child: Text(" العودة للرئيسية", style: TextStyle(fontSize: 20)),
+          ),
+        ],
       ),
     );
   }
@@ -78,9 +99,9 @@ class ConfirmationPage extends StatelessWidget {
       print("Appointment added successfully");
 
       // عرض رسالة نجاح
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("تم حجز الموعد بنجاح!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("تم حجز الموعد بنجاح!")));
 
       // الانتقال إلى الصفحة الرئيسية أو أي صفحة أخرى
       Navigator.pushReplacement(

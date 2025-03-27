@@ -33,15 +33,15 @@ class _ChildFeedbackState extends State<ChildFeedback> {
                   // Header Section
                   _buildHeader(),
                   SizedBox(height: 40.h),
-                  
+
                   // Illustration
                   _buildIllustration(),
                   SizedBox(height: 40.h),
-                  
+
                   // Rating Section
                   _buildRatingSection(),
                   SizedBox(height: 40.h),
-                  
+
                   // Buttons Section
                   _buildActionButtons(),
                 ],
@@ -61,10 +61,11 @@ class _ChildFeedbackState extends State<ChildFeedback> {
           children: [
             IconButton(
               icon: Icon(Icons.close, size: 28.sp, color: Colors.grey),
-              onPressed: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Homepage()),
-              ),
+              onPressed:
+                  () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Homepage()),
+                  ),
             ),
           ],
         ),
@@ -106,12 +107,7 @@ class _ChildFeedbackState extends State<ChildFeedback> {
           ),
         ],
       ),
-      child: Image.asset(
-        'assets/images/rrr.jpg',
-        width: 180.w,
-        height: 180.h,
-      
-      ),
+      child: Image.asset('assets/images/rrr.jpg', width: 180.w, height: 180.h),
     );
   }
 
@@ -126,10 +122,8 @@ class _ChildFeedbackState extends State<ChildFeedback> {
           itemCount: 5,
           itemSize: 50.sp,
           itemPadding: EdgeInsets.symmetric(horizontal: 6.w),
-          itemBuilder: (context, _) => Icon(
-            Icons.star_rounded,
-            color: Colors.amber,
-          ),
+          itemBuilder:
+              (context, _) => Icon(Icons.star_rounded, color: Colors.amber),
           unratedColor: Colors.grey[300],
           glowColor: Colors.amber.withAlpha(50),
           onRatingUpdate: (rating) => setState(() => _rating = rating),
@@ -173,10 +167,11 @@ class _ChildFeedbackState extends State<ChildFeedback> {
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () => Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => Homepage()),
-            ),
+            onPressed:
+                () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Homepage()),
+                ),
             style: OutlinedButton.styleFrom(
               padding: EdgeInsets.symmetric(vertical: 16.h),
               side: BorderSide(color: Colors.grey[300]!),
@@ -207,23 +202,24 @@ class _ChildFeedbackState extends State<ChildFeedback> {
               ),
               elevation: 0,
             ),
-            child: _isSubmitting
-                ? SizedBox(
-                    width: 20.w,
-                    height: 20.h,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+            child:
+                _isSubmitting
+                    ? SizedBox(
+                      width: 20.w,
+                      height: 20.h,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                    : Text(
+                      'إرسال التقييم',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  )
-                : Text(
-                    'إرسال التقييم',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
           ),
         ),
       ],
@@ -232,59 +228,58 @@ class _ChildFeedbackState extends State<ChildFeedback> {
 
   Future<void> _submitRating() async {
     setState(() => _isSubmitting = true);
-    
+
     try {
       await _firestoreService.addRating(widget.uid, _rating);
-      
+
       // Show success dialog
       await showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 60.sp),
-              SizedBox(height: 16.h),
-              Text(
-                'شكراً لك!',
-                style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.bold,
-                ),
+        builder:
+            (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
               ),
-              SizedBox(height: 8.h),
-              Text(
-                'تم استلام تقييمك بنجاح',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: Colors.grey[600],
-                ),
-              ),
-              SizedBox(height: 24.h),
-              ElevatedButton(
-                onPressed: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => Homepage()),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 242, 141, 59),
-                  minimumSize: Size(double.infinity, 48.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 60.sp),
+                  SizedBox(height: 16.h),
+                  Text(
+                    '!شكراً لك',
+                    style: TextStyle(
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                child: Text(
-                  'العودة للرئيسية',
-                  style: TextStyle(fontSize: 16.sp,color: Colors.black),
-                ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'تم استلام تقييمك بنجاح',
+                    style: TextStyle(fontSize: 18.sp, color: Colors.grey[600]),
+                  ),
+                  SizedBox(height: 24.h),
+                  ElevatedButton(
+                    onPressed:
+                        () => Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => Homepage()),
+                        ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 242, 141, 59),
+                      minimumSize: Size(double.infinity, 48.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    child: Text(
+                      'العودة للرئيسية',
+                      style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       );
     } catch (e) {
       setState(() => _isSubmitting = false);
