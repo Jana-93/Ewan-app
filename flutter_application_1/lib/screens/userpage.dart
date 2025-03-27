@@ -165,7 +165,7 @@ class _UserPageState extends State<UserPage> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(50.r),
                                 child: Image.asset(
-                                  "assets/images/user-icon.jpg",
+                                  "assets/images/icon.jpg",
                                   width: 100.w,
                                   height: 90.h,
                                   fit: BoxFit.cover,
