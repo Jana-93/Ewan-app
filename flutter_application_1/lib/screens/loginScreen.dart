@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                SizedBox(height: 40.h),
+                SizedBox(height: 20.h),
                 Padding(
                   padding: EdgeInsets.all(20.r),
                   child: Column(
@@ -179,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.right,
                         ),
                       ),
-                      SizedBox(height: 10.h),
+                      // SizedBox(height: 10.h),
                     ],
                   ),
                 ),
@@ -187,8 +187,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50.r),
-                      topRight: Radius.circular(50.r),
+                      topLeft: Radius.circular(30.r),
+                      topRight: Radius.circular(30.r),
                     ),
                   ),
                   child: Padding(

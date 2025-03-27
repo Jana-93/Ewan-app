@@ -135,7 +135,7 @@ class _UserPageState extends State<UserPage> {
                       children: [
                         Container(
                           width: double.infinity,
-                          padding: EdgeInsets.only(top: 50.h),
+                          padding: EdgeInsets.only(top: 30.h),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               begin: Alignment.topLeft,
@@ -180,7 +180,7 @@ class _UserPageState extends State<UserPage> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 10.h),
+                              // SizedBox(height: 10.h),
                               Text(
                                 email,
                                 style: TextStyle(

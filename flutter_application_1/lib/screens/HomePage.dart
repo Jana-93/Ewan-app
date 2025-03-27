@@ -77,101 +77,103 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              colors: const [
-                Color.fromARGB(255, 219, 101, 37),
-                Color.fromRGBO(239, 108, 0, 1),
-                Color.fromRGBO(255, 167, 38, 1),
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              SizedBox(height: 40.h),
-              Padding(
-                padding: EdgeInsets.all(20.r),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    FadeInUp(
-                      duration: const Duration(milliseconds: 1000),
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: userFirstName,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40.sp,
-                              ),
-                            ),
-                            TextSpan(
-                              text: " ,أهلاً",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                  ],
-                ),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                colors: const [
+                  Color.fromARGB(255, 219, 101, 37),
+                  Color.fromRGBO(239, 108, 0, 1),
+                  Color.fromRGBO(255, 167, 38, 1),
+                ],
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50.r),
-                    topRight: Radius.circular(50.r),
-                  ),
-                ),
-                child: Padding(
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                SizedBox(height: 10.h),
+                Padding(
                   padding: EdgeInsets.all(20.r),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      SizedBox(height: 40.h),
-                      _buildHealthConsultation(),
-                      SizedBox(height: 20.h),
                       FadeInUp(
-                        duration: const Duration(milliseconds: 1400),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            SizedBox(height: 20.h),
-                            Container(
-                              padding: EdgeInsets.all(10.r),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(color: Colors.white),
+                        duration: const Duration(milliseconds: 1000),
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: userFirstName,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 40.sp,
                                 ),
                               ),
-                            ),
-                          ],
+                              TextSpan(
+                                text: " ,أهلاً",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 40.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.right,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30.r),
+                      topRight: Radius.circular(30.r),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(20.r),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(height: 40.h),
+                        _buildHealthConsultation(),
+                        SizedBox(height: 20.h),
+                        FadeInUp(
+                          duration: const Duration(milliseconds: 1400),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              SizedBox(height: 20.h),
+                              Container(
+                                padding: EdgeInsets.all(10.r),
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: FadeInUp(
-        duration: const Duration(milliseconds: 1000),
-        child: navBar(),
+        bottomNavigationBar: FadeInUp(
+          duration: const Duration(milliseconds: 1000),
+          child: navBar(),
+        ),
       ),
     );
   }

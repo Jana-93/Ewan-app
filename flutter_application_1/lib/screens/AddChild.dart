@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore for storing user data
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'userpage.dart';
-import 'package:uuid/uuid.dart'; // Import uuid package
+import 'package:uuid/uuid.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AddChild extends StatefulWidget {
@@ -15,76 +15,55 @@ class AddChild extends StatefulWidget {
 
 class _AddChildState extends State<AddChild> {
   final _formKey = GlobalKey<FormState>();
-
-  // Controllers for user input fields
   final TextEditingController _childNameController = TextEditingController();
-  String? selectedChildAge; // Variable to hold the selected age
+  String? selectedChildAge;
   final TextEditingController _childStatusController = TextEditingController();
+  String? childId;
 
-  // Add childId as a variable
-  String? childId; // This will hold the childId
-
-  /// Function to Register Child
   Future<void> registerChild() async {
     try {
-      // Get the current user (parent)
-      User? user = FirebaseAuth.instance.currentUser;
+      // Validate form first
+      if (!_formKey.currentState!.validate()) {
+        return;
+      }
+
+      final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         throw Exception("المستخدم غير مسجل دخول");
       }
 
-      // Check if all fields are empty
-      if (_childNameController.text.trim().isEmpty &&
-          selectedChildAge == null &&
-          _childStatusController.text.trim().isEmpty) {
-        throw Exception("يرجى تعبئة الحقول");
-      }
+      // Trim all inputs
+      final childName = _childNameController.text.trim();
+      final childStatus = _childStatusController.text.trim();
 
-      if (_childNameController.text.trim().isEmpty) {
-        throw Exception("يرجى إدخال اسم الطفل");
-      }
-
-      if (selectedChildAge == null) {
-        throw Exception("يرجى اختيار عمر الطفل");
-      }
-
-      if (_childStatusController.text.trim().isEmpty) {
-        throw Exception("يرجى إدخال حالة الطفل");
-      }
-
-      // Check if a child with the same name already exists
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance
-              .collection("children")
-              .where("childName", isEqualTo: _childNameController.text.trim())
-              .where(
-                "parentId",
-                isEqualTo: user.uid,
-              ) // Ensure it's the same parent
-              .get();
+      // Check for existing child with same name for this parent
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection("children")
+          .where("childName", isEqualTo: childName)
+          .where("parentId", isEqualTo: user.uid)
+          .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         throw Exception("يوجد طفل بنفس الاسم بالفعل");
       }
 
-      // Generate a unique childId
-      var uuid = Uuid();
-      childId = uuid.v4(); // Assign a unique ID to childId
+      // Generate unique ID
+      childId = Uuid().v4();
 
-      // Always store in "children" collection, and add the parentId (user's uid)
+      // Add child to Firestore
       await FirebaseFirestore.instance.collection("children").add({
-        "childId": childId, // Add the generated childId
-        "childName": _childNameController.text.trim(),
-        "childAge": selectedChildAge, // Use selected child age
-        "childStatus": _childStatusController.text.trim(),
-        "parentId": user.uid, // Adding parentId to associate with the child
+        "childId": childId,
+        "childName": childName,
+        "childAge": selectedChildAge,
+        "childStatus": childStatus,
+        "parentId": user.uid,
       });
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "تمت إضافة الطفل بنجاح ",
+            "تمت إضافة الطفل بنجاح",
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
@@ -101,18 +80,17 @@ class _AddChildState extends State<AddChild> {
         ),
       );
 
-      // Redirect to HomePage
+      // Navigate to UserPage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => UserPage()),
       );
     } catch (e) {
       print("Error: $e");
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            e.toString(),
+            e.toString().replaceAll('Exception: ', ''),
             style: TextStyle(fontSize: 16.sp, color: Colors.white),
             textAlign: TextAlign.center,
           ),
@@ -147,7 +125,7 @@ class _AddChildState extends State<AddChild> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  SizedBox(height: 70.h),
+                  SizedBox(height: 45.h),
                   Padding(
                     padding: EdgeInsets.all(10.r),
                     child: Column(
@@ -172,8 +150,8 @@ class _AddChildState extends State<AddChild> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60.r),
-                        topRight: Radius.circular(60.r),
+                        topLeft: Radius.circular(30.r),
+                        topRight: Radius.circular(30.r),
                       ),
                     ),
                     child: Padding(
@@ -191,13 +169,25 @@ class _AddChildState extends State<AddChild> {
                             _buildInputField(
                               "اسم الطفل",
                               controller: _childNameController,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return "يرجى إدخال اسم الطفل";
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 20.h),
-                            _buildAgeDropdown(), // Use dropdown for age
+                            _buildAgeDropdown(),
                             SizedBox(height: 20.h),
                             _buildInputField(
                               "حالة الطفل",
                               controller: _childStatusController,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return "يرجى إدخال حالة الطفل";
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 40.h),
                             FadeInUp(
@@ -217,11 +207,7 @@ class _AddChildState extends State<AddChild> {
                                       borderRadius: BorderRadius.circular(10.r),
                                     ),
                                   ),
-                                  onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      await registerChild(); // Call register function
-                                    }
-                                  },
+                                  onPressed: registerChild,
                                   child: Text(
                                     "إضافة طفل",
                                     style: TextStyle(
@@ -265,10 +251,9 @@ class _AddChildState extends State<AddChild> {
     );
   }
 
-  /// Reusable Input Field
   Widget _buildInputField(
     String label, {
-    TextEditingController? controller,
+    required TextEditingController controller,
     String? Function(String?)? validator,
   }) {
     return Column(
@@ -290,7 +275,7 @@ class _AddChildState extends State<AddChild> {
           ),
           child: TextFormField(
             controller: controller,
-            textAlign: TextAlign.right, // Align text to the right
+            textAlign: TextAlign.right,
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
@@ -305,7 +290,6 @@ class _AddChildState extends State<AddChild> {
     );
   }
 
-  /// Dropdown for child's age
   Widget _buildAgeDropdown() {
     List<String> ages = List.generate(7, (index) => (5 + index).toString());
 
@@ -349,19 +333,18 @@ class _AddChildState extends State<AddChild> {
               ),
               icon: Icon(Icons.arrow_drop_down, color: Colors.grey),
               iconEnabledColor: Colors.grey,
-              items:
-                  ages.map((age) {
-                    return DropdownMenuItem<String>(
-                      value: age,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(age),
-                      ),
-                    );
-                  }).toList(),
+              items: ages.map((age) {
+                return DropdownMenuItem<String>(
+                  value: age,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(age),
+                  ),
+                );
+              }).toList(),
               onChanged: (value) {
                 setState(() {
-                  selectedChildAge = value; // Update selected child age
+                  selectedChildAge = value;
                 });
               },
               validator: (value) {

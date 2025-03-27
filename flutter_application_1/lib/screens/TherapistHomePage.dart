@@ -80,7 +80,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                SizedBox(height: 60.h),
+                SizedBox(height: 40.h),
                 Padding(
                   padding: EdgeInsets.all(10.r),
                   child: FutureBuilder<Map<String, dynamic>>(
@@ -140,13 +140,13 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                     },
                   ),
                 ),
-                SizedBox(height: 20.h),
+                // SizedBox(height: 10.h),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50.r),
-                      topRight: Radius.circular(50.r),
+                      topLeft: Radius.circular(30.r),
+                      topRight: Radius.circular(30.r),
                     ),
                   ),
                   child: Padding(

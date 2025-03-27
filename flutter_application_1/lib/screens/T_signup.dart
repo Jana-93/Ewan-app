@@ -339,7 +339,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "تم إنشاء الحساب بنجاح وجاري مراجعته من قبل الإدارة",
+              "تم إنشاء الحساب بنجاح",
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
@@ -426,7 +426,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                SizedBox(height: 50.h),
+                SizedBox(height: 40.h),
                 Padding(
                   padding: EdgeInsets.all(10.r),
                   child: Column(
@@ -444,7 +444,7 @@ class _TherapistSignUpPageState extends State<TherapistSignUpPage> {
                           textAlign: TextAlign.right,
                         ),
                       ),
-                      SizedBox(height: 10.h),
+                      
                     ],
                   ),
                 ),

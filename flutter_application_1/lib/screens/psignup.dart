@@ -169,7 +169,7 @@ String? _validatePhone(String? value) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                SizedBox(height: 50.h),
+                SizedBox(height: 40.h),
                 Padding(
                   padding: EdgeInsets.all(10.r),
                   child: Column(
@@ -187,7 +187,7 @@ String? _validatePhone(String? value) {
                           textAlign: TextAlign.right,
                         ),
                       ),
-                      SizedBox(height: 10.h),
+                      // SizedBox(height: 10.h),
                     ],
                   ),
                 ),
@@ -195,8 +195,8 @@ String? _validatePhone(String? value) {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40.r),
-                      topRight: Radius.circular(40.r),
+                      topLeft: Radius.circular(30.r),
+                      topRight: Radius.circular(30.r),
                     ),
                   ),
                   child: Padding(

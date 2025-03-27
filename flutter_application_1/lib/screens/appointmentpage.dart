@@ -54,124 +54,126 @@ class _AppointmentpageState extends State<Appointmentpage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              colors: [
-                const Color.fromARGB(255, 219, 101, 37),
-                const Color.fromRGBO(239, 108, 0, 1),
-                const Color.fromRGBO(255, 167, 38, 1),
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              SizedBox(height: 60.h),
-              Padding(
-                padding: EdgeInsets.all(20.r),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    FadeInUp(
-                      duration: const Duration(milliseconds: 1000),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "مواعيدي",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 40.sp,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                colors: [
+                  const Color.fromARGB(255, 219, 101, 37),
+                  const Color.fromRGBO(239, 108, 0, 1),
+                  const Color.fromRGBO(255, 167, 38, 1),
+                ],
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50.r),
-                    topRight: Radius.circular(50.r),
-                  ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(30.r),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                SizedBox(height: 20.h),
+                Padding(
+                  padding: EdgeInsets.all(20.r),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      // Use StreamBuilder to fetch appointments from Firestore
-                      StreamBuilder<List<Map<String, dynamic>>>(
-                        stream: _firestoreService.getAppointments(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          }
-                          if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          }
-                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Text('No upcoming appointments available.');
-                          }
-
-                          List<dynamic> upcomingSchedules =
-                              snapshot.data!
-                                  .where(
-                                    (schedule) =>
-                                        schedule['status'] == 'upcoming',
-                                  )
-                                  .toList();
-
-                          return FadeInUp(
-                            duration: const Duration(milliseconds: 1400),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(10.r),
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: upcomingSchedules.length,
-                                    itemBuilder: (context, index) {
-                                      var schedule = upcomingSchedules[index];
-                                      bool isLastElement =
-                                          index == upcomingSchedules.length - 1;
-                                      return AppointmentCard(
-                                        key: ValueKey(
-                                          schedule['date'],
-                                        ), // Ensure unique key
-                                        schedule: schedule,
-                                        isLastElement: isLastElement,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
+                      FadeInUp(
+                        duration: const Duration(milliseconds: 1000),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "مواعيدي",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 40.sp,
+                              ),
+                              textAlign: TextAlign.right,
                             ),
-                          );
-                        },
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30.r),
+                      topRight: Radius.circular(30.r),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(30.r),
+                    child: Column(
+                      children: <Widget>[
+                        // Use StreamBuilder to fetch appointments from Firestore
+                        StreamBuilder<List<Map<String, dynamic>>>(
+                          stream: _firestoreService.getAppointments(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            }
+                            if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            }
+                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return Text('No upcoming appointments available.');
+                            }
+      
+                            List<dynamic> upcomingSchedules =
+                                snapshot.data!
+                                    .where(
+                                      (schedule) =>
+                                          schedule['status'] == 'upcoming',
+                                    )
+                                    .toList();
+      
+                            return FadeInUp(
+                              duration: const Duration(milliseconds: 1400),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.all(10.r),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: upcomingSchedules.length,
+                                      itemBuilder: (context, index) {
+                                        var schedule = upcomingSchedules[index];
+                                        bool isLastElement =
+                                            index == upcomingSchedules.length - 1;
+                                        return AppointmentCard(
+                                          key: ValueKey(
+                                            schedule['date'],
+                                          ), // Ensure unique key
+                                          schedule: schedule,
+                                          isLastElement: isLastElement,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
+        bottomNavigationBar: navBar(),
       ),
-      bottomNavigationBar: navBar(),
     );
   }
 

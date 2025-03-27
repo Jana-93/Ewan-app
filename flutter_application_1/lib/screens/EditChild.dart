@@ -172,13 +172,13 @@ class _EditChildState extends State<EditChild> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  SizedBox(height: 70.h),
+                  SizedBox(height: 40.h),
                   Padding(
                     padding: EdgeInsets.all(20.r),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        SizedBox(height: 10.h),
+                      
                         Text(
                           "تعديل بيانات الطفل",
                           style: TextStyle(color: Colors.white, fontSize: 30.sp),
@@ -191,8 +191,8 @@ class _EditChildState extends State<EditChild> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(40.r),
-                        topRight: Radius.circular(40.r),
+                        topLeft: Radius.circular(30.r),
+                        topRight: Radius.circular(30.r),
                       ),
                     ),
                     child: Padding(

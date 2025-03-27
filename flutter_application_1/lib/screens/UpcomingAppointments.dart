@@ -66,13 +66,13 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
                   ],
                 ),
               ),
-              SizedBox(height: 20.h),
+              // SizedBox(height: 10.h),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50.r),
-                    topRight: Radius.circular(50.r),
+                    topLeft: Radius.circular(30.r),
+                    topRight: Radius.circular(30.r),
                   ),
                 ),
                 child: Padding(
