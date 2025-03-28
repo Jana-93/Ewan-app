@@ -140,7 +140,7 @@ class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
                                         children: [
                                           Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                CrossAxisAlignment.end,//اسم الطفل يمين 
                                             children: [
                                               Text(
                                                 appointment['childName'] ??

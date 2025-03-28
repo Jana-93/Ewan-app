@@ -315,26 +315,19 @@ class _AppointmentCardState extends State<AppointmentCard> {
               ),
             ],
           ),
-          margin:
-              !widget.isLastElement
-                  ? EdgeInsets.only(bottom: 20.h)
-                  : EdgeInsets.zero,
+          margin: !widget.isLastElement
+              ? EdgeInsets.only(bottom: 20.h)
+              : EdgeInsets.zero,
           child: Padding(
             padding: EdgeInsets.all(15.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end, // تغيير إلى end
                   children: [
-                    CircleAvatar(
-                      backgroundImage:
-                          therapistData['profileImage'] != null
-                              ? NetworkImage(therapistData['profileImage'])
-                              : AssetImage("assets/images/icon.jpg"),
-                    ),
-                    SizedBox(width: 10.w),
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.end, // محاذاة النص إلى اليمين
                       children: [
                         Text(
                           "${therapistData['firstName'] ?? 'Unknown'} ${therapistData['lastName'] ?? ''}",
@@ -346,8 +339,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         ),
                         SizedBox(height: 5.h),
                         Text(
-                          therapistData['specialty'] ??
-                              "No Specialty Information",
+                          therapistData['specialty'] ?? "No Specialty Information",
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: 12.sp,
@@ -355,6 +347,13 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           ),
                         ),
                       ],
+                    ),
+                    SizedBox(width: 10.w),
+                    CircleAvatar(
+                      radius: 25.r,
+                      backgroundImage: therapistData['profileImage'] != null
+                          ? NetworkImage(therapistData['profileImage'])
+                          : AssetImage("assets/images/icon.jpg") as ImageProvider,
                     ),
                   ],
                 ),
@@ -406,13 +405,11 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => VideoCallScreen(
-                                    user: 'patient',
-                                    therapistUid:
-                                        widget.schedule['therapistUid'],
-                                    uid: '', // تمرير therapistUid هنا
-                                  ),
+                              builder: (context) => VideoCallScreen(
+                                user: 'patient',
+                                therapistUid: widget.schedule['therapistUid'],
+                                uid: '', // تمرير therapistUid هنا
+                              ),
                             ),
                           );
                         },
