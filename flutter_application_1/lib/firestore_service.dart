@@ -81,6 +81,20 @@ class FirestoreService {
         );
   }
 
+  Stream<List<Map<String, dynamic>>> getAppointmentsByTherapistId(
+    String therapistId,
+  ) {
+    return appointments
+        .where('therapistUid', isEqualTo: therapistId)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map((doc) => doc.data() as Map<String, dynamic>)
+                  .toList(),
+        );
+  }
+
   Future<List<Map<String, dynamic>>> getTherapists() async {
     List<Map<String, dynamic>> therapists = [];
     try {

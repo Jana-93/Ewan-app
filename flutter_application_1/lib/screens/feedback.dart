@@ -52,12 +52,17 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => TherapistHomePage()),
-            );
+            if (widget.isDoctor) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => TherapistHomePage()),
+              );
+            } else {
+              Navigator.pop(context);
+            }
           },
         ),
+
         actions: [
           Text(
             "مراجعاتي",
@@ -89,7 +94,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       alignment: Alignment.centerRight,
                       child: Container(
                         margin: EdgeInsets.symmetric(
-                          vertical: 5.h,
+                          vertical: 10.h,
                           horizontal: 15.w,
                         ),
 

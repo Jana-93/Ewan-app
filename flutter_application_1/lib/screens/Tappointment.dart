@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:flutter_application_1/callVideo/presentation/views/video_call_screen.dart';
 import 'package:flutter_application_1/feedbackScreen.dart';
 import 'package:flutter_application_1/firestore_service.dart';
 import 'package:flutter_application_1/screens/TherapistHomePage.dart';
 import 'package:flutter_application_1/screens/user_info_page_t.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Tappointment extends StatefulWidget {
-  const Tappointment({super.key});
+  const Tappointment({Key? key}) : super(key: key);
 
   @override
   State<Tappointment> createState() => _TappointmentState();
@@ -113,7 +113,6 @@ class _TappointmentState extends State<Tappointment> {
                   ],
                 ),
               ),
-              // SizedBox(height: 10.h),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -128,7 +127,9 @@ class _TappointmentState extends State<Tappointment> {
                     children: <Widget>[
                       SizedBox(height: 20.h),
                       StreamBuilder<List<Map<String, dynamic>>>(
-                        stream: _firestoreService.getAppointments(),
+                        stream: _firestoreService.getAppointmentsByTherapistId(
+                          FirebaseAuth.instance.currentUser!.uid,
+                        ),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -138,7 +139,7 @@ class _TappointmentState extends State<Tappointment> {
                             return Text('Error: ${snapshot.error}');
                           }
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Text('No upcoming appointments available.');
+                            return Text('لا يوجد مواعيد قادمة');
                           }
 
                           List<dynamic> appointments = snapshot.data!;
@@ -299,8 +300,11 @@ class _TappointmentState extends State<Tappointment> {
                                                                     (
                                                                       context,
                                                                     ) => VideoCallScreen(
-                                                                      user: 'doctor',
-                                                                      therapistUid: appointment['therapistUid'], uid: '', // تمرير therapistUid هنا
+                                                                      user:
+                                                                          'doctor',
+                                                                      therapistUid:
+                                                                          appointment['therapistUid'],
+                                                                      uid: '',
                                                                     ),
                                                               ),
                                                             );
