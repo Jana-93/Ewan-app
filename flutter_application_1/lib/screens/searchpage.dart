@@ -28,6 +28,7 @@ class _SearchpageState extends State<Searchpage> {
   String? selectedTime;
 
   List<Map<String, dynamic>> therapists = [];
+  List<Map<String, dynamic>> filteredTherapists = [];
   List<Map<String, dynamic>> children = [];
 
   @override
@@ -47,6 +48,7 @@ class _SearchpageState extends State<Searchpage> {
           await _firestoreService.getTherapists();
       setState(() {
         therapists = fetchedTherapists;
+        filteredTherapists = fetchedTherapists;
       });
     } catch (e) {
       print("Error fetching therapists: $e");
@@ -115,6 +117,24 @@ class _SearchpageState extends State<Searchpage> {
         );
         break;
     }
+  }
+
+  void _filterTherapists(String query) {
+    setState(() {
+      searchQuery = query;
+      if (query.isEmpty) {
+        filteredTherapists = therapists;
+      } else {
+        filteredTherapists = therapists.where((therapist) {
+          final name = '${therapist["firstName"] ?? ""} ${therapist["lastName"] ?? ""}'.toLowerCase();
+          final specialty = therapist["specialty"]?.toLowerCase() ?? "";
+          final bio = therapist["bio"]?.toLowerCase() ?? "";
+          return name.contains(query.toLowerCase()) || 
+                 specialty.contains(query.toLowerCase()) ||
+                 bio.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -291,7 +311,6 @@ class _SearchpageState extends State<Searchpage> {
                 ],
               ),
             ),
-            // SizedBox(height: 20.h),
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -306,22 +325,30 @@ class _SearchpageState extends State<Searchpage> {
                   child: Column(
                     children: [
                       TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            searchQuery = value;
-                          });
-                        },
+                        onChanged: _filterTherapists,
                         decoration: InputDecoration(
-                          hintText: "اختر الطبيب المناسب لك",
+                          hintText: "ابحث عن الطبيب بالاسم أو التخصص ",
                           prefixIcon: Icon(Icons.search),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                         ),
                       ),
+                      SizedBox(height: 10.h),
+                      if (searchQuery.isNotEmpty && filteredTherapists.isEmpty)
+                        Padding(
+                          padding: EdgeInsets.all(16.w),
+                          child: Text(
+                            "لا توجد نتائج مطابقة للبحث",
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: therapists.length,
+                          itemCount: filteredTherapists.length,
                           itemBuilder: (context, index) {
                             bool isSelected = selectedTherapistIndex == index;
                             return Card(
@@ -338,16 +365,16 @@ class _SearchpageState extends State<Searchpage> {
 
                                 trailing: CircleAvatar(
                                   backgroundImage:
-                                      therapists[index]["profileImage"] != null
+                                      filteredTherapists[index]["profileImage"] != null
                                           ? NetworkImage(
-                                            therapists[index]["profileImage"],
+                                            filteredTherapists[index]["profileImage"],
                                           )
                                           : AssetImage(
                                             "path_to_default_image.jpg",
-                                          ),
+                                          ) as ImageProvider,
                                 ),
                                 title: Text(
-                                  "${therapists[index]["firstName"] ?? ""} ${therapists[index]["lastName"] ?? ""}",
+                                  "${filteredTherapists[index]["firstName"] ?? ""} ${filteredTherapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
                                     color:
                                         isSelected
@@ -389,7 +416,7 @@ class _SearchpageState extends State<Searchpage> {
                                             ),
                                           ),
                                           child: Text(
-                                            therapists[index]["specialty"] ??
+                                            filteredTherapists[index]["specialty"] ??
                                                 "لا يوجد تخصص",
                                             style: const TextStyle(
                                               color: Colors.white,
@@ -405,7 +432,7 @@ class _SearchpageState extends State<Searchpage> {
                                       height: 20,
                                     ), // Add space between specialty and bio
                                     Text(
-                                      therapists[index]["bio"] ??
+                                      filteredTherapists[index]["bio"] ??
                                           "empty", // Display the bio
                                       style: TextStyle(
                                         color: const Color.fromARGB(
@@ -427,7 +454,7 @@ class _SearchpageState extends State<Searchpage> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         Text(
-                                          therapists[index]["experience"] ??
+                                          filteredTherapists[index]["experience"] ??
                                               "Experience Unavailable",
                                           style: TextStyle(
                                             color:
@@ -449,7 +476,7 @@ class _SearchpageState extends State<Searchpage> {
                                           width: 4.w,
                                         ), // مسافة صغيرة بين الأيقونة والنص
                                         Text(
-                                          "${therapists[index]["averageRating"]?.toStringAsFixed(2) ?? "0.00"}",
+                                          "${filteredTherapists[index]["averageRating"]?.toStringAsFixed(2) ?? "0.00"}",
                                           style: TextStyle(
                                             color: Colors.orange,
                                             fontSize: 16.sp,
@@ -462,7 +489,8 @@ class _SearchpageState extends State<Searchpage> {
                                 onTap: () async {
                                   try {
                                     setState(() {
-                                      selectedTherapistIndex = index;
+                                      selectedTherapistIndex = therapists.indexWhere((t) => 
+                                        t["id"] == filteredTherapists[index]["id"]);
                                     });
                                     await _fetchCurrentUserParentId;
                                   } catch (e) {
