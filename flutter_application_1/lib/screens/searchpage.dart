@@ -52,25 +52,23 @@ class _SearchpageState extends State<Searchpage> {
       });
     } catch (e) {
       print("Error fetching therapists: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")));
     }
   }
 
   Future<void> _fetchChildren(String parentId) async {
     try {
-      List<Map<String, dynamic>> fetchedChildren = await _firestoreService
-          .getChildrenByParentId(parentId);
+      List<Map<String, dynamic>> fetchedChildren =
+          await _firestoreService.getChildrenByParentId(parentId);
       print("Fetched Children: $fetchedChildren");
       setState(() {
         children = fetchedChildren;
       });
     } catch (e) {
       print("Error fetching children: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب الأطفال")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب الأطفال")));
     }
   }
 
@@ -78,7 +76,7 @@ class _SearchpageState extends State<Searchpage> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        return user.uid; // Assuming the parentId is the user's UID
+        return user.uid;
       }
     } catch (e) {
       print("Error fetching current user parent ID: $e");
@@ -221,16 +219,14 @@ class _SearchpageState extends State<Searchpage> {
         selectedTime = selected;
       });
 
-      // افتح رابط الدفع Stripe في متصفح خارجي
       await _launchPaymentUrl();
     }
   }
 
   Future<void> _launchPaymentUrl() async {
-    const url = "https://buy.stripe.com/test_8wMeYogGXfwq1occMO"; // رابط الدفع
+    const url = "https://buy.stripe.com/test_8wMeYogGXfwq1occMO";
 
     try {
-      // افتح المتصفح
       await FlutterWebBrowser.openWebPage(
         url: url,
         customTabsOptions: CustomTabsOptions(
@@ -252,9 +248,8 @@ class _SearchpageState extends State<Searchpage> {
       _navigateToConfirmationPage(context);
     } catch (e) {
       print("Error launching payment URL: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("تعذر فتح رابط الدفع")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("تعذر فتح رابط الدفع")));
     }
   }
 
@@ -262,16 +257,15 @@ class _SearchpageState extends State<Searchpage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => ConfirmationPage(
-              therapists: therapists,
-              selectedTherapistIndex: selectedTherapistIndex,
-              children: children,
-              selectedChildIndex: selectedChildIndex,
-              selectedDay: _selectedDay!,
-              selectedTime: selectedTime!,
-              firestoreService: _firestoreService,
-            ),
+        builder: (context) => ConfirmationPage(
+          therapists: therapists,
+          selectedTherapistIndex: selectedTherapistIndex,
+          children: children,
+          selectedChildIndex: selectedChildIndex,
+          selectedDay: _selectedDay!,
+          selectedTime: selectedTime!,
+          firestoreService: _firestoreService,
+        ),
       ),
     );
   }
@@ -353,45 +347,40 @@ class _SearchpageState extends State<Searchpage> {
                             bool isSelected = selectedTherapistIndex == index;
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 8.h),
-                              color:
-                                  isSelected
-                                      ? Colors.orange.withOpacity(0.2)
-                                      : Colors.white,
+                              color: isSelected
+                                  ? Colors.orange.withOpacity(0.2)
+                                  : Colors.white,
                               child: ListTile(
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 35.0,
                                   horizontal: 16.0,
                                 ),
-
                                 trailing: CircleAvatar(
                                   backgroundImage:
                                       filteredTherapists[index]["profileImage"] != null
                                           ? NetworkImage(
-                                            filteredTherapists[index]["profileImage"],
-                                          )
+                                              filteredTherapists[index]["profileImage"],
+                                            )
                                           : AssetImage(
-                                            "path_to_default_image.jpg",
-                                          ) as ImageProvider,
+                                              "path_to_default_image.jpg",
+                                            ) as ImageProvider,
                                 ),
                                 title: Text(
                                   "${filteredTherapists[index]["firstName"] ?? ""} ${filteredTherapists[index]["lastName"] ?? ""}",
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.orange
-                                            : Colors.black,
-                                    fontWeight:
-                                        isSelected
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
+                                    color: isSelected
+                                        ? Colors.orange
+                                        : Colors.black,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
                                     fontSize: 16.sp,
                                   ),
                                   textAlign: TextAlign.right,
                                 ),
                                 subtitle: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment
-                                          .end, // Align subtitle to the right
+                                      CrossAxisAlignment.end,
                                   children: [
                                     Align(
                                       alignment: Alignment.centerRight,
@@ -428,12 +417,10 @@ class _SearchpageState extends State<Searchpage> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
-                                      height: 20,
-                                    ), // Add space between specialty and bio
+                                    SizedBox(height: 20),
                                     Text(
                                       filteredTherapists[index]["bio"] ??
-                                          "empty", // Display the bio
+                                          "empty",
                                       style: TextStyle(
                                         color: const Color.fromARGB(
                                           255,
@@ -443,13 +430,9 @@ class _SearchpageState extends State<Searchpage> {
                                         ),
                                         fontSize: 20.sp,
                                       ),
-                                      textAlign:
-                                          TextAlign
-                                              .right, // Align bio text to the right
+                                      textAlign: TextAlign.right,
                                     ),
-                                    SizedBox(
-                                      height: 12.0,
-                                    ), // Add space between bio and experience
+                                    SizedBox(height: 12.0),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
@@ -457,24 +440,19 @@ class _SearchpageState extends State<Searchpage> {
                                           filteredTherapists[index]["experience"] ??
                                               "Experience Unavailable",
                                           style: TextStyle(
-                                            color:
-                                                isSelected
-                                                    ? Colors.orange
-                                                    : Colors.green,
+                                            color: isSelected
+                                                ? Colors.orange
+                                                : Colors.green,
                                             fontSize: 16.sp,
                                           ),
                                         ),
-                                        SizedBox(
-                                          width: 8.w,
-                                        ), // مسافة بين سنوات الخبرة والتقييم
+                                        SizedBox(width: 8.w),
                                         Icon(
                                           Icons.star,
                                           color: Colors.orange,
                                           size: 20.sp,
                                         ),
-                                        SizedBox(
-                                          width: 4.w,
-                                        ), // مسافة صغيرة بين الأيقونة والنص
+                                        SizedBox(width: 4.w),
                                         Text(
                                           "${filteredTherapists[index]["averageRating"]?.toStringAsFixed(2) ?? "0.00"}",
                                           style: TextStyle(
@@ -489,16 +467,16 @@ class _SearchpageState extends State<Searchpage> {
                                 onTap: () async {
                                   try {
                                     setState(() {
-                                      selectedTherapistIndex = therapists.indexWhere((t) => 
-                                        t["id"] == filteredTherapists[index]["id"]);
+                                      
+                                      selectedTherapistIndex = index;
                                     });
-                                    await _fetchCurrentUserParentId;
+                                    await _fetchCurrentUserParentId();
                                   } catch (e) {
-                                    print("Error fetching children: $e");
+                                    print("Error selecting therapist: $e");
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          "حدث خطأ أثناء جلب الأطفال",
+                                          "حدث خطأ أثناء اختيار المعالج",
                                         ),
                                       ),
                                     );
@@ -509,7 +487,6 @@ class _SearchpageState extends State<Searchpage> {
                           },
                         ),
                       ),
-
                       if (selectedTherapistIndex != -1) ...[
                         SizedBox(height: 20.h),
                         Text(
@@ -527,22 +504,19 @@ class _SearchpageState extends State<Searchpage> {
                               itemBuilder: (context, index) {
                                 bool isSelected = selectedChildIndex == index;
                                 return Card(
-                                  color:
-                                      isSelected
-                                          ? Colors.orange.withOpacity(0.2)
-                                          : Color.fromARGB(255, 250, 165, 95),
+                                  color: isSelected
+                                      ? Colors.orange.withOpacity(0.2)
+                                      : Color.fromARGB(255, 250, 165, 95),
                                   child: ListTile(
                                     title: Text(
                                       "${children[index]["childName"] ?? "No Name"}",
                                       style: TextStyle(
-                                        color:
-                                            isSelected
-                                                ? Colors.orange
-                                                : Colors.white,
-                                        fontWeight:
-                                            isSelected
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
+                                        color: isSelected
+                                            ? Colors.orange
+                                            : Colors.white,
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                         fontSize: 16.sp,
                                       ),
                                     ),
@@ -552,8 +526,8 @@ class _SearchpageState extends State<Searchpage> {
                                       });
                                       WidgetsBinding.instance
                                           .addPostFrameCallback((_) {
-                                            _selectDate(context);
-                                          });
+                                        _selectDate(context);
+                                      });
                                     },
                                   ),
                                 );
