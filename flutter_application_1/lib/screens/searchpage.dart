@@ -144,7 +144,7 @@ class _SearchpageState extends State<Searchpage> {
           content: Container(
             width: double.maxFinite,
             child: TableCalendar(
-              firstDay: DateTime.utc(2010, 10, 16),
+              firstDay: DateTime.now(),
               lastDay: DateTime.utc(2030, 3, 14),
               focusedDay: _focusedDay,
               calendarFormat: _calendarFormat,
@@ -152,11 +152,20 @@ class _SearchpageState extends State<Searchpage> {
                 return isSameDay(_selectedDay, day);
               },
               onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-                Navigator.pop(context, selectedDay);
+                if (!selectedDay.isBefore(DateTime.now().subtract(Duration(days: 1)))) {
+                  setState(() {
+                    _selectedDay = selectedDay;
+                    _focusedDay = focusedDay;
+                  });
+                  Navigator.pop(context, selectedDay);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("لا يمكن اختيار تاريخ منقضي")),
+                  );
+                }
+              },
+              enabledDayPredicate: (day) {
+                return !day.isBefore(DateTime.now().subtract(Duration(days: 1)));
               },
               onFormatChanged: (format) {
                 setState(() {
@@ -177,6 +186,7 @@ class _SearchpageState extends State<Searchpage> {
                 ),
                 weekendTextStyle: TextStyle(color: Colors.red),
                 defaultTextStyle: TextStyle(color: Colors.black),
+                disabledTextStyle: TextStyle(color: Colors.grey),
               ),
               headerStyle: HeaderStyle(
                 formatButtonVisible: false,
@@ -467,7 +477,6 @@ class _SearchpageState extends State<Searchpage> {
                                 onTap: () async {
                                   try {
                                     setState(() {
-                                      
                                       selectedTherapistIndex = index;
                                     });
                                     await _fetchCurrentUserParentId();
