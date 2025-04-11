@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'loginScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore for storing user data
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Psignup extends StatefulWidget {
@@ -14,21 +14,44 @@ class Psignup extends StatefulWidget {
 
 class _PsignupState extends State<Psignup> {
   final _formKey = GlobalKey<FormState>();
-
-  // Controllers for user input fields
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
-  // State to track password visibility
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  /// Function to Register Parents
+  // Track password requirements
+  bool _hasMinLength = false;
+  bool _hasUpperCase = false;
+  bool _hasLowerCase = false;
+  bool _hasNumber = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_checkPasswordRequirements);
+  }
+
+  @override
+  void dispose() {
+    _passwordController.removeListener(_checkPasswordRequirements);
+    super.dispose();
+  }
+
+  void _checkPasswordRequirements() {
+    final password = _passwordController.text;
+    setState(() {
+      _hasMinLength = password.length >= 8;
+      _hasUpperCase = RegExp(r'[A-Z]').hasMatch(password);
+      _hasLowerCase = RegExp(r'[a-z]').hasMatch(password);
+      _hasNumber = RegExp(r'[0-9]').hasMatch(password);
+    });
+  }
+
   Future<void> register() async {
     try {
       final credential = await FirebaseAuth.instance
@@ -37,10 +60,8 @@ class _PsignupState extends State<Psignup> {
             password: _passwordController.text.trim(),
           );
 
-      // Get the user ID (UID)
       String uid = credential.user!.uid;
 
-      // Always store in "parents" collection
       await FirebaseFirestore.instance.collection("parents").doc(uid).set({
         "firstName": _firstNameController.text.trim(),
         "lastName": _lastNameController.text.trim(),
@@ -49,7 +70,6 @@ class _PsignupState extends State<Psignup> {
         "uid": uid,
       });
 
-      // Redirect Parent to LoginScreen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -98,54 +118,54 @@ class _PsignupState extends State<Psignup> {
     }
   }
 
-String? _validatePassword(String? value) {
-  if (value == null || value.isEmpty) {
-    return "هذا الحقل مطلوب";
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (value.length < 8) {
+      return "يجب أن تحتوي كلمة المرور على 8 خانات على الأقل";
+    }
+    if (!RegExp(r'[a-z]').hasMatch(value)) {
+      return "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل";
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+      return "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل";
+    }
+    if (!RegExp(r'[0-9]').hasMatch(value)) {
+      return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
+    }
+    return null;
   }
-  if (value.length < 8) {
-    return "يجب أن تحتوي كلمة المرور على 8 خانات على الأقل";
-  }
-  if (!RegExp(r'[a-z]').hasMatch(value)) {
-    return "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل";
-  }
-  if (!RegExp(r'[A-Z]').hasMatch(value)) {
-    return "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل";
-  }
-  if (!RegExp(r'[0-9]').hasMatch(value)) {
-    return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
-  }
-  return null;
-}
 
-String? _validateConfirmPassword(String? value) {
-  if (value == null || value.isEmpty) {
-    return "هذا الحقل مطلوب";
+  String? _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (value != _passwordController.text) {
+      return "كلمة المرور غير متطابقة";
+    }
+    return null;
   }
-  if (value != _passwordController.text) {
-    return "كلمة المرور غير متطابقة";
-  }
-  return null;
-}
 
-String? _validateEmail(String? value) {
-  if (value == null || value.isEmpty) {
-    return "هذا الحقل مطلوب";
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return "صيغة البريد الإلكتروني غير صحيحة";
+    }
+    return null;
   }
-  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-    return "صيغة البريد الإلكتروني غير صحيحة";
-  }
-  return null;
-}
 
-String? _validatePhone(String? value) {
-  if (value == null || value.isEmpty) {
-    return "هذا الحقل مطلوب";
+  String? _validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return "هذا الحقل مطلوب";
+    }
+    if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+      return "يرجى إدخال رقم جوال صحيح (10 أرقام)";
+    }
+    return null;
   }
-  if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
-    return "يرجى إدخال رقم جوال صحيح (10 أرقام)";
-  }
-  return null;
-}
 
   @override
   Widget build(BuildContext context) {
@@ -155,8 +175,8 @@ String? _validatePhone(String? value) {
           child: Container(
             width: double.infinity,
             decoration: const BoxDecoration(
-              borderRadius:  BorderRadius.only(),
-              gradient:  LinearGradient(
+              borderRadius: BorderRadius.only(),
+              gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 colors: [
                   Color.fromARGB(255, 219, 101, 37),
@@ -186,7 +206,6 @@ String? _validatePhone(String? value) {
                           textAlign: TextAlign.right,
                         ),
                       ),
-                      // SizedBox(height: 10.h),
                     ],
                   ),
                 ),
@@ -231,6 +250,7 @@ String? _validatePhone(String? value) {
                               });
                             },
                             onChanged: (value) {
+                              _checkPasswordRequirements();
                               if (_confirmPasswordController.text.isNotEmpty) {
                                 setState(() {});
                               }
@@ -240,6 +260,19 @@ String? _validatePhone(String? value) {
                                 : Icons.visibility_off,
                             validator: _validatePassword,
                           ),
+                          // Password requirements checklist
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                _buildRequirementRow(" 8 أحرف على الأقل", _hasMinLength),
+                                _buildRequirementRow("حرف كبير واحد على الأقل", _hasUpperCase),
+                                _buildRequirementRow("حرف صغير واحد على الأقل", _hasLowerCase),
+                                _buildRequirementRow("رقم واحد على الأقل", _hasNumber),
+                              ],
+                            ),
+                          ),
                           SizedBox(height: 20.h),
                           _buildPasswordField(
                             "إعادة كتابة كلمة المرور",
@@ -247,8 +280,7 @@ String? _validatePhone(String? value) {
                             obscureText: !_isConfirmPasswordVisible,
                             onPressed: () {
                               setState(() {
-                                _isConfirmPasswordVisible =
-                                    !_isConfirmPasswordVisible;
+                                _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                               });
                             },
                             onChanged: (value) {
@@ -334,7 +366,30 @@ String? _validatePhone(String? value) {
     );
   }
 
-  /// Reusable Input Field
+  Widget _buildRequirementRow(String text, bool isMet) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: isMet ? Colors.green : Colors.grey,
+            ),
+          ),
+          SizedBox(width: 5.w),
+          Icon(
+            isMet ? Icons.check_circle : Icons.circle,
+            size: 14.sp,
+            color: isMet ? Colors.green : Colors.grey,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInputField(
     String label, {
     bool obscureText = false,
@@ -384,7 +439,6 @@ String? _validatePhone(String? value) {
     );
   }
 
-  /// Reusable Phone Field
   Widget _buildPhoneField(
     String label, {
     TextEditingController? controller,
@@ -417,7 +471,6 @@ String? _validatePhone(String? value) {
                 horizontal: 20.w,
                 vertical: 15.h,
               ),
-              
             ),
             validator: _validatePhone,
           ),
@@ -426,7 +479,6 @@ String? _validatePhone(String? value) {
     );
   }
 
-  /// Reusable Password Field with Visibility Icon
   Widget _buildPasswordField(
     String label, {
     required TextEditingController controller,
