@@ -11,7 +11,8 @@ import 'package:flutter_application_1/screens/EditChild.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UserPage extends StatefulWidget {
-  const UserPage({super.key});
+  final String pataintId;
+  const UserPage({super.key, required this.pataintId});
 
   @override
   State<UserPage> createState() => _UserPageState();
@@ -28,7 +29,9 @@ class _UserPageState extends State<UserPage> {
       case 0:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => UserPage()),
+          MaterialPageRoute(builder: (context) => UserPage(
+                       pataintId: widget.pataintId,
+          )),
         );
         break;
       case 1:
@@ -40,7 +43,10 @@ class _UserPageState extends State<UserPage> {
       case 2:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Appointmentpage()),
+          MaterialPageRoute(builder: (context) => Appointmentpage(
+                           pataintId: widget.pataintId,
+                           therapistId: "",
+          )),
         );
         break;
       case 3:

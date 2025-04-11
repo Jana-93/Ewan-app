@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UpcomingAppointments extends StatefulWidget {
-  const UpcomingAppointments({super.key});
+  final String therapistId;
+  const UpcomingAppointments({super.key, required this.therapistId});
 
   @override
   State<UpcomingAppointments> createState() => _UpcomingAppointmentsState();
@@ -13,15 +14,16 @@ class UpcomingAppointments extends StatefulWidget {
 class _UpcomingAppointmentsState extends State<UpcomingAppointments> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Function to fetch upcoming appointments
   Stream<List<Map<String, dynamic>>> getUpcomingAppointments() {
-    return _firestore
-        .collection('appointments')
-        .where('status', isEqualTo: 'upcoming') // Only upcoming appointments
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
-  }
-
+  return _firestore
+      .collection('appointments')
+      .where('status', isEqualTo: 'upcoming')
+      .where('therapistUid', isEqualTo: widget.therapistId) // Add this filter
+      .snapshots()
+      .map((snapshot) => snapshot.docs
+          .map((doc) => doc.data())
+          .toList());
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -255,13 +257,4 @@ class ScheduleCard extends StatelessWidget {
       ),
     );
   }
-}
-
-void main() {
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: UpcomingAppointments(),
-    ),
-  );
 }

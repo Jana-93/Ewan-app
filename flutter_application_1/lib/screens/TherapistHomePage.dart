@@ -11,6 +11,9 @@ import 'package:flutter_application_1/screens/user_info_page_t.dart';
 import 'package:animate_do/animate_do.dart';
 
 class TherapistHomePage extends StatefulWidget {
+  TherapistHomePage({Key? key, required this.therapistId, required this.patientId}) : super(key: key);
+  final String therapistId;
+  final String patientId ;
   @override
   _TherapistHomePageState createState() => _TherapistHomePageState();
 }
@@ -28,19 +31,28 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
       case 0:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => TherapistProfilePage()),
+          MaterialPageRoute(builder: (context) => TherapistProfilePage(
+            therapistId: widget.therapistId,
+                       pataintId: widget.patientId,
+          )),
         );
         break;
       case 1:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Tappointment()),
+          MaterialPageRoute(builder: (context) => Tappointment(
+             therapistId: widget.therapistId,
+             pataintId: widget.patientId,
+          )),
         );
         break;
       case 2:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => TherapistHomePage()),
+          MaterialPageRoute(builder: (context) => TherapistHomePage(
+            therapistId: widget.therapistId,
+            patientId: widget.patientId,
+          )),
         );
         break;
     }
@@ -127,11 +139,10 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                               ),
                               CircleAvatar(
                                 radius: 35.r,
-                                backgroundImage:
-                                    profileImageUrl.isNotEmpty
-                                        ? NetworkImage(profileImageUrl)
-                                        : AssetImage('assets/images/doctor.jpg')
-                                            as ImageProvider,
+                                backgroundImage: profileImageUrl.isNotEmpty
+                                    ? NetworkImage(profileImageUrl)
+                                    : AssetImage('assets/images/doctor.jpg')
+                                        as ImageProvider,
                               ),
                             ],
                           ),
@@ -259,7 +270,9 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => UpcomingAppointments(),
+                            builder: (context) => UpcomingAppointments(
+                              therapistId: widget.therapistId,
+                            ),
                           ),
                         );
                         break;
@@ -267,8 +280,11 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => FeedbackScreen(isDoctor: true),
+                            builder: (context) =>
+                                FeedbackScreen(
+                                  pataintId: "",
+                                  therapistId: widget.therapistId,
+                                  isDoctor: true),
                           ),
                         );
                         break;
@@ -370,8 +386,10 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
   }
 }
 
-void main() {
-  runApp(
-    MaterialApp(debugShowCheckedModeBanner: false, home: TherapistHomePage()),
-  );
-}
+// void main() {
+//   runApp(
+//     MaterialApp(debugShowCheckedModeBanner: false, home: TherapistHomePage(
+//       therapistId: therapistId,
+//     )),
+//   );
+// }

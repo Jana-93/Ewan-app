@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'HomePage.dart'; // Parent Home Screen
 import 'loginScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore for storing user data
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Psignup extends StatefulWidget {
-  Psignup({super.key});
+  const Psignup({super.key});
 
   @override
   _PsignupState createState() => _PsignupState();
@@ -155,9 +154,9 @@ String? _validatePhone(String? value) {
         body: SingleChildScrollView(
           child: Container(
             width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(),
-              gradient: const LinearGradient(
+            decoration: const BoxDecoration(
+              borderRadius:  BorderRadius.only(),
+              gradient:  LinearGradient(
                 begin: Alignment.topLeft,
                 colors: [
                   Color.fromARGB(255, 219, 101, 37),

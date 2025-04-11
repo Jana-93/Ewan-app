@@ -54,7 +54,9 @@ class _HomepageState extends State<Homepage> {
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => UserPage()),
+          MaterialPageRoute(builder: (context) => UserPage(
+            pataintId: FirebaseAuth.instance.currentUser!.uid,
+          )),
         );
         break;
       case 1:
@@ -66,7 +68,10 @@ class _HomepageState extends State<Homepage> {
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Appointmentpage()),
+          MaterialPageRoute(builder: (context) => Appointmentpage(
+            pataintId: FirebaseAuth.instance.currentUser!.uid,
+            therapistId: "",
+          )),
         );
         break;
       case 3:
@@ -204,7 +209,10 @@ class _HomepageState extends State<Homepage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => FeedbackScreen(isDoctor: false),
+                builder: (context) => FeedbackScreen(
+                  pataintId: FirebaseAuth.instance.currentUser!.uid,
+                    therapistId: "" ,
+                  isDoctor: false),
               ),
             );
           },

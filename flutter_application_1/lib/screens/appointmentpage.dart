@@ -9,7 +9,9 @@ import 'package:intl/intl.dart'; // Import the intl package for date formatting
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Appointmentpage extends StatefulWidget {
-  const Appointmentpage({super.key});
+  final String therapistId;
+  final String pataintId;
+  const Appointmentpage({super.key, required this.therapistId, required this.pataintId});
 
   @override
   State<Appointmentpage> createState() => _AppointmentpageState();
@@ -28,7 +30,9 @@ class _AppointmentpageState extends State<Appointmentpage> {
       case 0:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => UserPage()),
+          MaterialPageRoute(builder: (context) => UserPage(
+            pataintId: "",
+          )),
         );
         break;
       case 1:
@@ -40,7 +44,10 @@ class _AppointmentpageState extends State<Appointmentpage> {
       case 2:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Appointmentpage()),
+          MaterialPageRoute(builder: (context) => Appointmentpage(
+            therapistId: widget.therapistId,
+            pataintId: widget.pataintId,
+          )),
         );
         break;
       case 3:
@@ -153,6 +160,7 @@ class _AppointmentpageState extends State<Appointmentpage> {
                                             index ==
                                             upcomingSchedules.length - 1;
                                         return AppointmentCard(
+                                          pataintId: widget.pataintId,
                                           key: ValueKey(
                                             schedule['date'],
                                           ), // Ensure unique key
@@ -263,11 +271,12 @@ class _AppointmentpageState extends State<Appointmentpage> {
 class AppointmentCard extends StatefulWidget {
   final Map<String, dynamic> schedule;
   final bool isLastElement;
+  final String pataintId;
 
   const AppointmentCard({
     Key? key,
     required this.schedule,
-    required this.isLastElement,
+    required this.isLastElement, required this.pataintId,
   }) : super(key: key);
 
   @override
@@ -407,6 +416,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                             MaterialPageRoute(
                               builder: (context) => VideoCallScreen(
                                 user: 'patient',
+                                pataintId: widget.pataintId,
                                 therapistUid: widget.schedule['therapistUid'],
                                 uid: '', // تمرير therapistUid هنا
                               ),

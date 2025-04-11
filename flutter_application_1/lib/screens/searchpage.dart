@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_application_1/screens/ConfirmationPage.dart';
@@ -52,8 +55,8 @@ class _SearchpageState extends State<Searchpage> {
       });
     } catch (e) {
       print("Error fetching therapists: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("حدث خطأ أثناء جلب المعالجين")));
     }
   }
 
@@ -93,7 +96,9 @@ class _SearchpageState extends State<Searchpage> {
       case 0:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => UserPage()),
+          MaterialPageRoute(builder: (context) => UserPage(
+            pataintId: "",
+          )),
         );
         break;
       case 1:
@@ -105,7 +110,10 @@ class _SearchpageState extends State<Searchpage> {
       case 2:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Appointmentpage()),
+          MaterialPageRoute(builder: (context) => Appointmentpage(
+            therapistId: "",
+            pataintId: FirebaseAuth.instance.currentUser!.uid,  
+          )),
         );
         break;
       case 3:
@@ -124,12 +132,14 @@ class _SearchpageState extends State<Searchpage> {
         filteredTherapists = therapists;
       } else {
         filteredTherapists = therapists.where((therapist) {
-          final name = '${therapist["firstName"] ?? ""} ${therapist["lastName"] ?? ""}'.toLowerCase();
+          final name =
+              '${therapist["firstName"] ?? ""} ${therapist["lastName"] ?? ""}'
+                  .toLowerCase();
           final specialty = therapist["specialty"]?.toLowerCase() ?? "";
           final bio = therapist["bio"]?.toLowerCase() ?? "";
-          return name.contains(query.toLowerCase()) || 
-                 specialty.contains(query.toLowerCase()) ||
-                 bio.contains(query.toLowerCase());
+          return name.contains(query.toLowerCase()) ||
+              specialty.contains(query.toLowerCase()) ||
+              bio.contains(query.toLowerCase());
         }).toList();
       }
     });
@@ -151,8 +161,9 @@ class _SearchpageState extends State<Searchpage> {
               selectedDayPredicate: (day) {
                 return isSameDay(_selectedDay, day);
               },
-              onDaySelected: (selectedDay, focusedDay) {
-                if (!selectedDay.isBefore(DateTime.now().subtract(Duration(days: 1)))) {
+              onDaySelected: (selectedDay, focusedDay) async {
+                if (!selectedDay
+                    .isBefore(DateTime.now().subtract(Duration(days: 1)))) {
                   setState(() {
                     _selectedDay = selectedDay;
                     _focusedDay = focusedDay;
@@ -165,7 +176,8 @@ class _SearchpageState extends State<Searchpage> {
                 }
               },
               enabledDayPredicate: (day) {
-                return !day.isBefore(DateTime.now().subtract(Duration(days: 1)));
+                return !day
+                    .isBefore(DateTime.now().subtract(Duration(days: 1)));
               },
               onFormatChanged: (format) {
                 setState(() {
@@ -175,7 +187,7 @@ class _SearchpageState extends State<Searchpage> {
               onPageChanged: (focusedDay) {
                 _focusedDay = focusedDay;
               },
-              calendarStyle: CalendarStyle(
+              calendarStyle: const CalendarStyle(
                 todayDecoration: BoxDecoration(
                   color: Colors.orange,
                   shape: BoxShape.circle,
@@ -195,11 +207,11 @@ class _SearchpageState extends State<Searchpage> {
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                 ),
-                leftChevronIcon: Icon(
+                leftChevronIcon: const Icon(
                   Icons.chevron_left,
                   color: Colors.deepOrange,
                 ),
-                rightChevronIcon: Icon(
+                rightChevronIcon: const Icon(
                   Icons.chevron_right,
                   color: Colors.deepOrange,
                 ),
@@ -218,17 +230,89 @@ class _SearchpageState extends State<Searchpage> {
     }
   }
 
+  Future<bool> _addAppointment(BuildContext context) async {
+    bool checked = false;
+
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    String therapistUid =
+        therapists[selectedTherapistIndex]["uid"] ?? "unknown";
+    String therapistName =
+        "${therapists[selectedTherapistIndex]["firstName"] ?? ""} ${therapists[selectedTherapistIndex]["lastName"] ?? ""}";
+    String childName =
+        "${children[selectedChildIndex]["childName"] ?? "No Name"}";
+
+    // Format the date consistently
+    String formattedDate =
+        "${_selectedDay!.year.toString().padLeft(2, '0')}-${_selectedDay!.month.toString().padLeft(2, '0')}-${_selectedDay!.day.toString().padLeft(2, '0')}";
+
+    try {
+      // First check for existing appointments
+      QuerySnapshot existingAppointments = await FirebaseFirestore.instance
+          .collection('appointments')
+          .where('therapistUid', isEqualTo: therapistUid)
+          .where('date', isEqualTo: formattedDate)
+          .where('time', isEqualTo: selectedTime)
+          .get();
+        // log(existingAppointments.docs.first.data().toString());
+      if (existingAppointments.docs.isNotEmpty) {
+        checked = true;
+        // Appointment already exists
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text("هذا الموعد محجوز مسبقاً، الرجاء اختيار وقت آخر")),
+        );
+        return checked;
+      }
+
+      // If no existing appointment, proceed with booking
+      final appointmentData = {
+        "userId": uid,
+        "therapistUid": therapistUid,
+        "therapistName": therapistName,
+        "childName": childName,
+        "date": formattedDate,
+        "time": selectedTime,
+        "price": therapists[selectedTherapistIndex]["price"] ?? "0",
+        "status": "upcoming",
+      };
+
+      await _firestoreService.addAppointment(appointmentData);
+      print("Appointment added successfully");
+
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => Homepage()),
+      // );
+    } catch (e) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text("حدث خطأ أثناء حجز الموعد: ${e.toString()}")),
+      // );
+    }
+
+    //  ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text("تم حجز الموعد بنجاح!")),
+    //   );
+  return checked;
+  }
+
   Future<void> _selectTime(BuildContext context) async {
+      
     final String? selected = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TimeSelectionPage()),
+      MaterialPageRoute(builder: (context) => TimeSelectionPage(
+      )),
     );
 
+    
     if (selected != null) {
       setState(() {
         selectedTime = selected;
       });
-
+      
+      bool condition = await _addAppointment(context);
+     if(condition){
+       return;
+     }
       await _launchPaymentUrl();
     }
   }
@@ -239,7 +323,7 @@ class _SearchpageState extends State<Searchpage> {
     try {
       await FlutterWebBrowser.openWebPage(
         url: url,
-        customTabsOptions: CustomTabsOptions(
+        customTabsOptions: const CustomTabsOptions(
           colorScheme: CustomTabsColorScheme.dark,
           toolbarColor: Colors.deepOrange,
           secondaryToolbarColor: Colors.black,
@@ -366,14 +450,16 @@ class _SearchpageState extends State<Searchpage> {
                                   horizontal: 16.0,
                                 ),
                                 trailing: CircleAvatar(
-                                  backgroundImage:
-                                      filteredTherapists[index]["profileImage"] != null
-                                          ? NetworkImage(
-                                              filteredTherapists[index]["profileImage"],
-                                            )
-                                          : AssetImage(
-                                              "path_to_default_image.jpg",
-                                            ) as ImageProvider,
+                                  backgroundImage: filteredTherapists[index]
+                                              ["profileImage"] !=
+                                          null
+                                      ? NetworkImage(
+                                          filteredTherapists[index]
+                                              ["profileImage"],
+                                        )
+                                      : AssetImage(
+                                          "path_to_default_image.jpg",
+                                        ) as ImageProvider,
                                 ),
                                 title: Text(
                                   "${filteredTherapists[index]["firstName"] ?? ""} ${filteredTherapists[index]["lastName"] ?? ""}",
@@ -389,8 +475,7 @@ class _SearchpageState extends State<Searchpage> {
                                   textAlign: TextAlign.right,
                                 ),
                                 subtitle: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Align(
                                       alignment: Alignment.centerRight,
@@ -415,7 +500,8 @@ class _SearchpageState extends State<Searchpage> {
                                             ),
                                           ),
                                           child: Text(
-                                            filteredTherapists[index]["specialty"] ??
+                                            filteredTherapists[index]
+                                                    ["specialty"] ??
                                                 "لا يوجد تخصص",
                                             style: const TextStyle(
                                               color: Colors.white,
@@ -447,7 +533,8 @@ class _SearchpageState extends State<Searchpage> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         Text(
-                                          filteredTherapists[index]["experience"] ??
+                                          filteredTherapists[index]
+                                                  ["experience"] ??
                                               "Experience Unavailable",
                                           style: TextStyle(
                                             color: isSelected
@@ -648,6 +735,9 @@ class _SearchpageState extends State<Searchpage> {
 }
 
 class TimeSelectionPage extends StatelessWidget {
+  
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -657,6 +747,9 @@ class TimeSelectionPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
+      //       if (checkTime) {
+      //   return;
+      // }
             Navigator.pop(context);
           },
         ),

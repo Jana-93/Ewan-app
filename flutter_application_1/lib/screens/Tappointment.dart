@@ -11,7 +11,9 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Tappointment extends StatefulWidget {
-  const Tappointment({Key? key}) : super(key: key);
+  final String pataintId;
+  final String therapistId;
+  const Tappointment({Key? key, required this.therapistId, required this.pataintId}) : super(key: key);
 
   @override
   State<Tappointment> createState() => _TappointmentState();
@@ -29,19 +31,28 @@ class _TappointmentState extends State<Tappointment> {
       case 0:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => TherapistProfilePage()),
+          MaterialPageRoute(builder: (context) => TherapistProfilePage(
+             therapistId: widget.therapistId,
+                        pataintId: widget.pataintId,
+          )),
         );
         break;
       case 1:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Tappointment()),
+          MaterialPageRoute(builder: (context) => Tappointment(
+            pataintId: widget.pataintId,
+             therapistId: widget.therapistId,
+          )),
         );
         break;
       case 2:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => TherapistHomePage()),
+          MaterialPageRoute(builder: (context) => TherapistHomePage(
+            therapistId: widget.therapistId,
+             patientId: widget.pataintId,
+          )),
         );
         break;
     }
@@ -300,6 +311,7 @@ class _TappointmentState extends State<Tappointment> {
                                                                     (
                                                                       context,
                                                                     ) => VideoCallScreen(
+                                                                      pataintId: appointment['userId'],
                                                                       user:
                                                                           'doctor',
                                                                       therapistUid:

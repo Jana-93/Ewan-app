@@ -131,7 +131,9 @@ class _EditChildState extends State<EditChild> {
 
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => UserPage()),
+            MaterialPageRoute(builder: (context) => UserPage(
+              pataintId: "",
+            )),
           );
         }
       }
@@ -267,7 +269,9 @@ class _EditChildState extends State<EditChild> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => UserPage()),
+                  MaterialPageRoute(builder: (context) => UserPage(
+                    pataintId: "",
+                  )),
                 );
               },
             ),

@@ -8,6 +8,9 @@ import 'package:flutter_application_1/screens/loginScreen.dart';
 import 'package:flutter_application_1/screens/Tappointment.dart';
 
 class TherapistProfilePage extends StatefulWidget {
+  final String therapistId;
+  final String pataintId;
+  const TherapistProfilePage({required this.therapistId, required this.pataintId});
   @override
   _TherapistProfilePageState createState() => _TherapistProfilePageState();
 }
@@ -24,19 +27,28 @@ class _TherapistProfilePageState extends State<TherapistProfilePage> {
       case 0:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => TherapistProfilePage()),
+          MaterialPageRoute(builder: (context) => TherapistProfilePage(
+            therapistId: widget.therapistId,
+            pataintId: widget.pataintId,
+          )),
         );
         break;
       case 1:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Tappointment()),
+          MaterialPageRoute(builder: (context) => Tappointment(
+            pataintId: widget.pataintId,
+             therapistId: widget.therapistId,
+          )),
         );
         break;
       case 2:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => TherapistHomePage()),
+          MaterialPageRoute(builder: (context) => TherapistHomePage(
+            patientId: widget.pataintId,
+            therapistId: widget.therapistId,
+          )),
         );
         break;
     }

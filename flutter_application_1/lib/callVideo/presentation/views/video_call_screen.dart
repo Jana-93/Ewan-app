@@ -11,8 +11,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class VideoCallScreen extends StatefulWidget {
   final String user;
+  final String pataintId;
   final String therapistUid;
-  const VideoCallScreen({super.key, required this.user,required this.therapistUid, required String uid});
+  const VideoCallScreen({super.key, required this.user,required this.therapistUid, required String uid, required this.pataintId});
 
   @override
   State<VideoCallScreen> createState() => _VideoCallScreenState();
@@ -254,7 +255,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       onPressed: () {
                         _endCall();
                         if (widget.user == 'doctor') {
-                          _navigateToFeedbackScreen();
+                          _navigateToFeedbackScreen(
+                            widget.therapistUid,
+                            widget.pataintId,
+                          );
                         } else {
                           Navigator.of(context).pop();
                         }
@@ -283,10 +287,16 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   //feedback nav
-  void _navigateToFeedbackScreen() {
+  void _navigateToFeedbackScreen(
+    String therapistUid,
+    String pataintId,
+  ) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FeedbackScreen(isDoctor: true)),
+      MaterialPageRoute(builder: (context) => FeedbackScreen(
+        therapistId: therapistUid,
+        pataintId: pataintId,
+        isDoctor: true)),
     );
   }
 

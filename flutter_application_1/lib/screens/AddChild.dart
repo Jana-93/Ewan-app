@@ -83,7 +83,9 @@ class _AddChildState extends State<AddChild> {
       // Navigate to UserPage
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => UserPage()),
+        MaterialPageRoute(builder: (context) => UserPage(
+          pataintId: "",
+        )),
       );
     } catch (e) {
       print("Error: $e");
@@ -241,7 +243,9 @@ class _AddChildState extends State<AddChild> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => UserPage()),
+                  MaterialPageRoute(builder: (context) => UserPage(
+                    pataintId: '',
+                  )),
                 );
               },
             ),

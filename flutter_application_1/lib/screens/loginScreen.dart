@@ -83,7 +83,10 @@ class _LoginScreenState extends State<LoginScreen> {
         // Navigate to the therapist home page
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => TherapistHomePage()),
+          MaterialPageRoute(builder: (context) => TherapistHomePage(
+            patientId: uid,
+             therapistId:uid,
+          )),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -103,7 +106,10 @@ class _LoginScreenState extends State<LoginScreen> {
         // Navigate to the parent home page
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Homepage()),
+          MaterialPageRoute(builder: (context) => Homepage(
+
+            
+          )),
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
