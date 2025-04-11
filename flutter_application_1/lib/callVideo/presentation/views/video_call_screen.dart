@@ -181,21 +181,22 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     _updateCameraState(_isCameraOn);
   }
 
-  void _endCall() {
-    if (widget.user == "patient") {
-      setState(() {
-        _isOutroVideoPlaying = true;
-        _outroVideoController!.play();
-      });
+void _endCall() {
+  if (widget.user == "patient") {
+    setState(() {
+      _isOutroVideoPlaying = true;
+      _outroVideoController!.play();
+    });
 
-      _outroVideoController!.addListener(() {
-        if (!_outroVideoController!.value.isPlaying &&
-            _outroVideoController!.value.position >=
-                _outroVideoController!.value.duration) {
-          _outroVideoController!.dispose();
-          Navigator.pop(context);
-        }
-      });
+    _outroVideoController!.addListener(() {
+      if (!_outroVideoController!.value.isPlaying &&
+          _outroVideoController!.value.position >=
+              _outroVideoController!.value.duration) {
+            //  _outroVideoController!.dispose();
+        
+        _navigateToChildFeedbackScreen(widget.therapistUid);
+      }
+    });
     } else {
       Navigator.pop(context);
     }
