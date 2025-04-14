@@ -129,7 +129,7 @@ class _TherapistHomePageState extends State<TherapistHomePage> {
                                     ),
                                   ),
                                   Text(
-                                    "د. $firstName $lastName",
+                                    "   $firstName $lastName",
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 20.sp,
