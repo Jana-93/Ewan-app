@@ -6,7 +6,9 @@ import 'package:flutter_application_1/screens/HomePage.dart';
 import 'package:flutter_application_1/screens/T_signup.dart';
 import 'package:flutter_application_1/screens/TherapistHomePage.dart';
 import 'package:flutter_application_1/screens/psignup.dart';
+import 'package:flutter_application_1/utils/validators.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -20,14 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegex.hasMatch(email);
-  }
- bool isValidPassword(String password) {
-    final passwordRegex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$');
-    return passwordRegex.hasMatch(password);
-}
+
 
 
   Future<void> login() async {
